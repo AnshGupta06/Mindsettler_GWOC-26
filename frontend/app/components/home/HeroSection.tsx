@@ -1,31 +1,54 @@
 "use client";
 
-import { motion } from "framer-motion";
+import Reveal from "../common/Reveal";
 
 export default function HeroSection() {
+  const ModelViewer: any = "model-viewer";
+
   return (
     <section className="min-h-screen flex items-center px-24">
       <div className="grid grid-cols-2 gap-16 w-full">
+        
         {/* Text Area */}
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-        >
-          <div className="h-6 w-32 bg-[#Dd1764]/20 rounded mb-6" />
-          <div className="h-16 w-full bg-[#3F2965]/20 rounded mb-4" />
-          <div className="h-10 w-3/4 bg-[#3F2965]/10 rounded" />
-        </motion.div>
+        <Reveal>
+          <div>
+            <div className="h-6 w-32 bg-[#Dd1764]/20 rounded mb-6" />
+            <div className="h-16 w-full bg-[#3F2965]/20 rounded mb-4" />
+            <div className="h-10 w-3/4 bg-[#3F2965]/10 rounded" />
+          </div>
+        </Reveal>
 
-        {/* GLB Placeholder */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.96 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1, ease: "easeOut" }}
-          className="flex items-center justify-center"
-        >
-          <div className="w-[420px] h-[420px] rounded-full bg-[#3F2965]/10" />
-        </motion.div>
+        {/* GLB */}
+        <Reveal delay={0.15}>
+          <div className="flex items-center justify-center">
+            <ModelViewer
+  src="/assets/heart+with+brain+3d+model.glb"
+  alt="MindSettler 3D model"
+
+  /* VISIBILITY */
+  style={{
+    width: "420px",
+    height: "420px",
+  }}
+
+  /* CAMERA */
+  camera-orbit="90deg 75deg 2.5m"
+  field-of-view="30deg"
+  exposure="1"
+
+  /* INTERACTION */
+  camera-controls
+  disable-zoom
+  interaction-prompt="none"
+
+  /* MOTION */
+  auto-rotate
+  auto-rotate-delay="0"
+  rotation-per-second="10deg"
+/>
+          </div>
+        </Reveal>
+
       </div>
     </section>
   );
