@@ -1,5 +1,11 @@
-import HomePage from "./components/home/HomePage";
+import OpeningCurtain from "./components/home/OpeningCurtain";
+import HeroSection from "./components/home/HeroSection";
 
-export default function Home() {
-  return <HomePage />;
+export default function HomePage() {
+  return (
+    <>
+      <OpeningCurtain />
+      <HeroSection />
+    </>
+  );
 }
