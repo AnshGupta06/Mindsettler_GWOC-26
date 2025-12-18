@@ -6,7 +6,7 @@ export default function HeroSection() {
   const ModelViewer: any = "model-viewer";
 
   return (
-    <section className="min-h-screen flex items-center px-24 bg-[#faf7fb]">
+    <section className="min-h-screen flex items-center px-24">
       <div className="grid grid-cols-2 gap-20 w-full items-center">
 
         {/* TEXT AREA */}
@@ -59,7 +59,7 @@ export default function HeroSection() {
         w-[520px]
         h-[520px]
         rounded-[40px]
-        bg-[#3F2965]/5
+        bg-[#3F2965]/10
         blur-[0.5px]
       "
     />
@@ -71,7 +71,7 @@ export default function HeroSection() {
         w-[420px]
         h-[420px]
         rounded-full
-        bg-[#Dd1764]/10
+        bg-[#Dd1764]/2
         blur-[80px]
       "
     />

@@ -6,8 +6,8 @@ import SectionHeading from "../common/HeadingSection";
 
 export default function PersonalPathSection() {
   return (
-    <section className="py-32 px-24 bg-[#faf7fb]">
-      <div className="grid grid-cols-2 gap-20 items-center max-w-6xl mx-auto">
+    <section className="py-32 px-24 bg-gradient-to-b from-[#f3ecff] via-[#ffeaf5] to-[#f7f0ff]">
+      <div className="grid grid-cols-2 gap-20 items-center max-w-6xl mx-auto rounded-3xl border border-white/70 bg-white/80 backdrop-blur-sm p-12 shadow-[0_18px_45px_rgba(63,41,101,0.04)]">
 
         {/* TEXT */}
         <Reveal>

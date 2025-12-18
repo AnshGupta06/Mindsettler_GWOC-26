@@ -12,7 +12,7 @@ import FAQSection from "./components/home/FAQSection";
 
 export default function HomePage() {
   return (
-    <>
+    <main className="min-h-screen bg-gradient-to-b from-[#f3ecff] via-[#ffeaf5] to-[#f7f0ff]">
       <OpeningCurtain />
       <HeroSection />
       <AboutPreview />
@@ -22,6 +22,6 @@ export default function HomePage() {
       <WorkplaceWellnessSection />
       <FAQSection />
       <Footer />
-    </>
+    </main>
   );
 }

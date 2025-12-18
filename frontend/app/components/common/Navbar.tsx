@@ -4,14 +4,20 @@ import Link from "next/link";
 
 export default function Navbar() {
   return (
-    <header className="w-full px-24 py-6 bg-[#faf7fb]">
-      <nav className="flex items-center justify-between max-w-7xl mx-auto">
+    <header
+      className="w-full px-24 py-5 bg-gradient-to-b from-[#f0e7ff] via-[#ffe3f1] to-[#f5ecff] border-b border-[#3F2965]/10"
+    >
+      <nav
+        className="flex items-center justify-between max-w-7xl mx-auto rounded-2xl border border-white/70 bg-white/80 backdrop-blur-md px-8 py-3 shadow-[0_18px_45px_rgba(63,41,101,0.06)]"
+      >
 
         {/* LOGO */}
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-[#3F2965]/10 flex items-center justify-center">
             {/* Logo Placeholder */}
-            <span className="text-[#3F2965] font-semibold">MS</span>
+            <span className="text-[#3F2965] font-semibold">
+              MS
+            </span>
           </div>
           <span className="text-xl font-semibold text-[#3F2965]">
             MindSettler
@@ -30,15 +36,7 @@ export default function Navbar() {
         {/* CTA */}
         <Link
           href="/book"
-          className="
-            px-6 py-2.5
-            rounded-lg
-            bg-[#dd1764]
-            text-white
-            font-medium
-            hover:bg-[#c8155c]
-            transition
-          "
+          className="px-6 py-2.5 rounded-lg bg-[#dd1764] text-white font-medium shadow-sm hover:bg-[white] hover:text-[#3f2965] hover:shadow-md transition"
         >
           Book Session
         </Link>

@@ -11,8 +11,9 @@ import {
 
 export default function AboutSection() {
   return (
-    <section className="py-32 px-24 bg-white">
-      <div className="max-w-6xl mx-auto">
+    <section className="py-32 px-24 bg-gradient-to-b from-[#f3ecff] via-[#ffeaf5] to-[#f7f0ff]">
+      <Reveal>
+        <div className="max-w-6xl mx-auto rounded-3xl border border-[#3F2965]/8 bg-white/85 backdrop-blur-sm p-12 shadow-[0_22px_55px_rgba(63,41,101,0.12)]">
 
         {/* Heading */}
         <SectionHeading
@@ -42,16 +43,14 @@ export default function AboutSection() {
           </div>
 
           {/* RIGHT: HIGHLIGHTS */}
-          <div className="bg-[#faf7fb] rounded-2xl p-10 space-y-6">
+          <Reveal delay={0.05}>
+            <div className="bg-[#faf7fb] rounded-2xl p-10 space-y-6 border border-[#3F2965]/10 shadow-[0_18px_45px_rgba(63,41,101,0.10)]">
 
-            <Reveal>
               <Feature
                 icon={<Brain size={22} />}
                 title="Recognize emotional patterns"
                 description="Develop awareness of recurring thoughts, emotions, and behaviors."
               />
-            </Reveal>
-
             <Reveal delay={0.05}>
               <Feature
                 icon={<Puzzle size={22} />}
@@ -75,10 +74,11 @@ export default function AboutSection() {
                 description="All sessions are conducted ethically in a non-judgmental space."
               />
             </Reveal>
-
           </div>
+          </Reveal>
         </div>
-      </div>
+        </div>
+      </Reveal>
     </section>
   );
 }

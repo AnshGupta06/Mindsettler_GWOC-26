@@ -6,8 +6,8 @@ import SectionHeading from "../common/HeadingSection";
 
 export default function WorkplaceWellnessSection() {
   return (
-    <section className="py-32 px-24 bg-[#ffffff]">
-      <div className="max-w-3xl mx-auto text-center">
+    <section className="py-32 px-24 bg-gradient-to-b from-[#f3ecff] via-[#ffeaf5] to-[#f7f0ff]">
+      <div className="max-w-3xl mx-auto text-center rounded-3xl border border-white/70 bg-white/80 backdrop-blur-sm p-12 shadow-[0_18px_45px_rgba(63,41,101,0.04)]">
 
         <Reveal>
           <div className="flex justify-center mb-6 text-[#3F2965]">
