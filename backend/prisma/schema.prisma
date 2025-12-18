@@ -6,7 +6,47 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  REJECTED
+}
+
+enum SessionMode {
+  ONLINE
+  OFFLINE
+}
+
 model User {
-  id    Int    @id @default(autoincrement())
-  email String @unique
+  id        String    @id @default(uuid())
+  name      String
+  email     String    @unique
+  phone     String?
+  bookings  Booking[]
+  createdAt DateTime  @default(now())
+}
+
+model SessionSlot {
+  id        String    @id @default(uuid())
+  date      DateTime
+  startTime DateTime
+  endTime   DateTime
+  mode      SessionMode
+  isBooked  Boolean   @default(false)
+
+  booking   Booking?
+}
+
+model Booking {
+  id        String        @id @default(uuid())
+  status    BookingStatus @default(PENDING)
+
+  userId    String
+  slotId    String @unique
+
+  user      User         @relation(fields: [userId], references: [id])
+  slot      SessionSlot  @relation(fields: [slotId], references: [id])
+
+  createdAt DateTime     @default(now())
 }
