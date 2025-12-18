@@ -1,53 +1,78 @@
 "use client";
 
-import Reveal from "../common/Reveal";
 import Image from "next/image";
-import SectionHeading from "../common/HeadingSection";
+import { CharReveal, SlideUp } from "../common/RevealComponent";
 
 export default function PersonalPathSection() {
   return (
-    <section className="py-32 px-24 bg-gradient-to-b from-[#f3ecff] via-[#ffeaf5] to-[#f7f0ff]">
-      <div className="grid grid-cols-2 gap-20 items-center max-w-6xl mx-auto rounded-3xl border border-white/70 bg-white/80 backdrop-blur-sm p-12 shadow-[0_18px_45px_rgba(63,41,101,0.04)]">
+    <section className="py-12 px-4 md:px-8 bg-white">
+      
+      {/* Container */}
+      <div className="max-w-[1440px] mx-auto bg-[#F9F6FF] rounded-[3rem] px-6 md:px-20 py-24 overflow-hidden relative">
+        
+        {/* Background Decor */}
+        <div className="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-[#Dd1764]/5 rounded-full blur-[100px] pointer-events-none" />
 
-        {/* TEXT */}
-        <Reveal>
-          <div className="max-w-xl">
-            <SectionHeading
-  label="Your Personal Path to Wellness"
-  title="Every journey is unique. Your care should be too."
-/>
+        <div className="grid lg:grid-cols-2 gap-20 items-center relative z-10">
 
-            <p className="text-lg leading-relaxed text-[#3F2965]/80 mb-8">
-              At MindSettler, we walk alongside you, providing the tools,
-              understanding, and professional support you need to navigate your
-              mental health journey with confidence.
-            </p>
-
-            <p className="text-lg leading-relaxed text-[#3F2965]/80 mb-10">
-              Our focus on psycho-education empowers you with knowledge — helping
-              you understand your experiences, emotions, and patterns rather
-              than feeling overwhelmed by them.
-            </p>
-
-            <button className="px-7 py-3 rounded-lg bg-[#Dd1764] text-white font-medium hover:bg-[#c8155c] transition">
-              Discover Our Approach
-            </button>
-          </div>
-        </Reveal>
-
-        {/* IMAGE */}
-        <Reveal delay={0.1}>
-          <div className="rounded-2xl overflow-hidden shadow-[0_12px_30px_rgba(63,41,101,0.12)]">
+            {/* LEFT: IMAGE */}
+<SlideUp>
+    <div className="relative group">
+        <div className="relative rounded-[2.5rem] overflow-hidden shadow-2xl shadow-[#3F2965]/10 h-[500px] w-full border-4 border-white">
             <Image
-              src="/images/personal-path.jpg" 
-              alt="A calm path symbolizing personal growth and healing"
-              width={600}
-              height={420}
-              className="object-cover w-full h-full"
+                src="/assets/journey.jpeg" 
+                alt="Person walking on a peaceful path"
+                fill
+                className="object-cover transition-transform duration-700 group-hover:scale-105"
             />
-          </div>
-        </Reveal>
+            
+            {/* Optional: Subtle Overlay if text needs to pop, though usually not needed here since text is on the right */}
+             <div className="absolute inset-0 bg-[#3F2965]/10 group-hover:bg-transparent transition-colors duration-500" />
+        </div>
+    </div>
+</SlideUp>
 
+            {/* RIGHT: TEXT */}
+            <div className="max-w-xl">
+                {/* Header */}
+                <div className="mb-6">
+                    <SlideUp>
+                        <span className="block text-[#Dd1764] font-bold text-sm tracking-wide mb-3 uppercase">
+                            Your Personal Path
+                        </span>
+                    </SlideUp>
+                    <div className="text-3xl md:text-4xl font-bold text-[#3F2965] leading-tight">
+                        <CharReveal delay={0.1}>
+                             Every journey is unique.
+                        </CharReveal>
+                        <CharReveal delay={0.1} className="text-[#Dd1764]">
+                             Your care should be too.
+                        </CharReveal>
+                    </div>
+                </div>
+
+                <SlideUp delay={0.2} className="mb-8">
+                    <p className="text-xl text-[#3F2965]/70 leading-relaxed font-medium">
+                    At MindSettler, we walk alongside you. We focus on psycho-education to empower you with knowledge — helping you understand your experiences rather than feeling overwhelmed by them.
+                    </p>
+                </SlideUp>
+
+                <SlideUp delay={0.3} className="mb-12">
+                    <p className="text-lg text-[#3F2965]/70 leading-relaxed">
+                    Whether you need structured therapy or a listening ear, our approach is tailored to fit your life, your needs, and your pace.
+                    </p>
+                </SlideUp>
+
+                <SlideUp delay={0.4}>
+                    <button className="relative px-10 py-4 rounded-full bg-[#Dd1764] text-white font-bold tracking-wide overflow-hidden group transition-all duration-300 hover:shadow-2xl hover:shadow-[#3F2965]/20 hover:-translate-y-1">
+                        <span className="absolute top-0 left-[-25%] w-[80%] h-full bg-gradient-to-r from-[#3F2965] to-[#513681] -skew-x-12 -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-left" />
+                        <span className="absolute top-0 right-[-25%] w-[80%] h-full bg-gradient-to-l from-[#3F2965] to-[#513681] -skew-x-12 translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-right" />
+                        <span className="relative z-10 flex items-center gap-2">Discover Our Approach</span>
+                    </button>
+                </SlideUp>
+            </div>
+
+        </div>
       </div>
     </section>
   );

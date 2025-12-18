@@ -1,6 +1,6 @@
 "use client";
-import SectionHeading from "../common/HeadingSection";
-import Reveal from "../common/Reveal";
+
+import { CharReveal, SlideUp, StaggerContainer, StaggerItem } from "../common/RevealComponent";
 import {
   UserCheck,
   BookOpen,
@@ -11,91 +11,90 @@ import {
 
 export default function DifferentiatorsSection() {
   return (
-    <section className="py-32 px-24 bg-gradient-to-b from-[#f3ecff] via-[#ffeaf5] to-[#f7f0ff]">
-      <div className="max-w-6xl mx-auto rounded-3xl border border-white/70 bg-white/80 backdrop-blur-sm p-12 shadow-[0_18px_45px_rgba(63,41,101,0.04)]">
+    <section className="py-24 px-4 md:px-8 bg-white">
+      <div className="max-w-[1440px] mx-auto">
 
-        {/* Heading */}
-        <div className="max-w-3xl mb-20">
-          <Reveal>
-           <SectionHeading
-  label="What Makes MindSettler Different"
-  title="Thoughtful care, guided by ethics, empathy, and understanding"
-/>
-          </Reveal>
+        {/* Heading Area */}
+        <div className="text-center mb-20 max-w-3xl mx-auto flex flex-col items-center">
+             <SlideUp>
+                <span className="block text-[#Dd1764] font-bold text-sm tracking-wide mb-3 uppercase">
+                    Why Choose Us
+                </span>
+             </SlideUp>
+             <div className="flex flex-wrap justify-center text-3xl md:text-5xl font-bold text-[#3F2965]">
+                <CharReveal delay={0.1}>
+                    Thoughtful care, guided by
+                </CharReveal>
+                <CharReveal delay={0.1} className="text-[#Dd1764] ml-2">
+                     ethics & empathy
+                </CharReveal>
+             </div>
         </div>
 
-        {/* Cards Grid */}
-        <div className="grid grid-cols-3 gap-10">
-
-          <Reveal>
+        {/* Staggered Grid */}
+        <StaggerContainer className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          
+          <StaggerItem>
             <Card
-              icon={<UserCheck size={22} />}
+              icon={<UserCheck size={32} strokeWidth={1.5} />}
               title="Founder-Led Practice"
-              description="Sessions are guided by the vision and expertise of psychotherapist Parnika Bajaj, ensuring consistency and clinical responsibility."
+              description="Guided by the vision of psychotherapist Parnika Bajaj, ensuring clinical responsibility."
             />
-          </Reveal>
+          </StaggerItem>
 
-          <Reveal delay={0.05}>
+          <StaggerItem>
             <Card
-              icon={<BookOpen size={22} />}
+              icon={<BookOpen size={32} strokeWidth={1.5} />}
               title="Structured Psycho-Education"
-              description="Not just therapy, but a clear understanding of why you feel what you feel — empowering informed healing."
+              description="Understanding why you feel what you feel — empowering informed healing."
             />
-          </Reveal>
+          </StaggerItem>
 
-          <Reveal delay={0.1}>
+          <StaggerItem>
             <Card
-              icon={<Globe size={22} />}
-              title="Online & Offline Accessibility"
+              icon={<Globe size={32} strokeWidth={1.5} />}
+              title="Online & Offline Access"
               description="Access support in a way that fits your lifestyle, comfort, and availability."
             />
-          </Reveal>
+          </StaggerItem>
 
-          <Reveal delay={0.15}>
-            <Card
-              icon={<ShieldCheck size={22} />}
-              title="Ethical Diagnosis"
-              description="Professional assessments conducted with responsibility, clarity, and clinical ethics."
-            />
-          </Reveal>
+           {/* Bottom Row Logic (Centered) */}
+           {/* We wrap these two in a StaggerItem wrapper to keep layout, 
+               but we can also just let them be items 4 and 5 in the flow. 
+               Here I use a div to center them in the grid context. */}
+           <div className="lg:col-span-3 grid md:grid-cols-2 gap-8 lg:w-2/3 mx-auto">
+               <StaggerItem>
+                    <Card
+                        icon={<ShieldCheck size={32} strokeWidth={1.5} />}
+                        title="Ethical Diagnosis"
+                        description="Professional assessments conducted with responsibility and clarity."
+                    />
+               </StaggerItem>
 
-          <Reveal delay={0.2}>
-            <Card
-              icon={<Heart size={22} />}
-              title="Human-First Approach"
-              description="Empathy before labels, understanding before conclusions — every individual is treated with care."
-            />
-          </Reveal>
+               <StaggerItem>
+                    <Card
+                        icon={<Heart size={32} strokeWidth={1.5} />}
+                        title="Human-First Approach"
+                        description="Empathy before labels. Every individual is treated with care."
+                    />
+               </StaggerItem>
+           </div>
 
-        </div>
+        </StaggerContainer>
+
       </div>
     </section>
   );
 }
 
-/* Card Component */
-function Card({
-  icon,
-  title,
-  description,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-}) {
+function Card({ icon, title, description }: { icon: React.ReactNode; title: string; description: string; }) {
   return (
-    <div className="bg-[#faf7fb] rounded-2xl p-8 h-full">
-      <div className="w-12 h-12 flex items-center justify-center rounded-xl bg-[#3F2965]/10 text-[#3F2965] mb-6">
+    <div className="group h-full p-10 rounded-[2rem] bg-[#F9F6FF] border border-[#3F2965]/5 hover:border-[#Dd1764]/20 hover:shadow-2xl hover:shadow-[#3F2965]/10 transition-all duration-500 hover:-translate-y-2">
+      <div className="w-16 h-16 flex items-center justify-center rounded-2xl bg-white text-[#3F2965] mb-8 group-hover:bg-[#Dd1764] group-hover:text-white transition-all duration-300 shadow-sm">
         {icon}
       </div>
-
-      <h3 className="text-xl font-medium text-[#3F2965] mb-3">
-        {title}
-      </h3>
-
-      <p className="text-[#3F2965]/80 leading-relaxed">
-        {description}
-      </p>
+      <h3 className="text-2xl font-bold text-[#3F2965] mb-4">{title}</h3>
+      <p className="text-[#3F2965]/70 text-lg leading-relaxed font-medium">{description}</p>
     </div>
   );
 }

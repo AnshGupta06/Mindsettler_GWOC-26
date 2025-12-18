@@ -31,3 +31,6 @@ html, body {
   color: #2b1f3a;
   overflow-x: hidden;
 }
+button{
+  cursor: pointer;
+}

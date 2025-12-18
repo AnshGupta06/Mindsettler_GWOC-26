@@ -9,20 +9,27 @@ import {
   ClipboardList,
   Layers,
   HeartHandshake,
+  Clock,
+  MessageCircleHeart,
+  FileSearch,
+  Puzzle,
+  Flower2,
 } from "lucide-react";
 import SectionHeading from "../common/HeadingSection";
+import { CharReveal, SlideUp } from "../common/RevealComponent";
+
 gsap.registerPlugin(ScrollTrigger);
 
 export default function JourneySection() {
-  const sectionRef = useRef<HTMLDivElement>(null);
   const lineRef = useRef<HTMLDivElement>(null);
   const cardsRef = useRef<HTMLDivElement[]>([]);
   const timelineRef = useRef<HTMLDivElement>(null);
+  const decorRef = useRef<HTMLDivElement[]>([]);
 
   useEffect(() => {
-    if (!sectionRef.current) return;
+    if (!timelineRef.current) return;
 
-    // Animate center timeline when the journey steps enter view
+    // 1. Center Line Animation
     gsap.fromTo(
       lineRef.current,
       { scaleY: 0 },
@@ -32,99 +39,141 @@ export default function JourneySection() {
         ease: "none",
         scrollTrigger: {
           trigger: timelineRef.current,
-          start: "top 80%",
-          end: "bottom 20%",
+          start: "top 70%",
+          end: "bottom 40%",
           scrub: true,
-          ease: "none",
-        } as any,
+        },
       }
     );
 
-    // Animate each journey card with a lift + fade-in effect
+    // 2. Cards Animation
     cardsRef.current.forEach((card) => {
       gsap.fromTo(
         card,
-        { opacity: 0, y: 60, scale: 0.9, boxShadow: "0 0 0 rgba(0,0,0,0)" },
+        { opacity: 0, y: 50 },
         {
           opacity: 1,
           y: 0,
-          scale: 1,
           duration: 0.8,
           ease: "power3.out",
-          boxShadow: "0 18px 45px rgba(63,41,101,0.18)",
           scrollTrigger: {
             trigger: card,
-            start: "top 80%",
+            start: "top 85%",
             toggleActions: "play none none reverse",
-          } as any,
+          },
         }
       );
     });
+
+    // 3. Floating Decor Parallax
+    decorRef.current.forEach((el, i) => {
+        gsap.to(el, {
+            y: -40, 
+            rotation: i % 2 === 0 ? 10 : -10, // Slight rotation for natural feel
+            ease: "none",
+            scrollTrigger: {
+                trigger: el,
+                start: "top bottom",
+                end: "bottom top",
+                scrub: 1.5,
+            }
+        })
+    });
+
   }, []);
 
   return (
-    <section
-      ref={sectionRef}
-      className="relative py-32 px-24 bg-gradient-to-b from-[#f3ecff] via-[#ffeaf5] to-[#f7f0ff]"
-    >
-      <div className="max-w-6xl mx-auto rounded-3xl border border-white/70 bg-white/80 backdrop-blur-sm px-16 py-20 shadow-[0_18px_45px_rgba(63,41,101,0.04)]">
+    <section className="py-12 px-4 md:px-8 bg-white">
+      
+      {/* Container */}
+      <div className="max-w-[1440px] mx-auto bg-[#F9F6FF] rounded-[3rem] px-6 md:px-20 py-24 relative overflow-hidden">
+        
+        {/* Background Blurs */}
+        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-[#3F2965]/5 blur-[120px] rounded-full pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-[#Dd1764]/5 blur-[100px] rounded-full pointer-events-none" />
+
         {/* Heading */}
-        <div className="max-w-3xl mx-auto text-center mb-28">
-          <SectionHeading
-            label="Your Journey With MindSettler"
-            title="A guided path toward understanding, growth, and healing"
-            align="center"
-          />
+        <div className="max-w-3xl mx-auto text-center mb-24 relative z-10 flex flex-col items-center">
+          <SlideUp>
+            <span className="block text-[#Dd1764] font-bold text-sm tracking-wide mb-3 uppercase">
+                Your Journey
+            </span>
+          </SlideUp>
+          <div className="flex flex-wrap justify-center text-3xl md:text-5xl font-bold text-[#3F2965]">
+             <CharReveal delay={0.1}>
+                 A guided path
+             </CharReveal>
+             <CharReveal delay={0.1} className="text-[#Dd1764] ml-2">
+                 toward healing
+             </CharReveal>
+          </div>
         </div>
 
         {/* Timeline Container */}
-        <div ref={timelineRef} className="relative max-w-5xl mx-auto">
+        <div ref={timelineRef} className="relative max-w-5xl mx-auto z-10">
+          
           {/* Center Line */}
-          <div className="absolute left-1/2 top-0 -translate-x-1/2 h-full flex items-stretch">
-            <div className="w-[4px] rounded-full bg-[#3F2965]/10 overflow-hidden">
+          <div className="absolute left-1/2 top-0 -translate-x-1/2 h-full hidden md:block">
+            <div className="w-[2px] h-full bg-[#3F2965]/10">
               <div
                 ref={lineRef}
-                className="w-full h-full origin-top scale-y-0 bg-gradient-to-b from-[#3F2965] via-[#dd1764] to-[#3F2965] shadow-[0_0_18px_rgba(221,23,100,0.4)]"
+                className="w-full h-full origin-top bg-gradient-to-b from-[#3F2965] via-[#Dd1764] to-[#3F2965]"
               />
             </div>
           </div>
 
-          {/* Cards */}
-          <div className="space-y-28">
+          {/* Steps */}
+          <div className="space-y-16 md:space-y-32">
             {journeySteps.map((step, index) => {
               const isLeft = index % 2 === 0;
 
               return (
                 <div
                   key={index}
-                  className={`relative flex ${
-                    isLeft ? "justify-start" : "justify-end"
+                  className={`relative flex flex-col md:flex-row items-center ${
+                    isLeft ? "md:flex-row" : "md:flex-row-reverse"
                   }`}
                 >
-                  {/* Dot */}
-                  <div className="absolute left-1/2 -translate-x-1/2 top-8 w-5 h-5 rounded-full bg-white shadow-[0_0_0_4px_rgba(63,41,101,0.08)] flex items-center justify-center">
-                    <span className="w-2.5 h-2.5 rounded-full bg-gradient-to-b from-[#3F2965] via-[#dd1764] to-[#3F2965]" />
-                  </div>
-
-                  {/* Card */}
-                  <div
-                    ref={(el) => {
-                      if (el) cardsRef.current[index] = el;
-                    }}
-                    className="w-[420px] bg-white rounded-2xl p-8 shadow-[0_12px_30px_rgba(63,41,101,0.12)]"
-                  >
-                    <div className="flex items-center gap-4 mb-4">
-                      <div className="p-3 rounded-xl bg-[#3F2965]/10 text-[#3F2965]">
+                  {/* TEXT SIDE (Card) */}
+                  <div className={`w-full md:w-1/2 ${isLeft ? "md:pr-16" : "md:pl-16"} z-10`}>
+                    <div
+                      ref={(el) => { if (el) cardsRef.current[index] = el; }}
+                      // ADDED HOVER EFFECTS HERE (Same as Differentiators)
+                      className="group bg-white p-8 md:p-10 rounded-[2rem] shadow-xl shadow-[#3F2965]/5 border border-[#3F2965]/5 hover:border-[#Dd1764]/20 hover:shadow-2xl hover:shadow-[#3F2965]/10 transition-all duration-500 hover:-translate-y-2 cursor-default"
+                    >
+                      <div className="w-14 h-14 rounded-2xl bg-[#F9F6FF] text-[#3F2965] flex items-center justify-center mb-6 group-hover:bg-[#Dd1764] group-hover:text-white transition-all duration-300">
                         {step.icon}
                       </div>
-                      <h3 className="text-xl font-medium text-[#3F2965]">
+                      <h3 className="text-2xl font-bold text-[#3F2965] mb-3">
                         {step.title}
                       </h3>
+                      <p className="text-[#3F2965]/70 leading-relaxed font-medium">
+                        {step.description}
+                      </p>
                     </div>
+                  </div>
 
-                    <p className="text-[#3F2965]/80 leading-relaxed">
-                      {step.description}
-                    </p>
+                  {/* CENTER DOT */}
+                  <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center justify-center w-8 h-8 rounded-full bg-white border-4 border-[#F9F6FF] shadow-sm z-20">
+                    <div className="w-2.5 h-2.5 rounded-full bg-[#Dd1764]" />
+                  </div>
+
+                  {/* EMPTY SIDE (Decor Placement) */}
+                  <div className={`w-full md:w-1/2 hidden md:flex ${isLeft ? "justify-end pr-12" : "justify-start pl-12"}`}>
+                      {/* Floating Element Container */}
+                      <div 
+                        ref={(el) => { if (el) decorRef.current[index] = el; }}
+                        className={`flex flex-col items-center gap-4 ${step.colorClass}`}
+                      >
+                         {/* Large Icon */}
+                         <div className="opacity-10 scale-100">
+                             {step.decor}
+                         </div>
+                         {/* Optional Label for "Linking" context */}
+                         <span className="text-sm font-bold uppercase tracking-widest opacity-30">
+                            {step.decorLabel}
+                         </span>
+                      </div>
                   </div>
                 </div>
               );
@@ -136,36 +185,51 @@ export default function JourneySection() {
   );
 }
 
-/* Journey Content */
+// Data Array with Thematic Icons
 const journeySteps = [
   {
     title: "Book a Session",
-    description:
-      "Choose an online or offline consultation at a time that feels right for you.",
-    icon: <CalendarCheck size={22} />,
+    description: "Choose an online or offline consultation at a time that feels right for you.",
+    icon: <CalendarCheck size={28} strokeWidth={1.5} />,
+    // Concept: Time/Scheduling
+    decor: <Clock size={160} strokeWidth={0.5} />,
+    decorLabel: "Your Time",
+    colorClass: "text-[#Dd1764]" // Pink
   },
   {
     title: "Initial Understanding",
-    description:
-      "Your concerns are listened to with care in a supportive, non-judgmental environment.",
-    icon: <Ear size={22} />,
+    description: "Your concerns are listened to with care in a supportive, non-judgmental environment.",
+    icon: <Ear size={28} strokeWidth={1.5} />,
+    // Concept: Listening/Connection
+    decor: <MessageCircleHeart size={160} strokeWidth={0.5} />,
+    decorLabel: "Safe Space",
+    colorClass: "text-[#3F2965]" // Purple
   },
   {
     title: "Assessment & Diagnosis",
-    description:
-      "If required, professional diagnosis is conducted with clinical responsibility and ethical care.",
-    icon: <ClipboardList size={22} />,
+    description: "Professional diagnosis conducted with clinical responsibility and ethical care.",
+    icon: <ClipboardList size={28} strokeWidth={1.5} />,
+    // Concept: Analysis/Clarity
+    decor: <FileSearch size={160} strokeWidth={0.5} />,
+    decorLabel: "Clarity",
+    colorClass: "text-[#Dd1764]" // Pink
   },
   {
     title: "Structured Sessions",
-    description:
-      "Therapy and psycho-education sessions designed around your mental health needs.",
-    icon: <Layers size={22} />,
+    description: "Therapy and psycho-education sessions designed around your mental health needs.",
+    icon: <Layers size={28} strokeWidth={1.5} />,
+    // Concept: Building Blocks/Structure
+    decor: <Puzzle size={160} strokeWidth={0.5} />,
+    decorLabel: "Structure",
+    colorClass: "text-[#3F2965]" // Purple
   },
   {
     title: "Growth & Healing",
-    description:
-      "Develop awareness, coping strategies, and emotional resilience over time.",
-    icon: <HeartHandshake size={22} />,
+    description: "Develop awareness, coping strategies, and emotional resilience over time.",
+    icon: <HeartHandshake size={28} strokeWidth={1.5} />,
+    // Concept: Blooming/Growth
+    decor: <Flower2 size={160} strokeWidth={0.5} />,
+    decorLabel: "Bloom",
+    colorClass: "text-[#Dd1764]" // Pink
   },
 ];
