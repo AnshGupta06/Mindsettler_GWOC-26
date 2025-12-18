@@ -2,6 +2,10 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import HeroCarousel from "./components/HeroCarousel";
+import Image from "next/image";
+import type { Variants } from "framer-motion";
+
+
 
 export default function AwarenessPage() {
 
@@ -34,31 +38,37 @@ export default function AwarenessPage() {
             title: "Anxiety",
             slug: "anxiety",
             description: "Persistent worry, fear, or unease that can interfere with daily life.",
+            image: "/awareness_hero/anxiety.jpg",
         },
         {
             title: "Depression",
             slug: "depression",
             description: "Feelings of sadness, emptiness, or hopelessness lasting over time.",
+            image: "/awareness_hero/depression.jpg",
         },
         {
             title: "Stress",
             slug: "stress",
             description: "Mental and emotional strain caused by overwhelming situations.",
+            image: "/awareness_hero/anxiety.jpg",
         },
         {
             title: "Relationship Issues",
             slug: "relationship-issues",
             description: "Challenges in communication, trust, or emotional connection.",
+            image: "/awareness_hero/relationship.jpg",
         },
         {
             title: "Self-Esteem",
             slug: "self-esteem",
             description: "Struggles with self-worth, confidence, and self-acceptance.",
+            image: "/awareness_hero/trauma.jpg",
         },
         {
             title: "Trauma",
             slug: "trauma",
             description: "Emotional responses to deeply distressing experiences.",
+            image: "/awareness_hero/trauma.jpg",
         },
         ];
 
@@ -112,32 +122,47 @@ export default function AwarenessPage() {
             </p>
         </div>
 
-        <motion.div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"
-            variants={containerVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            >
-            {awarenessAreas.map((item) => (
-            <Link href={`/awareness/${item.slug}`} key={item.slug}>
-            <motion.div
-                // variants={cardVariants}
-                className="relative group bg-lightBg rounded-2xl p-8 border border-gray-100 shadow-md cursor-pointer transition-all duration-300 hover:-translate-y-2 hover:shadow-xl"
-            >
-                <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition bg-gradient-to-br from-softPurple/20 to-softPink/20"></div>
+       <motion.div
+  variants={containerVariants}
+  initial="hidden"
+  whileInView="visible"
+  viewport={{ once: true }}
+  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10"
+>
+  {awarenessAreas.map((item) => (
+    <Link href={`/awareness/${item.slug}`} key={item.slug}>
+      <motion.div
+        variants={cardVariants}
+        className="group bg-lightBg rounded-3xl overflow-hidden border border-gray-100 shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer"
+      >
+        {/* Image */}
+        <div className="relative h-48 overflow-hidden">
+          <Image
+            src={item.image}
+            alt={item.title}
+            fill
+            className="object-cover transition-transform duration-500 group-hover:scale-110"
+          />
 
-                <div className="relative z-10">
-                <h3 className="text-xl font-semibold text-primary mb-3">
-                    {item.title}
-                </h3>
-                <p className="text-gray-700 leading-relaxed">
-                    {item.description}
-                </p>
-                </div>
-            </motion.div>
-            </Link>
-            ))}
-        </motion.div>
+          {/* Hover Overlay */}
+          <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition" />
+        </div>
+
+        {/* Content */}
+        <div className="p-6">
+          <h3 className="text-xl font-semibold text-primary mb-2">
+            {item.title}
+          </h3>
+          <p className="text-gray-700 text-sm leading-relaxed">
+            {item.description}
+          </p>
+        </div>
+      </motion.div>
+    </Link>
+  ))}
+</motion.div>
+
+
         </section>
 
     </main>

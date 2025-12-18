@@ -1,186 +1,119 @@
 "use client";
 
-import { motion, useScroll, useTransform, MotionValue } from "framer-motion";
+import { motion, useScroll } from "framer-motion";
 import Image from "next/image";
-import { useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 
 const slides = [
   {
     image: "/awareness_hero/brain-1.jpeg",
-    title: "It's okay to feel tired, sad, or anxious.",
-    subtitle: "It's human.",
+    title: "It’s okay to feel tired, sad, or anxious.",
+    highlight: "It’s human.",
   },
   {
-    image: "/awareness_hero/rbrain-1.png",
+    image: "/awareness_hero/brain-2.jpeg",
     title: "Mental well-being begins with awareness.",
-    subtitle: "Not judgment.",
+    highlight: "Not judgment.",
   },
   {
     image: "/awareness_hero/brain-3.jpeg",
     title: "Support is not weakness.",
-    subtitle: "It's self-care.",
-  },
-  {
-    image: "/awareness_hero/brain-4.jpeg",
-    title: "Your journey matters.",
-    subtitle: "Every step forward counts.",
+    highlight: "It’s self-care.",
   },
 ];
 
-// Separate component for each image slide to properly use hooks
-function ImageSlide({ 
-  slide, 
-  index, 
-  scrollYProgress, 
-  total 
-}: { 
-  slide: typeof slides[0]; 
-  index: number; 
-  scrollYProgress: MotionValue<number>;
-  total: number;
-}) {
-  // Calculate slide position in scroll progress (0 to 1)
-  // Each slide occupies an equal portion of the scroll
-  const slideStart = index / total;
-  const slideEnd = (index + 1) / total;
-  const slideCenter = (slideStart + slideEnd) / 2;
-
-  const opacity = useTransform(
-    scrollYProgress,
-    [slideStart, slideCenter, slideEnd],
-    [0, 1, 0]
-  );
-
-  const scale = useTransform(
-    scrollYProgress,
-    [slideStart, slideCenter, slideEnd],
-    [0.9, 1, 0.9]
-  );
-
-  return (
-    <motion.div
-      style={{ opacity, scale }}
-      className="absolute inset-0 flex items-center justify-center"
-    >
-      <Image
-        src={slide.image}
-        alt="Mental health illustration"
-        width={500}
-        height={500}
-        priority={index === 0}
-        className="object-contain w-full h-full"
-        unoptimized
-      />
-    </motion.div>
-  );
-}
-
-// Separate component for each text slide to properly use hooks
-function TextSlide({ 
-  slide, 
-  index, 
-  scrollYProgress, 
-  total 
-}: { 
-  slide: typeof slides[0]; 
-  index: number; 
-  scrollYProgress: MotionValue<number>;
-  total: number;
-}) {
-  // Calculate slide position in scroll progress (0 to 1)
-  // Each slide occupies an equal portion of the scroll
-  const slideStart = index / total;
-  const slideEnd = (index + 1) / total;
-  const slideCenter = (slideStart + slideEnd) / 2;
-
-  const opacity = useTransform(
-    scrollYProgress,
-    [slideStart, slideCenter, slideEnd],
-    [0, 1, 0]
-  );
-
-  const y = useTransform(
-    scrollYProgress,
-    [slideStart, slideCenter, slideEnd],
-    [30, 0, -30]
-  );
-
-  return (
-    <motion.div
-      style={{ opacity, y }}
-      className="absolute inset-0 flex items-center w-full"
-    >
-      <h1 className="text-4xl md:text-5xl font-bold text-primary leading-tight">
-        {slide.title}
-        <br />
-        <span className="text-accent">{slide.subtitle}</span>
-      </h1>
-    </motion.div>
-  );
-}
-
-// Hero Image component - must be outside render
-function HeroImage({ scrollYProgress }: { scrollYProgress: MotionValue<number> }) {
-  return (
-    <div className="relative w-full h-[420px] md:h-[500px] flex items-center justify-center">
-      {slides.map((slide, index) => (
-        <ImageSlide
-          key={slide.image}
-          slide={slide}
-          index={index}
-          scrollYProgress={scrollYProgress}
-          total={slides.length}
-        />
-      ))}
-    </div>
-  );
-}
-
-// Hero Text component - must be outside render
-function HeroText({ scrollYProgress }: { scrollYProgress: MotionValue<number> }) {
-  return (
-    <div className="relative h-[240px] md:h-[300px] flex items-center w-full">
-      {slides.map((slide, index) => (
-        <TextSlide
-          key={slide.title}
-          slide={slide}
-          index={index}
-          scrollYProgress={scrollYProgress}
-          total={slides.length}
-        />
-      ))}
-    </div>
-  );
-}
-
 export default function HeroStory() {
-
-
   const containerRef = useRef<HTMLDivElement>(null);
-
+  
+  // Track scroll progress of this specific container
   const { scrollYProgress } = useScroll({
     target: containerRef,
-    offset: ["start start", "end start"],
+    offset: ["start start", "end end"],
   });
 
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  useEffect(() => {
+    // This updates the active index as the user scrolls through the 300vh height
+    return scrollYProgress.on("change", (latest) => {
+      const index = Math.min(
+        slides.length - 1,
+        Math.floor(latest * slides.length)
+      );
+      setActiveIndex(index);
+    });
+  }, [scrollYProgress]);
+
   return (
-    <section
-      ref={containerRef}
-      className="relative bg-lightBg"
-      style={{ height: `${(slides.length + 1) * 100}vh` }}
-    >
-      {/* Sticky Hero */}
-      <div className="sticky top-0 min-h-screen flex items-center py-20">
-        <div className="grid md:grid-cols-2 gap-12 md:gap-16 items-center max-w-6xl mx-auto px-6 w-full">
-          {/* Image */}
-          <div className="w-full flex justify-center">
-            <HeroImage scrollYProgress={scrollYProgress} />
+    // 1. We use 300vh so there is enough "room" to scroll for 3 messages.
+    <section ref={containerRef} className="relative h-[300vh] bg-lightBg">
+      
+      {/* 2. Sticky container: Stay on screen for the duration of the 300vh scroll */}
+      <div className="sticky top-0 flex h-screen w-full items-center justify-center overflow-hidden">
+        <div className="container mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 px-6 items-center">
+          
+          {/* IMAGE AREA */}
+          <div className="relative h-[350px] md:h-[500px] w-full flex items-center justify-center">
+            {slides.map((slide, index) => (
+              <motion.div
+                key={`img-${index}`}
+                initial={false}
+                animate={{
+                  opacity: activeIndex === index ? 1 : 0,
+                  scale: activeIndex === index ? 1 : 0.8,
+                  zIndex: activeIndex === index ? 10 : 0,
+                }}
+                transition={{ duration: 0.6, ease: "easeInOut" }}
+                className="absolute w-full h-full max-w-[450px]"
+              >
+                <div className="relative w-full h-full border-4 border-white shadow-2xl rounded-3xl overflow-hidden">
+                  <Image
+                    src={slide.image}
+                    alt="Awareness"
+                    fill
+                    className="object-cover"
+                    priority={index === 0}
+                  />
+                </div>
+              </motion.div>
+            ))}
           </div>
 
-          {/* Text */}
-          <div className="w-full">
-            <HeroText scrollYProgress={scrollYProgress} />
+          {/* TEXT AREA */}
+          <div className="relative h-[250px] flex items-center">
+            {slides.map((slide, index) => (
+              <motion.div
+                key={`text-${index}`}
+                initial={false}
+                animate={{
+                  opacity: activeIndex === index ? 1 : 0,
+                  y: activeIndex === index ? 0 : 30,
+                  filter: activeIndex === index ? "blur(0px)" : "blur(10px)",
+                }}
+                transition={{ duration: 0.5 }}
+                className="absolute"
+              >
+                <h1 className="text-4xl md:text-6xl font-bold text-primary leading-tight">
+                  {slide.title}
+                  <br />
+                  <span className="text-accent">
+                    {slide.highlight}
+                  </span>
+                </h1>
+              </motion.div>
+            ))}
           </div>
+
+        </div>
+
+        {/* INDICATOR DOTS (Visual cue for the user) */}
+        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex gap-3">
+          {slides.map((_, i) => (
+            <div 
+              key={i} 
+              className={`h-1.5 transition-all duration-500 rounded-full ${activeIndex === i ? 'w-8 bg-accent' : 'w-2 bg-softPurple'}`} 
+            />
+          ))}
         </div>
       </div>
     </section>
