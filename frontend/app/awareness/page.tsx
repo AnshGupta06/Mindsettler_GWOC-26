@@ -121,7 +121,7 @@ export default function AwarenessPage() {
             {awarenessAreas.map((item) => (
             <Link href={`/awareness/${item.slug}`} key={item.slug}>
             <motion.div
-                variants={cardVariants}
+                // variants={cardVariants}
                 className="relative group bg-lightBg rounded-2xl p-8 border border-gray-100 shadow-md cursor-pointer transition-all duration-300 hover:-translate-y-2 hover:shadow-xl"
             >
                 <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition bg-gradient-to-br from-softPurple/20 to-softPink/20"></div>
