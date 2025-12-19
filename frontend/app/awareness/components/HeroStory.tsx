@@ -20,6 +20,16 @@ const slides = [
     title: "Support is not weakness.",
     highlight: "It’s self-care.",
   },
+  {
+    image: "/awareness_hero/brain-4.jpeg",
+    title: "Healing doesn’t follow a straight line.",
+    highlight: "Take your time.",
+  },
+  {
+    image: "/awareness_hero/brain-5.jpeg",
+    title: "Asking for help shows strength.",
+    highlight: "Never weakness.",
+  },
 ];
 
 export default function HeroStory() {

@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import HeroCarousel from "./components/HeroCarousel";
 import Image from "next/image";
 import type { Variants } from "framer-motion";
+import { awarenessAreas } from "./awarenessCardsData";
 
 
 
@@ -34,45 +35,6 @@ export default function AwarenessPage() {
             },
         },
         };
-
-    const awarenessAreas = [
-        {
-            title: "Anxiety",
-            slug: "anxiety",
-            description: "Persistent worry, fear, or unease that can interfere with daily life.",
-            image: "/awareness_hero/anxiety.jpg",
-        },
-        {
-            title: "Depression",
-            slug: "depression",
-            description: "Feelings of sadness, emptiness, or hopelessness lasting over time.",
-            image: "/awareness_hero/depression.jpg",
-        },
-        {
-            title: "Stress",
-            slug: "stress",
-            description: "Mental and emotional strain caused by overwhelming situations.",
-            image: "/awareness_hero/anxiety.jpg",
-        },
-        {
-            title: "Relationship Issues",
-            slug: "relationship-issues",
-            description: "Challenges in communication, trust, or emotional connection.",
-            image: "/awareness_hero/relationship.jpg",
-        },
-        {
-            title: "Self-Esteem",
-            slug: "self-esteem",
-            description: "Struggles with self-worth, confidence, and self-acceptance.",
-            image: "/awareness_hero/trauma.jpg",
-        },
-        {
-            title: "Trauma",
-            slug: "trauma",
-            description: "Emotional responses to deeply distressing experiences.",
-            image: "/awareness_hero/trauma.jpg",
-        },
-        ];
 
   return (
     <main className="min-h-screen bg-lightBg">

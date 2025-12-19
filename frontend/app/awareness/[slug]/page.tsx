@@ -7,6 +7,13 @@ interface AwarenessPageProps {
   };
 }
 
+// Generate static params for all awareness pages at build time
+export async function generateStaticParams() {
+  return Object.keys(awarenessContent).map((slug) => ({
+    slug: slug,
+  }));
+}
+
 export default async function AwarenessDetailPage({ 
     params,
 }: AwarenessPageProps) {
@@ -85,7 +92,7 @@ export default async function AwarenessDetailPage({
                             {content.whatIs}
                         </p>
                         {content.whatIsExtended && (
-                            <p className="text-gray-600 leading-relaxed">
+                            <p className="text-gray-700 leading-relaxed">
                                 {content.whatIsExtended}
                             </p>
                         )}
@@ -106,7 +113,7 @@ export default async function AwarenessDetailPage({
                                     </div>
                                     <div>
                                         <h3 className="font-semibold text-primary mb-2">{symptom.title}</h3>
-                                        <p className="text-gray-600 text-sm leading-relaxed">{symptom.description}</p>
+                                        <p className="text-gray-700 text-sm leading-relaxed">{symptom.description}</p>
                                     </div>
                                 </div>
                             </div>
@@ -154,7 +161,7 @@ export default async function AwarenessDetailPage({
                         <h2 className="text-3xl md:text-4xl font-bold text-primary mb-4">
                             How MindSettler Can Help
                         </h2>
-                        <p className="text-gray-600 text-lg max-w-3xl mx-auto">
+                        <p className="text-gray-700 text-lg max-w-3xl mx-auto">
                             Our personalized approach combines psycho-education, evidence-based techniques, and compassionate support to help you navigate your journey.
                         </p>
                     </div>
@@ -166,7 +173,7 @@ export default async function AwarenessDetailPage({
                                         <span className="text-white text-2xl font-bold">{idx + 1}</span>
                                     </div>
                                     <h3 className="text-xl font-semibold text-primary mb-3">{approach.title}</h3>
-                                    <p className="text-gray-600 leading-relaxed">{approach.description}</p>
+                                    <p className="text-gray-700 leading-relaxed">{approach.description}</p>
                                 </div>
                             </div>
                         ))}
@@ -186,10 +193,10 @@ export default async function AwarenessDetailPage({
                                 </svg>
                             </div>
                             <h3 className="text-xl font-semibold text-primary mb-3">Awareness Sessions</h3>
-                            <p className="text-gray-600 leading-relaxed mb-4">
+                            <p className="text-gray-700 leading-relaxed mb-4">
                                 Structured psycho-education sessions designed to help you understand {content.title.toLowerCase()}, recognize patterns, and develop healthy coping strategies.
                             </p>
-                            <ul className="space-y-2 text-sm text-gray-600">
+                            <ul className="space-y-2 text-sm text-gray-700">
                                 <li className="flex items-center gap-2">
                                     <span className="text-accent">✓</span>
                                     Interactive learning modules
@@ -212,10 +219,10 @@ export default async function AwarenessDetailPage({
                                 </svg>
                             </div>
                             <h3 className="text-xl font-semibold text-primary mb-3">Personalized Guidance</h3>
-                            <p className="text-gray-600 leading-relaxed mb-4">
+                            <p className="text-gray-700 leading-relaxed mb-4">
                                 One-on-one or group sessions tailored to your unique needs, challenges, and goals. Available both online and offline in a safe, confidential environment.
                             </p>
-                            <ul className="space-y-2 text-sm text-gray-600">
+                            <ul className="space-y-2 text-sm text-gray-700">
                                 <li className="flex items-center gap-2">
                                     <span className="text-accent">✓</span>
                                     Individual counseling
