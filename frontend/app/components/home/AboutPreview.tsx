@@ -1,7 +1,7 @@
 "use client";
 
 import Reveal from "../common/Reveal";
-import { CharReveal, SlideUp, StaggerContainer, StaggerItem } from "../common/RevealComponent";
+import { CharReveal, SlideUp, StaggerContainer, StaggerItem, ImageWipeReveal } from "../common/RevealComponent";
 import { CheckCircle2 } from "lucide-react";
 import Image from "next/image";
 
@@ -70,33 +70,37 @@ export default function AboutSection() {
         </div>
 
         {/* RIGHT: IMAGE */}
-       <Reveal delay={0.2}>
+      <Reveal delay={0.2}>
   <div className="relative px-4 sm:px-0">
     {/* Decorative Background Shape */}
     <div className="absolute inset-0 bg-[#F9F6FF] rounded-2xl sm:rounded-3xl md:rounded-[3rem] rotate-3 scale-95" />
-    
+
     {/* Main Card Container */}
-    <div className="relative bg-[#3F2965] rounded-2xl sm:rounded-3xl md:rounded-[3rem] overflow-hidden shadow-2xl h-[350px] sm:h-[400px] md:h-[450px] lg:h-[500px] flex items-center justify-center group">
-        
-        {/* 1. THE IMAGE (Background) */}
+    <ImageWipeReveal delay={0.1}>
+      <div className="relative bg-[#3F2965] rounded-2xl sm:rounded-3xl md:rounded-[3rem] overflow-hidden shadow-2xl h-[350px] sm:h-[400px] md:h-[450px] lg:h-[500px] flex items-center justify-center group">
+
+        {/* 1. THE IMAGE */}
         <Image 
-            src="/assets/therapy.png"
-            alt="Compassionate therapy session"
-            fill
-            className="object-cover transition-transform duration-700 group-hover:scale-105"
+          src="/assets/therapy.png"
+          alt="Compassionate therapy session"
+          fill
+          className="object-cover transition-transform duration-700 group-hover:scale-105"
         />
 
-        {/* 2. THE OVERLAY (Dark Gradient to make text readable) */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[#3F2965]/90 to-[#2a1b45]/50 mix-blend-multiply" />
+        {/* 2. OVERLAY */}
+        <div className="absolute inset-0 bg-[#3F2965]/60 mix-blend-multiply" />
 
-        {/* 3. THE TEXT */}
+        {/* 3. TEXT */}
         <h3 className="relative z-10 text-white text-xl sm:text-2xl md:text-3xl font-bold text-center px-6 sm:px-8 leading-snug">
           "Compassion is the heart of <br className="hidden sm:block" /> 
           <span className="text-[#Dd1764]">Healing.</span>"
         </h3>
-    </div>
+
+      </div>
+    </ImageWipeReveal>
   </div>
 </Reveal>
+
 
       </div>
     </section>

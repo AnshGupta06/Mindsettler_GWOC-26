@@ -63,7 +63,7 @@ export default function Navbar() {
           <ul className="hidden md:flex items-center gap-2 bg-[#F9F6FF] p-1.5 rounded-full border border-[#3F2965]/5">
             <NavLink href="/" active={pathname === "/"}>Home</NavLink>
             <NavLink href="/about" active={pathname === "/about"}>About</NavLink>
-            <NavLink href="/services" active={pathname === "/services"}>Services</NavLink>
+            <NavLink href="/awareness" active={pathname === "/awareness"}>Awareness</NavLink>
             <NavLink href="/resources" active={pathname === "/resources"}>Resources</NavLink>
             <NavLink href="/contact" active={pathname === "/contact"}>Contact</NavLink>
           </ul>

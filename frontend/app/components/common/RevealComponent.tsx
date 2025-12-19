@@ -21,21 +21,22 @@ export const CharReveal = ({ children, className = "", delay = 0 }: CharRevealPr
 
   return (
     <motion.h1
-  className={`inline-flex overflow-hidden pb-2 ${className}`}
-  initial="hidden"
-  animate="visible"
-  transition={{ staggerChildren: 0.03, delayChildren: delay }}
->
+      className={`flex flex-wrap w-full overflow-hidden pb-2 ${className}`}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.4 }}
+      transition={{ staggerChildren: 0.03, delayChildren: delay }}
+    >
       {characters.map((char, index) => (
         <motion.span
           key={index}
           variants={{
             hidden: { x: 20, opacity: 0 },
-            visible: { 
-              x: 0, 
+            visible: {
+              x: 0,
               opacity: 1,
-              transition: { duration: 0.5, ease: "easeOut" } 
-            }
+              transition: { duration: 0.5, ease: "easeOut" },
+            },
           }}
           className="inline-block whitespace-pre"
         >
@@ -45,7 +46,7 @@ export const CharReveal = ({ children, className = "", delay = 0 }: CharRevealPr
     </motion.h1>
   );
 };
-
+  
 // --- 2. Masked Slide Up (Block Reveal) ---
 export const MaskedReveal = ({ children, className = "", delay = 0 }: WrapperProps) => {
   return (
@@ -109,5 +110,27 @@ export const StaggerItem = ({ children, className = "" }: { children: React.Reac
     >
       {children}
     </motion.div>
+  );
+};
+// --- 6. Image Wipe Reveal (Mask slides left → right) ---
+export const ImageWipeReveal = ({ children, className = "", delay = 0 }: WrapperProps) => {
+  return (
+    <div className={`relative overflow-hidden ${className}`}>
+      {/* Image stays static */}
+      {children}
+
+      {/* Wipe overlay */}
+      <motion.div
+        initial={{ x: "0%" }}
+        whileInView={{ x: "100%" }}
+        transition={{
+          duration: 1,
+          ease: [0.33, 1, 0.68, 1],
+          delay,
+        }}
+        viewport={{ once: true }}
+        className="absolute inset-0 bg-white z-10"
+      />
+    </div>
   );
 };

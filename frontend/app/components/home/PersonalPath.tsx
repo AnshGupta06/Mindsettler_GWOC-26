@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { CharReveal, SlideUp } from "../common/RevealComponent";
+import { CharReveal, SlideUp, ImageWipeReveal } from "../common/RevealComponent";
 
 export default function PersonalPathSection() {
   return (
@@ -15,22 +15,26 @@ export default function PersonalPathSection() {
 
         <div className="grid lg:grid-cols-2 gap-10 sm:gap-12 md:gap-16 lg:gap-20 items-center relative z-10">
 
-            {/* LEFT: IMAGE */}
-            <SlideUp>
-                <div className="relative group">
-                    <div className="relative rounded-xl sm:rounded-2xl md:rounded-[2.5rem] overflow-hidden shadow-2xl shadow-[#3F2965]/10 h-[350px] sm:h-[400px] md:h-[450px] lg:h-[500px] w-full border-2 sm:border-4 border-white">
-                        <Image
-                            src="/assets/journey.jpeg" 
-                            alt="Person walking on a peaceful path"
-                            fill
-                            className="object-cover transition-transform duration-700 group-hover:scale-105"
-                        />
-                        
-                        {/* Optional: Subtle Overlay */}
-                         <div className="absolute inset-0 bg-[#3F2965]/10 group-hover:bg-transparent transition-colors duration-500" />
-                    </div>
-                </div>
-            </SlideUp>
+           {/* LEFT: IMAGE */}
+<SlideUp>
+  <div className="relative group">
+    <ImageWipeReveal delay={0.1}>
+      <div className="relative rounded-xl sm:rounded-2xl md:rounded-[2.5rem] overflow-hidden shadow-2xl shadow-[#3F2965]/10 h-[350px] sm:h-[400px] md:h-[450px] lg:h-[500px] w-full border-2 sm:border-4 border-white">
+
+        <Image
+          src="/assets/journey.jpeg" 
+          alt="Person walking on a peaceful path"
+          fill
+          className="object-cover transition-transform duration-700 group-hover:scale-105"
+        />
+
+        {/* Subtle Overlay */}
+        <div className="absolute inset-0 bg-[#3F2965]/10 group-hover:bg-transparent transition-colors duration-500" />
+
+      </div>
+    </ImageWipeReveal>
+  </div>
+</SlideUp>
 
             {/* RIGHT: TEXT */}
             <div className="max-w-xl mx-auto lg:mx-0">

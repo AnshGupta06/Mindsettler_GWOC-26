@@ -5,7 +5,7 @@ import HeroCarousel from "./components/HeroCarousel";
 import Image from "next/image";
 import type { Variants } from "framer-motion";
 import { awarenessAreas } from "./awarenessCardsData";
-
+import Footer from "../components/common/Footer";
 
 
 export default function AwarenessPage() {
@@ -37,17 +37,17 @@ export default function AwarenessPage() {
         };
 
   return (
-    <main className="min-h-screen bg-lightBg">
+    <>
+    <main className="min-h-screen bg-white">
         <HeroCarousel />
 
       {/* Hero Section */}
       <section className="relative overflow-hidden">
-        {/* Background Gradient */}
-        <div className="absolute inset-0 bg-gradient-to-br from-softPurple via-lightBg to-softPink opacity-70"></div>
+        <div className="absolute inset-0 bg-white"></div>
 
         {/* Content */}
-        <div className="relative max-w-6xl mx-auto px-6 py-28 text-center">
-          <div className="bg-white rounded-3xl shadow-xl p-12 md:p-16 border border-gray-100">
+        <div className="relative max-w-6xl mx-auto px-6 py-15 text-center">
+          <div className="bg-[#f9f6ff] rounded-3xl shadow-xl p-12 md:p-16 border border-gray-100">
             <h1 className="text-4xl md:text-5xl font-bold text-primary leading-tight">
               Understanding Your Mind <br />
               Is the First Step Toward Healing
@@ -61,12 +61,18 @@ export default function AwarenessPage() {
             </p>
 
             <div className="mt-10 flex flex-col sm:flex-row justify-center gap-6">
-            <button className="px-10 py-3 rounded-full bg-primary text-white font-medium shadow-md hover:shadow-xl hover:scale-105 transition-all">
-                Explore Awareness
+            <button className="w-full sm:w-auto relative px-6 sm:px-8 md:px-10 py-3 sm:py-3.5 md:py-4 rounded-full bg-[#Dd1764] text-white font-bold text-sm sm:text-base tracking-wide overflow-hidden group transition-all duration-300 hover:shadow-2xl hover:shadow-[#3F2965]/20 hover:-translate-y-1">
+              <span className="absolute top-0 left-[-25%] w-[80%] h-full bg-gradient-to-r from-[#3F2965] to-[#513681] -skew-x-12 -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-left" />
+              <span className="absolute top-0 right-[-25%] w-[80%] h-full bg-gradient-to-l from-[#3F2965] to-[#513681] -skew-x-12 translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-right" />
+              <span className="relative z-10">Explore Awareness</span>
             </button>
 
-            <button className="px-10 py-3 rounded-full border-2 border-primary text-primary font-medium hover:bg-primary hover:text-white transition-all">
+             <button className="w-full sm:w-auto relative px-6 sm:px-8 md:px-10 py-3 sm:py-3.5 md:py-4 rounded-full border-2 border-[#3F2965]/10 text-[#3F2965] font-bold text-sm sm:text-base tracking-wide overflow-hidden group transition-all duration-300 hover:border-[#3F2965] hover:-translate-y-1">
+              <span className="absolute top-0 left-[-25%] w-[80%] h-full bg-gradient-to-r from-[#3F2965] to-[#513681] -skew-x-12 -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-left" />
+              <span className="absolute top-0 right-[-25%] w-[80%] h-full bg-gradient-to-l from-[#3F2965] to-[#513681] -skew-x-12 translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-right" />
+              <span className="relative z-10 group-hover:text-white transition-colors duration-300">
                 Our Programs
+              </span>
             </button>
             </div>
           </div>
@@ -97,7 +103,7 @@ export default function AwarenessPage() {
     <Link href={`/awareness/${item.slug}`} key={item.slug}>
       <motion.div
         variants={cardVariants}
-        className="group bg-lightBg rounded-3xl overflow-hidden border border-gray-100 shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer"
+        className="group bg-[#f9f6ff] rounded-3xl overflow-hidden border border-gray-100 shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer"
       >
         {/* Image */}
         <div className="relative h-48 overflow-hidden">
@@ -128,10 +134,9 @@ export default function AwarenessPage() {
 
 
         </section>
-
     </main>
-
-    
+<Footer />
+    </>
   );
 }
 
