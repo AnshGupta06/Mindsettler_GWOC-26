@@ -20,14 +20,12 @@ export const CharReveal = ({ children, className = "", delay = 0 }: CharRevealPr
   const characters = children.split("");
 
   return (
-    <motion.h1 
-      // FIX: Added 'pb-2' to prevent cutting off descenders (g, y, p)
-      className={`inline-flex overflow-hidden pb-2 ${className}`} 
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true }}
-      transition={{ staggerChildren: 0.03, delayChildren: delay }}
-    >
+    <motion.h1
+  className={`inline-flex overflow-hidden pb-2 ${className}`}
+  initial="hidden"
+  animate="visible"
+  transition={{ staggerChildren: 0.03, delayChildren: delay }}
+>
       {characters.map((char, index) => (
         <motion.span
           key={index}

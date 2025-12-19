@@ -15,7 +15,6 @@ import {
   Puzzle,
   Flower2,
 } from "lucide-react";
-import SectionHeading from "../common/HeadingSection";
 import { CharReveal, SlideUp } from "../common/RevealComponent";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -69,7 +68,7 @@ export default function JourneySection() {
     decorRef.current.forEach((el, i) => {
         gsap.to(el, {
             y: -40, 
-            rotation: i % 2 === 0 ? 10 : -10, // Slight rotation for natural feel
+            rotation: i % 2 === 0 ? 10 : -10,
             ease: "none",
             scrollTrigger: {
                 trigger: el,
@@ -83,36 +82,40 @@ export default function JourneySection() {
   }, []);
 
   return (
-    <section className="py-12 px-4 md:px-8 bg-white">
+    <section className="py-8 sm:py-10 md:py-12 px-4 sm:px-6 md:px-8 bg-white">
       
       {/* Container */}
-      <div className="max-w-[1440px] mx-auto bg-[#F9F6FF] rounded-[3rem] px-6 md:px-20 py-24 relative overflow-hidden">
+      <div className="max-w-[1440px] mx-auto bg-[#F9F6FF] rounded-2xl sm:rounded-3xl md:rounded-[3rem] px-4 sm:px-8 md:px-12 lg:px-20 py-12 sm:py-16 md:py-20 lg:py-24 relative overflow-hidden">
         
         {/* Background Blurs */}
-        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-[#3F2965]/5 blur-[120px] rounded-full pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-[#Dd1764]/5 blur-[100px] rounded-full pointer-events-none" />
+        <div className="absolute top-0 right-0 w-[400px] sm:w-[500px] md:w-[600px] h-[400px] sm:h-[500px] md:h-[600px] bg-[#3F2965]/5 blur-[100px] sm:blur-[120px] rounded-full pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-[350px] sm:w-[450px] md:w-[500px] h-[350px] sm:h-[450px] md:h-[500px] bg-[#Dd1764]/5 blur-[80px] sm:blur-[100px] rounded-full pointer-events-none" />
 
         {/* Heading */}
-        <div className="max-w-3xl mx-auto text-center mb-24 relative z-10 flex flex-col items-center">
+        <div className="max-w-3xl mx-auto text-center mb-12 sm:mb-16 md:mb-20 lg:mb-24 relative z-10 flex flex-col items-center">
           <SlideUp>
-            <span className="block text-[#Dd1764] font-bold text-sm tracking-wide mb-3 uppercase">
+            <span className="block text-[#Dd1764] font-bold text-xs sm:text-sm tracking-wide mb-2 sm:mb-3 uppercase">
                 Your Journey
             </span>
           </SlideUp>
-          <div className="flex flex-wrap justify-center text-3xl md:text-5xl font-bold text-[#3F2965]">
-             <CharReveal delay={0.1}>
-                 A guided path
-             </CharReveal>
-             <CharReveal delay={0.1} className="text-[#Dd1764] ml-2">
-                 toward healing
-             </CharReveal>
+          <div className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-[#3F2965] space-y-1">
+            <div>
+                <CharReveal delay={0.1}>
+                    A guided path
+                </CharReveal>
+            </div>
+            <div className="text-[#Dd1764]">
+                <CharReveal delay={0.1}>
+                    toward healing
+                </CharReveal>
+            </div>
           </div>
         </div>
 
         {/* Timeline Container */}
         <div ref={timelineRef} className="relative max-w-5xl mx-auto z-10">
           
-          {/* Center Line */}
+          {/* Center Line - Hidden on mobile */}
           <div className="absolute left-1/2 top-0 -translate-x-1/2 h-full hidden md:block">
             <div className="w-[2px] h-full bg-[#3F2965]/10">
               <div
@@ -123,54 +126,54 @@ export default function JourneySection() {
           </div>
 
           {/* Steps */}
-          <div className="space-y-16 md:space-y-32">
+          <div className="space-y-10 sm:space-y-12 md:space-y-16 lg:space-y-32">
             {journeySteps.map((step, index) => {
               const isLeft = index % 2 === 0;
 
               return (
                 <div
                   key={index}
-                  className={`relative flex flex-col md:flex-row items-center ${
-                    isLeft ? "md:flex-row" : "md:flex-row-reverse"
-                  }`}
+                  className="relative flex flex-col md:flex-row items-center md:items-center"
+                  style={{
+                    flexDirection: isLeft ? 'row' : 'row-reverse'
+                  }}
                 >
                   {/* TEXT SIDE (Card) */}
-                  <div className={`w-full md:w-1/2 ${isLeft ? "md:pr-16" : "md:pl-16"} z-10`}>
+                  <div className={`w-full md:w-1/2 ${isLeft ? "md:pr-8 lg:pr-16" : "md:pl-8 lg:pl-16"} z-10`}>
                     <div
                       ref={(el) => { if (el) cardsRef.current[index] = el; }}
-                      // ADDED HOVER EFFECTS HERE (Same as Differentiators)
-                      className="group bg-white p-8 md:p-10 rounded-[2rem] shadow-xl shadow-[#3F2965]/5 border border-[#3F2965]/5 hover:border-[#Dd1764]/20 hover:shadow-2xl hover:shadow-[#3F2965]/10 transition-all duration-500 hover:-translate-y-2 cursor-default"
+                      className="group bg-white p-6 sm:p-8 md:p-10 rounded-xl sm:rounded-2xl md:rounded-[2rem] shadow-xl shadow-[#3F2965]/5 border border-[#3F2965]/5 hover:border-[#Dd1764]/20 hover:shadow-2xl hover:shadow-[#3F2965]/10 transition-all duration-500 hover:-translate-y-2 cursor-default"
                     >
-                      <div className="w-14 h-14 rounded-2xl bg-[#F9F6FF] text-[#3F2965] flex items-center justify-center mb-6 group-hover:bg-[#Dd1764] group-hover:text-white transition-all duration-300">
+                      <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-[#F9F6FF] text-[#3F2965] flex items-center justify-center mb-4 sm:mb-6 group-hover:bg-[#Dd1764] group-hover:text-white transition-all duration-300">
                         {step.icon}
                       </div>
-                      <h3 className="text-2xl font-bold text-[#3F2965] mb-3">
+                      <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-[#3F2965] mb-2 sm:mb-3">
                         {step.title}
                       </h3>
-                      <p className="text-[#3F2965]/70 leading-relaxed font-medium">
+                      <p className="text-sm sm:text-base text-[#3F2965]/70 leading-relaxed font-medium">
                         {step.description}
                       </p>
                     </div>
                   </div>
 
                   {/* CENTER DOT */}
-                  <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center justify-center w-8 h-8 rounded-full bg-white border-4 border-[#F9F6FF] shadow-sm z-20">
-                    <div className="w-2.5 h-2.5 rounded-full bg-[#Dd1764]" />
+                  <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white border-4 border-[#F9F6FF] shadow-sm z-20">
+                    <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-[#Dd1764]" />
                   </div>
 
-                  {/* EMPTY SIDE (Decor Placement) */}
-                  <div className={`w-full md:w-1/2 hidden md:flex ${isLeft ? "justify-end pr-12" : "justify-start pl-12"}`}>
+                  {/* EMPTY SIDE (Decor Placement) - Hidden on mobile */}
+                  <div className={`w-full md:w-1/2 hidden md:flex ${isLeft ? "justify-end pr-8 lg:pr-12" : "justify-start pl-8 lg:pl-12"}`}>
                       {/* Floating Element Container */}
                       <div 
                         ref={(el) => { if (el) decorRef.current[index] = el; }}
-                        className={`flex flex-col items-center gap-4 ${step.colorClass}`}
+                        className={`flex flex-col items-center gap-3 sm:gap-4 ${step.colorClass}`}
                       >
                          {/* Large Icon */}
-                         <div className="opacity-10 scale-100">
+                         <div className="opacity-10 scale-75 sm:scale-90 lg:scale-100">
                              {step.decor}
                          </div>
-                         {/* Optional Label for "Linking" context */}
-                         <span className="text-sm font-bold uppercase tracking-widest opacity-30">
+                         {/* Optional Label */}
+                         <span className="text-xs sm:text-sm font-bold uppercase tracking-widest opacity-30">
                             {step.decorLabel}
                          </span>
                       </div>
@@ -190,46 +193,41 @@ const journeySteps = [
   {
     title: "Book a Session",
     description: "Choose an online or offline consultation at a time that feels right for you.",
-    icon: <CalendarCheck size={28} strokeWidth={1.5} />,
-    // Concept: Time/Scheduling
+    icon: <CalendarCheck size={24} strokeWidth={1.5} />,
     decor: <Clock size={160} strokeWidth={0.5} />,
     decorLabel: "Your Time",
-    colorClass: "text-[#Dd1764]" // Pink
+    colorClass: "text-[#Dd1764]"
   },
   {
     title: "Initial Understanding",
     description: "Your concerns are listened to with care in a supportive, non-judgmental environment.",
-    icon: <Ear size={28} strokeWidth={1.5} />,
-    // Concept: Listening/Connection
+    icon: <Ear size={24} strokeWidth={1.5} />,
     decor: <MessageCircleHeart size={160} strokeWidth={0.5} />,
     decorLabel: "Safe Space",
-    colorClass: "text-[#3F2965]" // Purple
+    colorClass: "text-[#3F2965]"
   },
   {
     title: "Assessment & Diagnosis",
     description: "Professional diagnosis conducted with clinical responsibility and ethical care.",
-    icon: <ClipboardList size={28} strokeWidth={1.5} />,
-    // Concept: Analysis/Clarity
+    icon: <ClipboardList size={24} strokeWidth={1.5} />,
     decor: <FileSearch size={160} strokeWidth={0.5} />,
     decorLabel: "Clarity",
-    colorClass: "text-[#Dd1764]" // Pink
+    colorClass: "text-[#Dd1764]"
   },
   {
     title: "Structured Sessions",
     description: "Therapy and psycho-education sessions designed around your mental health needs.",
-    icon: <Layers size={28} strokeWidth={1.5} />,
-    // Concept: Building Blocks/Structure
+    icon: <Layers size={24} strokeWidth={1.5} />,
     decor: <Puzzle size={160} strokeWidth={0.5} />,
     decorLabel: "Structure",
-    colorClass: "text-[#3F2965]" // Purple
+    colorClass: "text-[#3F2965]"
   },
   {
     title: "Growth & Healing",
     description: "Develop awareness, coping strategies, and emotional resilience over time.",
-    icon: <HeartHandshake size={28} strokeWidth={1.5} />,
-    // Concept: Blooming/Growth
+    icon: <HeartHandshake size={24} strokeWidth={1.5} />,
     decor: <Flower2 size={160} strokeWidth={0.5} />,
     decorLabel: "Bloom",
-    colorClass: "text-[#Dd1764]" // Pink
+    colorClass: "text-[#Dd1764]"
   },
 ];
