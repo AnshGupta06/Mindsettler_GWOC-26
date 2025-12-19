@@ -1,6 +1,6 @@
 import Script from "next/script";
 import "./globals.css";
-// import Navbar from "./components/common/Navbar";
+import Navbar from "./components/common/Navbar";
 
 export default function RootLayout({
   children,
@@ -10,7 +10,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        {/* <Navbar /> */}
+        <Navbar />
         <Script
           type="module"
           src="https://unpkg.com/@google/model-viewer@latest/dist/model-viewer.min.js"

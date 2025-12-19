@@ -66,4 +66,19 @@
   body {
     @apply bg-background text-foreground;
   }
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont;
+  background: #faf7fb; /* soft off-white */
+  color: #2b1f3a;
+  overflow-x: hidden;
+}
+button{
+  cursor: pointer;
+}
 }
