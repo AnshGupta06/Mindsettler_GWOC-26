@@ -9,7 +9,7 @@ import type { Variants } from "framer-motion";
 
 export default function AwarenessPage() {
 
-    const containerVariants = {
+    const containerVariants: Variants = {
         hidden: {},
         visible: {
             transition: {
@@ -18,7 +18,7 @@ export default function AwarenessPage() {
         },
         };
 
-        const cardVariants = {
+        const cardVariants: Variants = {
         hidden: {
             opacity: 0,
             y: 40,
@@ -28,7 +28,9 @@ export default function AwarenessPage() {
             y: 0,
             transition: {
             duration: 0.6,
-            ease: "easeOut",
+            // Using cubic-bezier equivalent of ease-out to satisfy
+            // Framer Motion's typed Easing while keeping behavior similar.
+            ease: [0.0, 0.0, 0.58, 1.0],
             },
         },
         };
