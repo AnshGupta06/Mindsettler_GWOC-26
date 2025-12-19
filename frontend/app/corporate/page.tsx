@@ -535,9 +535,23 @@ export default function CorporatePage() {
         </div>
       </div>
 
-      {/* Form section */}
-<div className="py-16 sm:py-24 bg-white relative">
-  <div className="container mx-auto px-4">
+      {/* Form section with background image */}
+<div className="py-16 sm:py-24 relative overflow-hidden">
+  {/* Background image with overlay - very light */}
+  <div className="absolute inset-0 z-0">
+    <div 
+      className="absolute inset-0"
+      style={{
+        backgroundImage: 'url("https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=2070&auto=format&fit=crop")',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}
+    />
+    <div className="absolute inset-0 bg-gradient-to-br from-white/95 via-white/90 to-white/95"></div>
+  </div>
+  
+  <div className="container mx-auto px-4 relative z-10">
     <div className="flex justify-center">
       <div className="w-full max-w-2xl">
         <FastScrollReveal>
