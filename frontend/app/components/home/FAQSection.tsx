@@ -24,7 +24,7 @@ export default function FAQSection() {
                     </span>
                  </SlideUp>
                  <div className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-[#3F2965]">
-                    <CharReveal delay={0.1}>
+                    <CharReveal delay={0.1} className="justify-center">
                         Common questions, answered
                     </CharReveal>
                  </div>

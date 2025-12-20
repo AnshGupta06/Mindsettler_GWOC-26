@@ -100,12 +100,12 @@ export default function JourneySection() {
           </SlideUp>
           <div className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-[#3F2965] space-y-1">
             <div>
-                <CharReveal delay={0.1}>
+                <CharReveal delay={0.1} className="justify-center">
                     A guided path
                 </CharReveal>
             </div>
             <div className="text-[#Dd1764]">
-                <CharReveal delay={0.1}>
+                <CharReveal delay={0.1} className="justify-center">
                     toward healing
                 </CharReveal>
             </div>

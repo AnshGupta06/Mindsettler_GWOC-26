@@ -27,12 +27,12 @@ export default function WorkplaceWellnessSection() {
             {/* Title: Alphabet Reveal */}
             <div className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-[#3F2965] space-y-1">
                 <div>
-                    <CharReveal delay={0.2}>
+                    <CharReveal delay={0.2} className="justify-center">
                         Wellness solutions for
                     </CharReveal>
                 </div>
                 <div className="text-[#Dd1764]">
-                    <CharReveal delay={0.2}>
+                    <CharReveal delay={0.2} className="justify-center">
                         healthier workplaces
                     </CharReveal>
                 </div>
