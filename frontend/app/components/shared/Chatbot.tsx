@@ -173,17 +173,27 @@ export function Chatbot() {
                 ))}
 
                 {isLoading && (
-                  <div className="flex items-start gap-3">
-                    <Avatar>
-                      <AvatarFallback>
-                        <Bot className="h-5 w-5" />
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="ms-chatbot-bot rounded-lg p-3">
-                      <Loader className="ms-chatbot-loader h-5 w-5 animate-spin" />
-                    </div>
-                  </div>
-                )}
+  <div className="flex flex-col gap-1 pl-12">
+    {/* Typing text */}
+    <div className="text-xs text-muted-foreground italic">
+      MindSettler Assistant is typing…
+    </div>
+
+    {/* Loader bubble */}
+    <div className="flex items-start gap-3">
+      <Avatar>
+        <AvatarFallback>
+          <Bot className="h-5 w-5" />
+        </AvatarFallback>
+      </Avatar>
+
+      <div className="ms-chatbot-bot rounded-lg p-3">
+        <Loader className="ms-chatbot-loader h-5 w-5 animate-spin" />
+      </div>
+    </div>
+  </div>
+)}
+
               </div>
             </ScrollArea>
           </div>
