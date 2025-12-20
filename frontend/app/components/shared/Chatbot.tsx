@@ -46,42 +46,54 @@ export function Chatbot() {
   }, [messages]);
 
   const handleSendMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!input.trim()) return;
+  e.preventDefault();
+  if (!input.trim()) return;
 
-    const userMessage: Message = { role: 'user', content: input };
-    setMessages(prev => [...prev, userMessage]);
-    setInput('');
-    setIsLoading(true);
+  const userMessage: Message = { role: 'user', content: input };
+  setMessages(prev => [...prev, userMessage]);
+  setInput('');
+  setIsLoading(true);
 
-    try {
-      const response = await chatbotAssistsBooking({ message: input });
+  try {
+    const result = await chatbotAssistsBooking({ message: input });
 
-      setMessages(prev => [
-        ...prev,
-        { role: 'bot', content: response.response },
-      ]);
+    setMessages(prev => [
+      ...prev,
+      { role: 'bot', content: result.response },
+    ]);
 
-      if (response.redirectUrl) {
-        setTimeout(() => {
-          router.push(response.redirectUrl!);
-          setIsOpen(false);
-        }, 1500);
-      }
-    } catch (error) {
+    // DIRECT REDIRECT
+    if (result.action === 'redirect_booking') {
+      setTimeout(() => {
+        router.push('/booking');
+        setIsOpen(false);
+      }, 700);
+    }
+
+    // SOFT SUGGESTION (BUTTON)
+    if (result.action === 'suggest_booking') {
       setMessages(prev => [
         ...prev,
         {
           role: 'bot',
-          content:
-            "I’m having a little trouble right now. Please try again in a moment.",
+          content: '__BOOK_SESSION_BUTTON__',
         },
       ]);
-      console.error(error);
-    } finally {
-      setIsLoading(false);
     }
-  };
+  } catch (err) {
+    setMessages(prev => [
+      ...prev,
+      {
+        role: 'bot',
+        content:
+          "I’m having a little trouble right now. Please try again in a moment.",
+      },
+    ]);
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 
   return (
     <>
@@ -136,7 +148,20 @@ export function Chatbot() {
                           : 'ms-chatbot-bot'
                       )}
                     >
-                      {message.content}
+                     {message.content === '__BOOK_SESSION_BUTTON__' ? (
+  <Button
+    className="mt-2 w-fit bg-[#b8aaf3] text-white hover:bg-[#a79bf0]"
+    onClick={() => {
+      router.push('/booking');
+      setIsOpen(false);
+    }}
+  >
+    Book a session with MindSettler
+  </Button>
+) : (
+  message.content
+)}
+
                     </div>
                   </div>
                 ))}
