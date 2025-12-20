@@ -1,32 +1,23 @@
 "use client";
 
-import { GoogleAuthProvider, signInWithRedirect } from "firebase/auth";
+import { signInWithRedirect, GoogleAuthProvider } from "firebase/auth";
 import { auth } from "../../lib/firebase";
+import styles from "../styles/google-button.module.css";
 
 export default function GoogleButton() {
   const handleGoogleLogin = () => {
     const provider = new GoogleAuthProvider();
-    provider.setCustomParameters({
-      prompt: "select_account",
-    });
-
+    provider.setCustomParameters({ prompt: "select_account" });
     signInWithRedirect(auth, provider);
   };
 
   return (
-    <button
-      type="button"
-      onClick={handleGoogleLogin}
-      style={{
-        width: "100%",
-        padding: "12px",
-        borderRadius: "8px",
-        border: "1px solid #ccc",
-        background: "#fff",
-        cursor: "pointer",
-        fontSize: "15px",
-      }}
-    >
+    <button className={styles.googleButton} onClick={handleGoogleLogin}>
+      <img
+        src="/assets/google-icon.png"
+        alt="Google"
+        className={styles.icon}
+      />
       Sign in with Google
     </button>
   );
