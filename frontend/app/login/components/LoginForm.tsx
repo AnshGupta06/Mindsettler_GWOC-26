@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 
 import { useEffect, useState } from "react";
 import {
@@ -132,17 +133,21 @@ export default function LoginForm() {
 
       {/* Footer */}
       <p style={{ marginTop: "22px", fontSize: "14px", color: "#374151" }}>
-        Don’t have an account?{" "}
-        <span
-          style={{
-            color: "#0b2343",
-            fontWeight: 500,
-            cursor: "pointer",
-          }}
-        >
-          Sign up
-        </span>
-      </p>
+  Don’t have an account?{" "}
+  <Link
+    href="/login/signup"
+    style={{
+      color: "#0b2343",
+      fontWeight: 500,
+      textDecoration: "none",
+      cursor: "pointer",
+    }}
+  >
+    Sign up
+  </Link>
+</p>
+
     </div>
   );
 }
+
