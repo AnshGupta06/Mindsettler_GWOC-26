@@ -1,10 +1,9 @@
 import LoginForm from "./components/LoginForm";
-import styles from "./styles/auth-layout.module.css";
 
 export default function LoginPage() {
   return (
-    <div className={styles.page}>
-      <div className={styles.card}>
+    <div className="min-h-screen flex items-center justify-center bg-[#F9F6FF] px-4">
+      <div className="w-full max-w-md">
         <LoginForm />
       </div>
     </div>

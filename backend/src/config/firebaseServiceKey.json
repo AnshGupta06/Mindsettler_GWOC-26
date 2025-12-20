@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "mindsettler-14087",
+  "private_key_id": "d5ec5008ea79d9727efefcbbc5bb09e427c438c1",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQClvopwMOJEcA2B\n6G0gUzQzKniMBHKIuw3JPfrw5RGkna9NU+9j65UKI1/lbw/jc/1gdsaEcTFU/kWI\ns+iR5aAuuWL7ikRPnHzntTU23jXmm4AT7KxZ4F+8aY8cHLK7Zu1vVCT4RzKLorTS\n1wXhgVez5539Nto9Dh7OXbAfkQSGEHKIDd+PDi8NcoWHRTS5uk8i2OUN5bjN7PsM\nPswT6k31Wp66y0Y/BTsOuY7JOzCM91PNymfLXan3pUOAuqlA6anwJX5Z53mKbaDA\nnA8z05KCP7JDIskOSQslDHsqBLLTt0vzB1puqlZKBof7Q5f0qOBgWOKiVykQ7zJf\nU9r+HkNVAgMBAAECggEADIC54Toyy15XioHtv3c/VA/DXa6VND7GDLT9+c+R2+Tg\nPTlUcOlrygK+oGhXHr2Ycr8q/QEr60EuHiCSLfVQNs4ZyydUPVws6O64t62eC8oV\nqIsdOj9sgWJGHyUED5J1XUVP76GxTKrGsLPzN95hrwrNFnWdk2b+CGu1VkBCgtla\nMo7VlRWUTXLvc2QUxAKBIBQuM576xxsdTFa51nMIg+VyakSuua60vXofG5bDw9f8\n1RrRB2HBYgoNlrAGBnABIh8u0tuFhEfIMdoQXaVmHJiWUavQy+2PERyV/vnDP2N5\nE2lwf1qyGx30Ovo40EuGd+63Qwx7hbmYn4OHjrigUQKBgQDOj7HzCkMglf7I1Lbh\nk4qzKmY4kN+ey2GLSafBvDkDw7QAHRSoAp48FyZLfrJefTxKeibTAF/8Pj2xH1k3\nK9TRpD7f59P3FBPACjH3LIURAImrSKitTHMVxEemz8mnuB4LpKm+Bk95/ms2gvhq\nnyDfjtJhUhYWLG6G7AFXO8NxZQKBgQDNae301YOJp+Uyp3kMCLh9TEfwS4Kk1aRP\nYq/9jl5f9Y8lXngGuijppirTdLEqroI8G5BPqng/RQ1wCT2tw4W6KlrzhbJl4CqM\nwM8wIqj4N+xt4gQFHZbIuDwQ8qOh8Us3e7ADwBp4kmPuh6mgV5+0uecsT8nXPcUE\ngsIxaXXjMQKBgQCXYdxKgDTeBs+pI6u7+kNmNyafQh2A5RDh4eMeKvGl/qFGjAl9\ncB3DcDvSjFHwyduLwaX+cYHm/T59NrpNosPfuH2T3vULWR14WoBv46LJ6Rj7/M4R\n47tcMnNIn3PshRUP92enKjzI7VppouaoTWLsNGGejWg+a+W83+3DnrsHuQKBgDK9\nA6YCR2dtLVQBwgiS7t8kRHC6dh65Fsj1G3uJ+w3A3gbg+szOluR/wvxQSqK8UDcA\np/jFpsYaDGOsJKwTK6j8ZVLZp2M6p8f0qDi/lvUY+zF5Ln0E/gW+XDfjdz+9FlMy\nHhwPC3rUzhJRODj+69f8Q3nSi4y7GTswAT+rSQ9BAoGBAIK3SkTE+kzyP3hoa0Al\njN3GWKjOjM+H8RkRYSj0PgQPsOcura4zpkTgO9vQMPcI0kmnocxQojN2/IUqwcSD\nh6sdvLJaT9dLUZh1QmxVkHoyEBehVP02aAQ4bJ4H9Uar8e9LI8ZY0cOZDF8NsPSy\nru3cIhatffsS5YEK8ncYKzEb\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-fbsvc@mindsettler-14087.iam.gserviceaccount.com",
+  "client_id": "117096330318898112127",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-fbsvc%40mindsettler-14087.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

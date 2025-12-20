@@ -19,12 +19,13 @@ enum SessionMode {
 }
 
 model User {
-  id        String    @id @default(uuid())
-  name      String
-  email     String    @unique
-  phone     String?
-  bookings  Booking[]
-  createdAt DateTime  @default(now())
+  id           String   @id @default(uuid())
+  firebaseUid String   @unique
+  name         String
+  email        String   @unique
+  phone        String?
+  createdAt    DateTime @default(now())
+  bookings     Booking[]
 }
 
 model SessionSlot {
