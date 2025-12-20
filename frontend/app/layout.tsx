@@ -1,6 +1,7 @@
 import Script from "next/script";
 import "./globals.css";
 import Navbar from "./components/common/Navbar";
+import { Chatbot } from './components/shared/Chatbot';
 
 export default function RootLayout({
   children,
@@ -17,6 +18,7 @@ export default function RootLayout({
           strategy="beforeInteractive"
         />
         {children}
+        <Chatbot />
       </body>
     </html>
   );
