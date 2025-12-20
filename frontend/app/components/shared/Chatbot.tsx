@@ -55,7 +55,13 @@ export function Chatbot() {
   setIsLoading(true);
 
   try {
-    const result = await chatbotAssistsBooking({ message: input });
+    const result = await chatbotAssistsBooking({
+  message: input,
+  history: messages
+    .filter(m => !m.content.startsWith('__'))
+    .slice(-10),
+});
+
 
     setMessages(prev => [
       ...prev,

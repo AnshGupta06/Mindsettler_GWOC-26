@@ -4,8 +4,19 @@ import { ai } from '../../ai/genkit';
 import { z } from 'genkit';
 
 const ChatbotAssistsBookingInputSchema = z.object({
-  message: z.string().describe('The user message to the chatbot.'),
+  message: z.string().describe('Current user message'),
+  history: z
+    .array(
+      z.object({
+        role: z.enum(['user', 'bot']),
+        content: z.string(),
+      })
+    )
+    .max(10)
+    .optional()
+    .describe('Last 10 conversation messages'),
 });
+
 export type ChatbotAssistsBookingInput = z.infer<
   typeof ChatbotAssistsBookingInputSchema
 >;
@@ -99,8 +110,16 @@ TONE & STYLE
 - Never robotic or clinical
 
 ────────────────────────
-USER MESSAGE:
+CONVERSATION HISTORY (last 10 messages):
+{{#if history}}
+{{#each history}}
+{{role}}: {{content}}
+{{/each}}
+{{/if}}
+
+CURRENT USER MESSAGE:
 {{{message}}}
+
 `,
 });
 
