@@ -64,3 +64,73 @@ body {
 button {
   cursor: pointer;
 }
+
+/* =========================
+   MindSettler Chatbot Theme
+========================= */
+
+.ms-chatbot-trigger {
+  background: linear-gradient(135deg, #6d5bd0, #ec407a);
+  color: white;
+  box-shadow: 0 12px 30px rgba(109, 91, 208, 0.35);
+}
+
+/* Sheet background */
+.ms-chatbot-sheet {
+  background: #f8f7fb;
+}
+
+/* Header */
+.ms-chatbot-header h2 {
+  color: #6d5bd0;
+  font-weight: 600;
+}
+
+.ms-chatbot-header p {
+  color: #7a768f;
+}
+
+/* Message bubbles */
+.ms-chatbot-bot {
+  background: #f1effa;
+  color: #2d2a38;
+  border-radius: 14px 14px 14px 4px;
+}
+
+.ms-chatbot-user {
+  background: #ec407a;
+  color: white;
+  border-radius: 14px 14px 4px 14px;
+}
+
+/* Avatar (REMOVE GREEN) */
+.ms-chatbot-sheet .rounded-full {
+  background-color: #e6e1fb !important;
+  color: #6d5bd0 !important;
+}
+
+/* Input field (REMOVE GREEN) */
+.ms-chatbot-input {
+  background-color: #f1effa !important;
+  border-radius: 999px;
+  border: 1px solid #ddd;
+}
+
+.ms-chatbot-input::placeholder {
+  color: #7a768f;
+}
+
+/* Send button (REMOVE GREEN) */
+.ms-chatbot-sheet button[type='submit'] {
+  background: #6d5bd0;
+  color: white;
+}
+
+.ms-chatbot-sheet button[type='submit']:hover {
+  background: #5b4bc4;
+}
+
+/* Loader */
+.ms-chatbot-loader {
+  color: #7a768f;
+}

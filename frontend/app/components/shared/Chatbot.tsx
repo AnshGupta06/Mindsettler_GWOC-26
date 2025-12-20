@@ -28,7 +28,7 @@ export function Chatbot() {
     {
       role: 'bot',
       content:
-        "Hello! I'm here to help you learn about MindSettler and book a session. How can I assist you today?",
+        "Hi 🌱 I’m here to listen and guide you. You can ask about sessions, services, or anything you’re unsure about.",
     },
   ]);
   const [input, setInput] = useState('');
@@ -56,27 +56,28 @@ export function Chatbot() {
 
     try {
       const response = await chatbotAssistsBooking({ message: input });
-      const botMessage: Message = { role: 'bot', content: response.response };
-      setMessages(prev => [...prev, botMessage]);
+
+      setMessages(prev => [
+        ...prev,
+        { role: 'bot', content: response.response },
+      ]);
 
       if (response.redirectUrl) {
-        // Add a message indicating redirection
-        const redirectMessage: Message = { role: 'bot', content: `One moment, redirecting you to the ${response.redirectUrl.replace('/', '')} page...` };
-        setMessages(prev => [...prev, redirectMessage]);
-        
         setTimeout(() => {
           router.push(response.redirectUrl!);
           setIsOpen(false);
         }, 1500);
       }
     } catch (error) {
-      const errorMessage: Message = {
-        role: 'bot',
-        content:
-          "I'm sorry, but I'm having trouble connecting right now. Please try again later.",
-      };
-      setMessages(prev => [...prev, errorMessage]);
-      console.error('Chatbot error:', error);
+      setMessages(prev => [
+        ...prev,
+        {
+          role: 'bot',
+          content:
+            "I’m having a little trouble right now. Please try again in a moment.",
+        },
+      ]);
+      console.error(error);
     } finally {
       setIsLoading(false);
     }
@@ -84,8 +85,9 @@ export function Chatbot() {
 
   return (
     <>
+      {/* Floating Trigger Button */}
       <Button
-        className="fixed bottom-6 right-6 h-16 w-16 rounded-full shadow-lg"
+        className="ms-chatbot-trigger fixed bottom-6 right-6 h-16 w-16 rounded-full"
         onClick={() => setIsOpen(true)}
         aria-label="Open chatbot"
       >
@@ -93,16 +95,16 @@ export function Chatbot() {
       </Button>
 
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
-        <SheetContent className="flex h-full flex-col sm:max-w-md">
-          <SheetHeader className="pr-8">
-            <SheetTitle className="font-headline text-2xl">
+        <SheetContent className="ms-chatbot-sheet flex h-full flex-col sm:max-w-md">
+          <SheetHeader className="ms-chatbot-header pr-8">
+            <SheetTitle className="text-2xl">
               MindSettler Assistant
             </SheetTitle>
             <SheetDescription>
-              Your guide to our services. Ask me about booking, our approach, or
-              anything else you need to know.
+              A calm space to understand our services and take the next step.
             </SheetDescription>
           </SheetHeader>
+
           <div className="flex-1 overflow-hidden">
             <ScrollArea className="h-full" ref={scrollAreaRef}>
               <div className="space-y-6 p-4">
@@ -113,7 +115,7 @@ export function Chatbot() {
                       'flex items-start gap-3',
                       message.role === 'user'
                         ? 'flex-row-reverse'
-                        : 'flex-row',
+                        : 'flex-row'
                     )}
                   >
                     <Avatar>
@@ -125,18 +127,20 @@ export function Chatbot() {
                         )}
                       </AvatarFallback>
                     </Avatar>
+
                     <div
                       className={cn(
-                        'max-w-[80%] rounded-lg p-3 text-sm',
+                        'ms-chatbot-message max-w-[80%] rounded-lg p-3 text-sm',
                         message.role === 'user'
-                          ? 'bg-primary text-primary-foreground'
-                          : 'bg-card',
+                          ? 'ms-chatbot-user'
+                          : 'ms-chatbot-bot'
                       )}
                     >
                       {message.content}
                     </div>
                   </div>
                 ))}
+
                 {isLoading && (
                   <div className="flex items-start gap-3">
                     <Avatar>
@@ -144,14 +148,15 @@ export function Chatbot() {
                         <Bot className="h-5 w-5" />
                       </AvatarFallback>
                     </Avatar>
-                    <div className="rounded-lg bg-card p-3">
-                      <Loader className="h-5 w-5 animate-spin text-muted-foreground" />
+                    <div className="ms-chatbot-bot rounded-lg p-3">
+                      <Loader className="ms-chatbot-loader h-5 w-5 animate-spin" />
                     </div>
                   </div>
                 )}
               </div>
             </ScrollArea>
           </div>
+
           <form
             onSubmit={handleSendMessage}
             className="flex items-center gap-2 border-t p-4"
@@ -161,9 +166,13 @@ export function Chatbot() {
               onChange={e => setInput(e.target.value)}
               placeholder="Type your message..."
               disabled={isLoading}
-              className="flex-1"
+              className="ms-chatbot-input flex-1"
             />
-            <Button type="submit" disabled={isLoading || !input.trim()} size="icon">
+            <Button
+              type="submit"
+              disabled={isLoading || !input.trim()}
+              size="icon"
+            >
               <Send className="h-4 w-4" />
             </Button>
           </form>
