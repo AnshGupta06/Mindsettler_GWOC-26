@@ -111,7 +111,7 @@ export default async function AwarenessDetailPage({
         <span className="text-white text-xl font-bold">?</span>
       </div>
       <h2 className="text-3xl md:text-4xl font-bold text-primary leading-tight">
-        <CharReveal delay={0.05}>
+        <CharReveal delay={0.05} className="justify-center">
           {`What is ${content.title}?`}
         </CharReveal>
       </h2>
@@ -145,7 +145,7 @@ export default async function AwarenessDetailPage({
 
     {/* Heading */}
     <h2 className="relative text-3xl md:text-4xl font-bold text-primary mb-10 text-center">
-      <CharReveal delay={0.1}>
+      <CharReveal delay={0.1} className="justify-center">
         Common Signs & Symptoms
       </CharReveal>
     </h2>
@@ -190,7 +190,7 @@ export default async function AwarenessDetailPage({
       
       {/* Heading */}
       <h2 className="relative text-3xl md:text-4xl font-bold text-primary mb-10 text-center">
-        <CharReveal delay={0.1}>
+        <CharReveal delay={0.1} className="justify-center">
           Common Causes & Triggers
         </CharReveal>
       </h2>
@@ -231,7 +231,7 @@ export default async function AwarenessDetailPage({
 
       {/* Heading */}
       <h2 className="relative text-3xl md:text-4xl font-bold mb-10 text-center">
-        <CharReveal delay={0.1}>
+        <CharReveal delay={0.1} className="justify-center">
           Did You Know?
         </CharReveal>
       </h2>
@@ -269,7 +269,7 @@ export default async function AwarenessDetailPage({
     {/* Header */}
     <div className="relative text-center mb-14">
       <h2 className="text-3xl md:text-4xl font-bold text-primary mb-4">
-        <CharReveal delay={0.1}>
+        <CharReveal delay={0.1} className="justify-center">
           How MindSettler Can Help
         </CharReveal>
       </h2>
@@ -315,7 +315,7 @@ export default async function AwarenessDetailPage({
   <section className="relative bg-[#f9f6ff] rounded-3xl p-8 md:p-14 overflow-hidden">
     {/* Heading */}
     <h2 className="relative text-3xl md:text-4xl font-bold text-primary mb-12 text-center">
-      <CharReveal delay={0.1}>
+      <CharReveal delay={0.1} className="justify-center">
         Our Programs & Services
       </CharReveal>
     </h2>
@@ -413,7 +413,7 @@ export default async function AwarenessDetailPage({
       
       {/* Heading */}
       <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight">
-        <CharReveal delay={0.05}>
+        <CharReveal delay={0.05} className="justify-center">
           You Don&apos;t Have to Navigate This Alone
         </CharReveal>
       </h2>
