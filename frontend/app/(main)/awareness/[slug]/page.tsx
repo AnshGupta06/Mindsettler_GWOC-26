@@ -2,7 +2,7 @@ import Image from "next/image";
 import { awarenessContent } from "./awarenessData";
 import { CharReveal, MaskedReveal, SlideUp, StaggerContainer, StaggerItem, ImageWipeReveal } from "../../components/common/RevealComponent";
 import { AlertTriangle,   } from "lucide-react";
-import Footer from "@/app/components/common/Footer";
+import Footer from "app/(main)/components/common/Footer";
 
 interface AwarenessPageProps {
   params: {
