@@ -64,3 +64,114 @@ body {
 button {
   cursor: pointer;
 }
+
+/* =========================
+   MindSettler Chatbot Theme
+========================= */
+
+.ms-chatbot-trigger {
+  background: linear-gradient(135deg, #6d5bd0, #ec407a);
+  color: white;
+  box-shadow: 0 12px 30px rgba(109, 91, 208, 0.35);
+}
+
+/* Sheet background */
+.ms-chatbot-sheet {
+  background: #f8f7fb;
+}
+
+/* Header */
+.ms-chatbot-header h2 {
+  color: #6d5bd0;
+  font-weight: 600;
+}
+
+.ms-chatbot-header p {
+  color: #7a768f;
+}
+
+/* Message bubbles */
+.ms-chatbot-bot {
+  background: #f1effa;
+  color: #2d2a38;
+  border-radius: 14px 14px 14px 4px;
+}
+
+.ms-chatbot-user {
+  background: #ec407a;
+  color: white;
+  border-radius: 14px 14px 4px 14px;
+}
+
+/* Avatar (REMOVE GREEN) */
+.ms-chatbot-sheet .rounded-full {
+  background-color: #e6e1fb !important;
+  color: #6d5bd0 !important;
+}
+
+/* Input field (REMOVE GREEN) */
+.ms-chatbot-input {
+  background-color: #f1effa !important;
+  border-radius: 999px;
+  border: 1px solid #ddd;
+}
+
+.ms-chatbot-input::placeholder {
+  color: #7a768f;
+}
+
+/* Send button (REMOVE GREEN) */
+.ms-chatbot-sheet button[type='submit'] {
+  background: #6d5bd0;
+  color: white;
+}
+
+.ms-chatbot-sheet button[type='submit']:hover {
+  background: #5b4bc4;
+}
+
+/* Loader */
+.ms-chatbot-loader {
+  color: #7a768f;
+}
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-primary: #3F2965;
+  --color-accent: #DD1764;
+  --color-softPurple: #C7BEDA;
+  --color-softPink: #F7C6D6;
+  --color-lightBg: #F9F7FC;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont;
+  background: #faf7fb; /* soft off-white */
+  color: #2b1f3a;
+  overflow-x: hidden;
+}
+button{
+  cursor: pointer;
+}

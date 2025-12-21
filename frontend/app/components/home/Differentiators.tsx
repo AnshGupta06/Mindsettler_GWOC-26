@@ -11,32 +11,36 @@ import {
 
 export default function DifferentiatorsSection() {
   return (
-    <section className="py-24 px-4 md:px-8 bg-white">
+    <section className="py-12 sm:py-16 md:py-20 lg:py-24 px-4 sm:px-6 md:px-8 bg-white">
       <div className="max-w-[1440px] mx-auto">
 
         {/* Heading Area */}
-        <div className="text-center mb-20 max-w-3xl mx-auto flex flex-col items-center">
+        <div className="text-center mb-12 sm:mb-16 md:mb-20 max-w-3xl mx-auto flex flex-col items-center">
              <SlideUp>
-                <span className="block text-[#Dd1764] font-bold text-sm tracking-wide mb-3 uppercase">
+                <span className="block text-[#Dd1764] font-bold text-xs sm:text-sm tracking-wide mb-2 sm:mb-3 uppercase">
                     Why Choose Us
                 </span>
              </SlideUp>
-             <div className="flex flex-wrap justify-center text-3xl md:text-5xl font-bold text-[#3F2965]">
-                <CharReveal delay={0.1}>
-                    Thoughtful care, guided by
-                </CharReveal>
-                <CharReveal delay={0.1} className="text-[#Dd1764] ml-2">
-                     ethics & empathy
-                </CharReveal>
+             <div className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-[#3F2965] space-y-1">
+                <div>
+                    <CharReveal delay={0.1} className="justify-center">
+                        Thoughtful care, guided by
+                    </CharReveal>
+                </div>
+                <div className="text-[#Dd1764]">
+                    <CharReveal delay={0.1} className="justify-center">
+                        ethics & empathy
+                    </CharReveal>
+                </div>
              </div>
         </div>
 
         {/* Staggered Grid */}
-        <StaggerContainer className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <StaggerContainer className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
           
           <StaggerItem>
             <Card
-              icon={<UserCheck size={32} strokeWidth={1.5} />}
+              icon={<UserCheck size={28} strokeWidth={1.5} />}
               title="Founder-Led Practice"
               description="Guided by the vision of psychotherapist Parnika Bajaj, ensuring clinical responsibility."
             />
@@ -44,7 +48,7 @@ export default function DifferentiatorsSection() {
 
           <StaggerItem>
             <Card
-              icon={<BookOpen size={32} strokeWidth={1.5} />}
+              icon={<BookOpen size={28} strokeWidth={1.5} />}
               title="Structured Psycho-Education"
               description="Understanding why you feel what you feel — empowering informed healing."
             />
@@ -52,20 +56,17 @@ export default function DifferentiatorsSection() {
 
           <StaggerItem>
             <Card
-              icon={<Globe size={32} strokeWidth={1.5} />}
+              icon={<Globe size={28} strokeWidth={1.5} />}
               title="Online & Offline Access"
               description="Access support in a way that fits your lifestyle, comfort, and availability."
             />
           </StaggerItem>
 
-           {/* Bottom Row Logic (Centered) */}
-           {/* We wrap these two in a StaggerItem wrapper to keep layout, 
-               but we can also just let them be items 4 and 5 in the flow. 
-               Here I use a div to center them in the grid context. */}
-           <div className="lg:col-span-3 grid md:grid-cols-2 gap-8 lg:w-2/3 mx-auto">
+           {/* Bottom Row (Centered on large screens) */}
+           <div className="sm:col-span-2 lg:col-span-3 grid sm:grid-cols-2 gap-6 sm:gap-8 lg:w-2/3 mx-auto">
                <StaggerItem>
                     <Card
-                        icon={<ShieldCheck size={32} strokeWidth={1.5} />}
+                        icon={<ShieldCheck size={28} strokeWidth={1.5} />}
                         title="Ethical Diagnosis"
                         description="Professional assessments conducted with responsibility and clarity."
                     />
@@ -73,7 +74,7 @@ export default function DifferentiatorsSection() {
 
                <StaggerItem>
                     <Card
-                        icon={<Heart size={32} strokeWidth={1.5} />}
+                        icon={<Heart size={28} strokeWidth={1.5} />}
                         title="Human-First Approach"
                         description="Empathy before labels. Every individual is treated with care."
                     />
@@ -89,12 +90,12 @@ export default function DifferentiatorsSection() {
 
 function Card({ icon, title, description }: { icon: React.ReactNode; title: string; description: string; }) {
   return (
-    <div className="group h-full p-10 rounded-[2rem] bg-[#F9F6FF] border border-[#3F2965]/5 hover:border-[#Dd1764]/20 hover:shadow-2xl hover:shadow-[#3F2965]/10 transition-all duration-500 hover:-translate-y-2">
-      <div className="w-16 h-16 flex items-center justify-center rounded-2xl bg-white text-[#3F2965] mb-8 group-hover:bg-[#Dd1764] group-hover:text-white transition-all duration-300 shadow-sm">
+    <div className="group h-full p-6 sm:p-8 md:p-10 rounded-xl sm:rounded-2xl md:rounded-[2rem] bg-[#F9F6FF] border border-[#3F2965]/5 hover:border-[#Dd1764]/20 hover:shadow-2xl hover:shadow-[#3F2965]/10 transition-all duration-500 hover:-translate-y-2">
+      <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 flex items-center justify-center rounded-xl sm:rounded-2xl bg-white text-[#3F2965] mb-4 sm:mb-6 md:mb-8 group-hover:bg-[#Dd1764] group-hover:text-white transition-all duration-300 shadow-sm">
         {icon}
       </div>
-      <h3 className="text-2xl font-bold text-[#3F2965] mb-4">{title}</h3>
-      <p className="text-[#3F2965]/70 text-lg leading-relaxed font-medium">{description}</p>
+      <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-[#3F2965] mb-3 sm:mb-4">{title}</h3>
+      <p className="text-[#3F2965]/70 text-sm sm:text-base md:text-lg leading-relaxed font-medium">{description}</p>
     </div>
   );
 }
