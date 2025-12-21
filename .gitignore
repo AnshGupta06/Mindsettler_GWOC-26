@@ -1,17 +1,31 @@
 # Node
 node_modules/
-npm-debug.log
+npm-debug.log*
 
 # Env files
 .env
 .env.local
+.env.*.local
 
 # Next.js
 .next/
 out/
+dist/
+build/
 
 # OS
 .DS_Store
+Thumbs.db
 
-/generated/prisma
-src/config/firebaseServiceKey.json
+# Prisma
+**/prisma/migrations/
+**/prisma/*.db
+
+# Firebase / Service Accounts (CRITICAL)
+**/firebaseServiceKey.json
+**/serviceAccount*.json
+**/*service-account*.json
+
+# Logs
+logs/
+*.log

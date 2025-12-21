@@ -1,67 +1,84 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { createUserWithEmailAndPassword, onAuthStateChanged, sendEmailVerification } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  onAuthStateChanged,
+  sendEmailVerification,
+} from "firebase/auth";
 import { auth } from "../../../lib/firebase";
 import GoogleButton from "./GoogleButton";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-
 export default function SignupForm() {
-  const [waitingVerification, setWaitingVerification] = useState(false);
   const router = useRouter();
+
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [waitingVerification, setWaitingVerification] = useState(false);
 
- useEffect(() => {
-  const unsubscribe = onAuthStateChanged(auth, async (user) => {
-    if (!user) return;
+  // 👀 Watch for verification & auto-sync
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (!user) return;
 
-    // If email not verified yet, keep checking
-    if (!user.emailVerified) {
-      setWaitingVerification(true);
+      if (!user.emailVerified) {
+        setWaitingVerification(true);
 
-      const interval = setInterval(async () => {
-        await user.reload();
-        if (auth.currentUser?.emailVerified) {
-          clearInterval(interval);
-          const verifiedUser = auth.currentUser!;
+        const interval = setInterval(async () => {
+          await user.reload();
+          const refreshed = auth.currentUser;
 
-          const token = await verifiedUser.getIdToken();
-          await fetch("http://localhost:5000/api/auth/sync-user", {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
+          if (refreshed?.emailVerified) {
+            clearInterval(interval);
 
-          router.push("/");
-        }
-      }, 3000); // check every 3 sec
+            const token = await refreshed.getIdToken();
+            await fetch("http://localhost:5000/api/auth/sync-user", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify({
+                name: `${firstName} ${lastName}`,
+                phone,
+              }),
+            });
 
-      return;
-    }
+            router.push("/");
+          }
+        }, 3000);
 
-    // Already verified (edge case)
-    const token = await user.getIdToken();
-    await fetch("http://localhost:5000/api/auth/sync-user", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+        return;
+      }
+
+      // Edge case: already verified
+      const token = await user.getIdToken();
+      await fetch("http://localhost:5000/api/auth/sync-user", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          name: `${firstName} ${lastName}`,
+          phone,
+        }),
+      });
+
+      router.push("/");
     });
-    router.push("/");
-  });
 
-  return () => unsubscribe();
-}, [router]);
+    return () => unsubscribe();
+  }, [router, firstName, lastName, phone]);
 
   const handleSignup = async () => {
     setError("");
@@ -79,21 +96,20 @@ export default function SignupForm() {
     setLoading(true);
 
     try {
-  const cred = await createUserWithEmailAndPassword(auth, email, password);
+      const cred = await createUserWithEmailAndPassword(auth, email, password);
+      await sendEmailVerification(cred.user);
 
-  await sendEmailVerification(cred.user);
+      setWaitingVerification(true);
+      setError("Verification email sent. Please check your inbox.");
 
-  setWaitingVerification(true);
-  setError("Verification email sent. Please check your inbox.");
-
-} catch (err: any) {
-  setError(err.message || "Signup failed.");
-  setLoading(false);
-}
+    } catch (err: any) {
+      setError(err.message || "Signup failed.");
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="w-full bg-white rounded-3xl shadow-xl p-7">
+    <div className="w-full max-w-md bg-white rounded-3xl shadow-xl p-7">
       <h2 className="text-2xl font-bold text-[#3F2965] text-center">
         Create your account
       </h2>
@@ -107,8 +123,14 @@ export default function SignupForm() {
         </div>
       )}
 
+      {waitingVerification && (
+        <div className="mt-4 text-sm text-[#3F2965] bg-[#3F2965]/10 p-3 rounded-lg">
+          Waiting for email verification… Once verified, you’ll be redirected ✨
+        </div>
+      )}
+
       <div className="mt-5 space-y-3">
-        {/* Name Row */}
+        {/* Name */}
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="text-sm font-medium text-[#3F2965]">
@@ -140,7 +162,6 @@ export default function SignupForm() {
           </label>
           <input
             type="tel"
-            autoComplete="tel"
             placeholder="+91 9XXXXXXXXX"
             className="w-full mt-1 px-4 py-2.5 border border-[#3F2965]/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#Dd1764]"
             value={phone}
@@ -153,7 +174,6 @@ export default function SignupForm() {
           <label className="text-sm font-medium text-[#3F2965]">Email</label>
           <input
             type="email"
-            autoComplete="email"
             className="w-full mt-1 px-4 py-2.5 border border-[#3F2965]/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#Dd1764]"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -167,31 +187,28 @@ export default function SignupForm() {
           </label>
           <input
             type="password"
-            autoComplete="new-password"
             className="w-full mt-1 px-4 py-2.5 border border-[#3F2965]/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#Dd1764]"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
         </div>
 
-        {/* Confirm Password */}
+        {/* Confirm */}
         <div>
           <label className="text-sm font-medium text-[#3F2965]">
             Confirm Password
           </label>
           <input
             type="password"
-            autoComplete="new-password"
             className="w-full mt-1 px-4 py-2.5 border border-[#3F2965]/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#Dd1764]"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
           />
         </div>
 
-        {/* Submit */}
         <button
           onClick={handleSignup}
-          disabled={loading}
+          disabled={loading || waitingVerification}
           className="w-full mt-3 py-2.5 rounded-full bg-[#Dd1764] text-white font-bold tracking-wide transition hover:shadow-lg hover:shadow-[#3F2965]/30 disabled:opacity-60"
         >
           {loading ? "Creating account..." : "Sign Up"}

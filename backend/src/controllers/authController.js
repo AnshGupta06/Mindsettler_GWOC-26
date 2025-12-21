@@ -1,8 +1,8 @@
 import prisma from "../config/prisma.js";
 
 export async function syncUser(req, res) {
-  console.log("SYNC HIT", req.firebaseUser);
-  const { uid, email, name } = req.firebaseUser;
+  const { uid, email, name: tokenName } = req.firebaseUser;
+  const { name, phone } = req.body;
 
   try {
     let user = await prisma.user.findUnique({
@@ -14,13 +14,15 @@ export async function syncUser(req, res) {
         data: {
           firebaseUid: uid,
           email,
-          name: name || "",
+          name: name || tokenName || "",
+          phone: phone || null,
         },
       });
     }
 
     res.json({ success: true, user });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: "User sync failed" });
   }
 }
