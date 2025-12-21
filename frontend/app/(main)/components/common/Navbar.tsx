@@ -2,17 +2,27 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
-import { Menu, X, ArrowRight, Home, Info, Briefcase, BookOpen, Mail } from "lucide-react";
-import { onAuthStateChanged, User } from "firebase/auth";
-import { auth } from "../../../lib/firebase"; // adjust if path differs
+import {
+  Menu,
+  X,
+  ArrowRight,
+  Home,
+  Info,
+  Briefcase,
+  BookOpen,
+  Mail,
+} from "lucide-react";
+import { onAuthStateChanged, User, signOut } from "firebase/auth";
+import { auth } from "../../../lib/firebase";
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const pathname = usePathname();
+  const router = useRouter();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -28,6 +38,11 @@ export default function Navbar() {
   useEffect(() => {
     document.body.style.overflow = mobileMenuOpen ? "hidden" : "auto";
   }, [mobileMenuOpen]);
+
+  const handleLogout = async () => {
+    await signOut(auth);
+    router.push("/login");
+  };
 
   const menuItems = [
     { href: "/", label: "Home", icon: <Home size={24} /> },
@@ -69,9 +84,9 @@ export default function Navbar() {
             <NavLink href="/contact" active={pathname === "/contact"}>Contact</NavLink>
           </ul>
 
-          {/* RIGHT CTA (Desktop) */}
+          {/* DESKTOP CTA */}
           <div className="hidden md:flex items-center gap-3">
-            {!user && (
+            {!user ? (
               <>
                 <Link href="/login">
                   <button className="px-5 py-2 rounded-full border border-[#3F2965]/30 text-[#3F2965] text-sm font-bold hover:bg-[#F9F6FF] transition">
@@ -84,16 +99,27 @@ export default function Navbar() {
                   </button>
                 </Link>
               </>
-            )}
+            ) : (
+              <>
+                <Link href="/profile">
+                  <button className="px-5 py-2 rounded-full border border-[#3F2965]/30 text-[#3F2965] text-sm font-bold hover:bg-[#F9F6FF] transition">
+                    Profile
+                  </button>
+                </Link>
 
-            {user && (
-              <Link href="/book">
-                <button className="relative px-6 py-3 rounded-full bg-[#Dd1764] text-white text-sm font-bold tracking-wide overflow-hidden group transition-all duration-300 hover:shadow-lg hover:shadow-[#3F2965]/20 hover:-translate-y-0.5">
-                  <span className="relative z-10 flex items-center gap-2">
+                <Link href="/book">
+                  <button className="px-6 py-3 rounded-full bg-[#Dd1764] text-white text-sm font-bold tracking-wide hover:shadow-lg hover:shadow-[#3F2965]/20 transition">
                     Book Session
-                  </span>
+                  </button>
+                </Link>
+
+                <button
+                  onClick={handleLogout}
+                  className="px-5 py-2 rounded-full border border-[#Dd1764]/40 text-[#Dd1764] text-sm font-bold hover:bg-[#Dd1764]/10 transition"
+                >
+                  Logout
                 </button>
-              </Link>
+              </>
             )}
           </div>
 
@@ -118,11 +144,13 @@ export default function Navbar() {
             {menuItems.map((item) => (
               <li key={item.href} onClick={() => setMobileMenuOpen(false)}>
                 <Link href={item.href}>
-                  <div className={`flex items-center justify-between px-6 py-4 rounded-2xl transition ${
-                    pathname === item.href
-                      ? "bg-gradient-to-r from-[#3F2965] to-[#513681] text-white"
-                      : "bg-white text-[#3F2965]"
-                  }`}>
+                  <div
+                    className={`flex items-center justify-between px-6 py-4 rounded-2xl transition ${
+                      pathname === item.href
+                        ? "bg-gradient-to-r from-[#3F2965] to-[#513681] text-white"
+                        : "bg-white text-[#3F2965]"
+                    }`}
+                  >
                     <div className="flex items-center gap-4">
                       {item.icon}
                       <span className="text-lg font-bold">{item.label}</span>
@@ -134,8 +162,8 @@ export default function Navbar() {
             ))}
           </ul>
 
-          {/* Mobile CTA */}
-          {!user && (
+          {/* MOBILE CTA */}
+          {!user ? (
             <div className="flex flex-col gap-3 w-full max-w-sm">
               <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
                 <button className="w-full py-3 rounded-xl border border-[#3F2965]/30 text-[#3F2965] font-bold">
@@ -148,14 +176,27 @@ export default function Navbar() {
                 </button>
               </Link>
             </div>
-          )}
+          ) : (
+            <div className="flex flex-col gap-3 w-full max-w-sm">
+              <Link href="/profile" onClick={() => setMobileMenuOpen(false)}>
+                <button className="w-full py-3 rounded-xl border border-[#3F2965]/30 text-[#3F2965] font-bold">
+                  Profile
+                </button>
+              </Link>
 
-          {user && (
-            <Link href="/book" onClick={() => setMobileMenuOpen(false)} className="w-full max-w-sm">
-              <button className="w-full py-4 rounded-2xl bg-[#Dd1764] text-white font-bold text-lg">
-                Book Your Session
+              <Link href="/book" onClick={() => setMobileMenuOpen(false)}>
+                <button className="w-full py-4 rounded-2xl bg-[#Dd1764] text-white font-bold text-lg">
+                  Book Your Session
+                </button>
+              </Link>
+
+              <button
+                onClick={handleLogout}
+                className="w-full py-3 rounded-xl border border-[#Dd1764]/40 text-[#Dd1764] font-bold"
+              >
+                Logout
               </button>
-            </Link>
+            </div>
           )}
         </div>
       </div>
@@ -163,7 +204,15 @@ export default function Navbar() {
   );
 }
 
-function NavLink({ href, active, children }: { href: string; active: boolean; children: React.ReactNode }) {
+function NavLink({
+  href,
+  active,
+  children,
+}: {
+  href: string;
+  active: boolean;
+  children: React.ReactNode;
+}) {
   return (
     <li>
       <Link
