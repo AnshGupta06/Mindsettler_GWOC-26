@@ -18,36 +18,43 @@ enum SessionMode {
   OFFLINE
 }
 
+enum SessionType {
+  FIRST
+  FOLLOW_UP
+}
+
 model User {
-  id           String   @id @default(uuid())
-  firebaseUid String   @unique
-  name         String
-  email        String   @unique
+  id           String    @id @default(uuid())
+  firebaseUid String    @unique
+  email        String    @unique
+  name         String?
   phone        String?
-  createdAt    DateTime @default(now())
   bookings     Booking[]
+  createdAt    DateTime  @default(now())
 }
 
 model SessionSlot {
-  id        String    @id @default(uuid())
+  id        String   @id @default(uuid())
   date      DateTime
   startTime DateTime
   endTime   DateTime
   mode      SessionMode
-  isBooked  Boolean   @default(false)
+  isBooked  Boolean  @default(false)
 
   booking   Booking?
 }
 
 model Booking {
-  id        String        @id @default(uuid())
+  id        String         @id @default(uuid())
   status    BookingStatus @default(PENDING)
+  type      SessionType
+  reason    String?
 
   userId    String
   slotId    String @unique
 
-  user      User         @relation(fields: [userId], references: [id])
-  slot      SessionSlot  @relation(fields: [slotId], references: [id])
+  user      User        @relation(fields: [userId], references: [id])
+  slot      SessionSlot @relation(fields: [slotId], references: [id])
 
-  createdAt DateTime     @default(now())
+  createdAt DateTime @default(now())
 }
