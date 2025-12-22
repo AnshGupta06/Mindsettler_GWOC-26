@@ -1,14 +1,14 @@
 "use client";
-import { PageHeader } from '../components/shared/PageHeader';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { PageHeader } from '../../components/shared/PageHeader';
+import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { Check, Users, Heart, BrainCircuit, Waves, GitCommit, UserCheck, ShieldCheck, Calendar, Globe, PencilRuler, Monitor, Users as UsersIcon, CalendarDays, CheckCircle, Star, Quote, ChevronLeft, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useEffect, useRef } from 'react';
 
 // Import JSON data
-import therapyApproachesData from '../../data/therapyApproaches.json';
-import testimonialsData from '../../data/testimonials.json';
+import therapyApproachesData from '../../../data/therapyApproaches.json';
+import testimonialsData from '../../../data/testimonials.json';
 
 export default function ServicesPage() {
   // Use imported JSON data
@@ -227,8 +227,8 @@ export default function ServicesPage() {
                 onClick={() => handleBookSession(therapy.title)}
               >
                 <button className="w-full relative px-4 py-3 rounded-full bg-white text-[#3F2965] text-sm font-bold tracking-wide overflow-hidden group transition-all duration-300 hover:shadow-lg hover:shadow-[#3F2965]/20 hover:-translate-y-0.5 border border-[#3F2965]/10">
-                  <span className="absolute top-0 left-[-25%] w-[75%] h-full bg-gradient-to-r from-[#3F2965] to-[#513681] -skew-x-12 -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-left" />
-                  <span className="absolute top-0 right-[-25%] w-[75%] h-full bg-gradient-to-l from-[#3F2965] to-[#513681] -skew-x-12 translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-right" />
+                  <span className="absolute top-0 left-[-25%] w-[80%] h-full bg-gradient-to-r from-[#3F2965] to-[#513681] -skew-x-12 -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-left" />
+                  <span className="absolute top-0 right-[-25%] w-[80%] h-full bg-gradient-to-l from-[#3F2965] to-[#513681] -skew-x-12 translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-right" />
                   <span className="relative z-10 flex items-center justify-center gap-2 group-hover:text-white transition-colors duration-300">
                     <Monitor className="h-4 w-4 group-hover:text-white transition-colors duration-300" />
                     Online
@@ -252,8 +252,8 @@ export default function ServicesPage() {
                 onClick={() => handleBookSession(therapy.title)}
               >
                 <button className="w-full relative px-4 py-3 rounded-full bg-white text-[#3F2965] text-sm font-bold tracking-wide overflow-hidden group transition-all duration-300 hover:shadow-lg hover:shadow-[#3F2965]/20 hover:-translate-y-0.5 border border-[#3F2965]/10">
-                  <span className="absolute top-0 left-[-25%] w-[75%] h-full bg-gradient-to-r from-[#3F2965] to-[#513681] -skew-x-12 -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-left" />
-                  <span className="absolute top-0 right-[-25%] w-[75%] h-full bg-gradient-to-l from-[#3F2965] to-[#513681] -skew-x-12 translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-right" />
+                  <span className="absolute top-0 left-[-25%] w-[80%] h-full bg-gradient-to-r from-[#3F2965] to-[#513681] -skew-x-12 -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-left" />
+                  <span className="absolute top-0 right-[-25%] w-[80%] h-full bg-gradient-to-l from-[#3F2965] to-[#513681] -skew-x-12 translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-right" />
                   <span className="relative z-10 flex items-center justify-center gap-2 group-hover:text-white transition-colors duration-300">
                     <UsersIcon className="h-4 w-4 group-hover:text-white transition-colors duration-300" />
                     Offline
@@ -274,8 +274,8 @@ export default function ServicesPage() {
           {/* Book Session Button with Animation - UPDATED for consistency */}
           <Link href={`/booking?therapy=${encodeURIComponent(therapy.title)}`}>
             <button className="w-full relative px-6 py-3 rounded-full bg-[#Dd1764] text-white text-sm font-bold tracking-wide overflow-hidden group transition-all duration-300 hover:shadow-lg hover:shadow-[#3F2965]/20 hover:-translate-y-0.5">
-              <span className="absolute top-0 left-[-25%] w-[75%] h-full bg-gradient-to-r from-[#3F2965] to-[#513681] -skew-x-12 -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-left" />
-              <span className="absolute top-0 right-[-25%] w-[75%] h-full bg-gradient-to-l from-[#3F2965] to-[#513681] -skew-x-12 translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-right" />
+              <span className="absolute top-0 left-[-25%] w-[80%] h-full bg-gradient-to-r from-[#3F2965] to-[#513681] -skew-x-12 -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-left" />
+              <span className="absolute top-0 right-[-25%] w-[80%] h-full bg-gradient-to-l from-[#3F2965] to-[#513681] -skew-x-12 translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-right" />
               <span className="relative z-10 flex items-center justify-center gap-2">
                 <CalendarDays className="h-4 w-4" />
                 Book Session
@@ -398,10 +398,10 @@ export default function ServicesPage() {
             
             {/* Animated Book Your First Session Button */}
             <div className="mt-20 text-center">
-              <Link href="/booking">
+              <Link href="/book">
                 <button className="relative px-8 py-4 rounded-full bg-[#Dd1764] text-white font-bold text-lg tracking-wide overflow-hidden group transition-all duration-300 hover:shadow-lg hover:shadow-[#3F2965]/20 hover:-translate-y-0.5">
-                  <span className="absolute top-0 left-[-25%] w-[75%] h-full bg-gradient-to-r from-[#3F2965] to-[#513681] -skew-x-12 -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-left" />
-                  <span className="absolute top-0 right-[-25%] w-[75%] h-full bg-gradient-to-l from-[#3F2965] to-[#513681] -skew-x-12 translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-right" />
+                  <span className="absolute top-0 left-[-25%] w-[80%] h-full bg-gradient-to-r from-[#3F2965] to-[#513681] -skew-x-12 -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-left" />
+                  <span className="absolute top-0 right-[-25%] w-[80%] h-full bg-gradient-to-l from-[#3F2965] to-[#513681] -skew-x-12 translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-right" />
                   <span className="relative z-10 flex items-center justify-center gap-3">
                     <span>Book Your First Session</span>
                   </span>
@@ -531,10 +531,10 @@ export default function ServicesPage() {
               </p>
             </div>
             
-            <Link href="/booking">
+            <Link href="/book">
               <button className="relative px-8 py-4 rounded-full bg-[#Dd1764] text-white font-bold text-lg tracking-wide overflow-hidden group transition-all duration-300 hover:shadow-lg hover:shadow-[#3F2965]/20 hover:-translate-y-0.5">
-                <span className="absolute top-0 left-[-25%] w-[75%] h-full bg-gradient-to-r from-[#3F2965] to-[#513681] -skew-x-12 -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-left" />
-                <span className="absolute top-0 right-[-25%] w-[75%] h-full bg-gradient-to-l from-[#3F2965] to-[#513681] -skew-x-12 translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-right" />
+                <span className="absolute top-0 left-[-25%] w-[80%] h-full bg-gradient-to-r from-[#3F2965] to-[#513681] -skew-x-12 -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-left" />
+                <span className="absolute top-0 right-[-25%] w-[80%] h-full bg-gradient-to-l from-[#3F2965] to-[#513681] -skew-x-12 translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-right" />
                 <span className="relative z-10 flex items-center justify-center gap-3">
                   <CalendarDays className="h-5 w-5" />
                   <span>Start Your Transformation Today</span>
