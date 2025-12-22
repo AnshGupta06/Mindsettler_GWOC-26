@@ -5,9 +5,6 @@ export const syncUser = async (req, res) => {
     const decoded = req.user; // from requireAuth middleware
 
     const { name, phone } = req.body || {};
-
-    console.log("🔥 Syncing user:", decoded.uid, decoded.email);
-
     const user = await prisma.user.upsert({
       where: { firebaseUid: decoded.uid },
       update: {

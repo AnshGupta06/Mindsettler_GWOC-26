@@ -5,7 +5,6 @@ import { getMe } from "../controllers/authController.js";
 const router = express.Router();
 router.get("/me", requireAuth, getMe);
 router.post("/sync-user", (req, res, next) => {
-  console.log("🔥 /sync-user route hit");
   next();
 }, requireAuth, syncUser);
 

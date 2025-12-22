@@ -90,8 +90,6 @@ res.json(result);
 };
 export async function getMyBookings(req, res) {
   try {
-    console.log("🔥 req.user:", req.user); 
-
     const firebaseUid = req.user.uid;
 
     const user = await prisma.user.findUnique({
