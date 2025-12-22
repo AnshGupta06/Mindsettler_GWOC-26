@@ -1,0 +1,40 @@
+{
+  "placeholderImages": [
+    {
+      "id": "hero",
+      "description": "A calm, serene landscape with soft light, representing peace of mind.",
+      "imageUrl": "https://images.unsplash.com/photo-1683041132892-0fe990b3afc3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxzZXJlbmUlMjBsYW5kc2NhcGV8ZW58MHx8fHwxNzY1ODg4MzAzfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "serene landscape"
+    },
+    {
+      "id": "about",
+      "description": "A close-up of a leaf with water droplets, symbolizing growth and renewal.",
+      "imageUrl": "https://images.unsplash.com/photo-1632321657646-df48ce404650?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxsZWFmJTIwd2F0ZXJ8ZW58MHx8fHwxNzY1OTAzOTA4fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "leaf water"
+    },
+    {
+      "id": "services1",
+      "description": "Two people talking in a calm setting, one listening intently.",
+      "imageUrl": "https://images.unsplash.com/photo-1604785800517-e972a4c16f2b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxlbXBhdGhldGljJTIwY29udmVyc2F0aW9ufGVufDB8fHx8MTc2NTkwNDQ3Nnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "empathetic conversation"
+    },
+    {
+      "id": "services2",
+      "description": "A person meditating by the water at sunrise.",
+      "imageUrl": "https://images.unsplash.com/photo-1630406866541-648a601541cf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxtZWRpdGF0aW9uJTIwc3VucmlzZXxlbnwwfHx8fDE3NjU4NzgzOTV8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "meditation sunrise"
+    },
+    {
+      "id": "corporate",
+      "description": "A group of people in a workshop, engaged and collaborating.",
+      "imageUrl": "https://images.unsplash.com/photo-1651103146963-49c3760f2393?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxjb3Jwb3JhdGUlMjB3b3Jrc2hvcHxlbnwwfHx8fDE3NjU5MDQ0NzZ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "corporate workshop"
+    },
+    {
+      "id": "journey",
+      "description": "A winding path through a peaceful forest.",
+      "imageUrl": "https://images.unsplash.com/photo-1605196560547-b2f7281b7355?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxmb3Jlc3QlMjBwYXRofGVufDB8fHx8MTc2NTg0MjU5OXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "forest path"
+    }
+  ]
+}

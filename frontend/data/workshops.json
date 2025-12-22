@@ -1,0 +1,109 @@
+{
+  "workshops": [
+    {
+      "id": 1,
+      "title": "Mental Health Awareness Workshops",
+      "purpose": "Build understanding and reduce stigma.",
+      "examples": [
+        "Understanding Mental Health: Myths vs Facts",
+        "Stress, Anxiety & Burnout — What They Are and How They Affect Us",
+        "Emotional Well-Being in Daily Life",
+        "Recognizing Early Signs of Mental Overload",
+        "Mental Health in the Indian Context"
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Stress & Burnout Management Workshops",
+      "purpose": "Help participants recognize and manage stress patterns.",
+      "examples": [
+        "Workplace Stress & Burnout Awareness",
+        "Managing Pressure Without Losing Balance",
+        "Emotional Fatigue & Recovery",
+        "Healthy Boundaries at Work",
+        "Preventing Burnout Before It Happens"
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Emotional Intelligence & Self-Awareness Workshops",
+      "purpose": "Improve emotional understanding and regulation.",
+      "examples": [
+        "Understanding Emotions & Emotional Triggers",
+        "Emotional Intelligence at Work",
+        "Building Emotional Resilience",
+        "Self-Awareness & Personal Growth",
+        "Managing Emotional Reactions in High-Pressure Situations"
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Mindfulness & Mental Wellness Practices",
+      "purpose": "Teach grounding and self-regulation techniques.",
+      "examples": [
+        "Introduction to Mindfulness",
+        "Practical Techniques for Mental Calm",
+        "Attention, Focus & Mental Clarity",
+        "Guided Relaxation & Awareness Exercises",
+        "Everyday Mindfulness for Busy Lives"
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Workplace Mental Well-Being Workshops",
+      "purpose": "Improve organizational mental health culture.",
+      "examples": [
+        "Creating a Psychologically Safe Workplace",
+        "Mental Health Conversations at Work",
+        "Supporting Team Members Without Overstepping",
+        "Healthy Communication & Emotional Safety",
+        "Work-Life Integration (Not Balance Myths)"
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Leadership & Manager Sensitization Workshops",
+      "purpose": "Equip leaders to respond responsibly.",
+      "examples": [
+        "Emotionally Intelligent Leadership",
+        "Recognizing Burnout in Teams",
+        "Supporting Employees Without Diagnosing",
+        "Building Empathy-Driven Teams",
+        "Ethical Boundaries in Mental Health Conversations"
+      ]
+    },
+    {
+      "id": 7,
+      "title": "Student & Youth Mental Wellness Workshops",
+      "purpose": "Address age-specific challenges.",
+      "examples": [
+        "Exam Stress & Performance Pressure",
+        "Managing Expectations & Self-Doubt",
+        "Career Anxiety & Uncertainty",
+        "Emotional Well-Being for College Life",
+        "Social Media & Mental Health"
+      ]
+    },
+    {
+      "id": 8,
+      "title": "Group Reflection & Support Sessions",
+      "purpose": "Shared learning & emotional normalization.",
+      "examples": [
+        "Understanding Emotional Overload",
+        "Coping With Change & Transitions",
+        "Building Emotional Resilience Together"
+      ]
+    },
+    {
+      "id": 9,
+      "title": "Custom Workshops (Organization-Specific)",
+      "purpose": "Tailored psycho-education.",
+      "examples": [
+        "Startup founder mental well-being",
+        "Frontline workers stress awareness",
+        "Educator mental wellness",
+        "NGO caregiver burnout awareness"
+      ]
+    }
+  ]
+}
