@@ -72,8 +72,8 @@ export default function Navbar() {
   const menuItems = [
     { href: "/", label: "Home", icon: <Home size={24} /> },
     { href: "/about", label: "About", icon: <Info size={24} /> },
+    { href: "/services", label: "Services", icon: <BookOpen size={24} /> },
     { href: "/awareness", label: "Awareness", icon: <Briefcase size={24} /> },
-    { href: "/resources", label: "Resources", icon: <BookOpen size={24} /> },
     { href: "/contact", label: "Contact", icon: <Mail size={24} /> },
   ];
   if (isAdmin) {
@@ -112,7 +112,7 @@ export default function Navbar() {
             <NavLink href="/" active={pathname === "/"}>Home</NavLink>
             <NavLink href="/about" active={pathname === "/about"}>About</NavLink>
             <NavLink href="/awareness" active={pathname === "/awareness"}>Awareness</NavLink>
-            <NavLink href="/resources" active={pathname === "/resources"}>Resources</NavLink>
+            <NavLink href="/services" active={pathname === "/services"}>Services</NavLink>
             <NavLink href="/contact" active={pathname === "/contact"}>Contact</NavLink>
           </ul>
 
