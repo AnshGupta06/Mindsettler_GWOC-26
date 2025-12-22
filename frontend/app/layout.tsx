@@ -1,12 +1,12 @@
+import Script from "next/script";
 
-  import type { Metadata } from "next";
-  import { Geist, Geist_Mono } from "next/font/google";
+import Navbar from "./components/common/Navbar";
+import { Chatbot } from './components/shared/Chatbot';
+import type { Metadata } from "next";
+import { Geist, Geist_Mono } from "next/font/google";
   import "./globals.css";
-  import Script from "next/script";
-  import Navbar from "./components/common/Navbar";
 
-
-  const geistSans = Geist({
+const geistSans = Geist({
     variable: "--font-geist-sans",
     subsets: ["latin"],
   });
@@ -22,24 +22,30 @@
   };
 
 
+export default function RootLayout({
+
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html lang="en">
+      <body>
+        <Navbar />
+        <Script
+          type="module"
+          src="https://unpkg.com/@google/model-viewer@latest/dist/model-viewer.min.js"
+          strategy="beforeInteractive"
+        />
+        {children}
+        <Chatbot />
+      </body>
+    </html>
+  );
+}
+
+  
+
+  
 
 
-  export default function RootLayout({
-    children,
-  }: {
-    children: React.ReactNode;
-  }) {
-    return (
-      <html lang="en">
-        <body>
-          <Navbar />
-          <Script
-            type="module"
-            src="https://unpkg.com/@google/model-viewer@latest/dist/model-viewer.min.js"
-            strategy="beforeInteractive"
-          />
-          {children}
-        </body>
-      </html>
-    );
-  }

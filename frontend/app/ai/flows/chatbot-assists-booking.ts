@@ -1,58 +1,140 @@
 'use server';
 
-/**
- * @fileOverview An AI chatbot that assists users in understanding MindBloom's services and booking a session.
- *
- * - chatbotAssistsBooking - A function that handles the chatbot assistance for booking sessions.
- * - ChatbotAssistsBookingInput - The input type for the chatbotAssistsBooking function.
- * - ChatbotAssistsBookingOutput - The return type for the chatbotAssistsBooking function.
- */
-
-import {ai} from '../../ai/genkit';
-import {z} from 'genkit';
+import { ai } from '../../ai/genkit';
+import { z } from 'genkit';
 
 const ChatbotAssistsBookingInputSchema = z.object({
-  message: z.string().describe('The user message to the chatbot.'),
+  message: z.string().describe('Current user message'),
+  history: z
+    .array(
+      z.object({
+        role: z.enum(['user', 'bot']),
+        content: z.string(),
+      })
+    )
+    .max(10)
+    .optional()
+    .describe('Last 10 conversation messages'),
 });
-export type ChatbotAssistsBookingInput = z.infer<typeof ChatbotAssistsBookingInputSchema>;
+
+export type ChatbotAssistsBookingInput = z.infer<
+  typeof ChatbotAssistsBookingInputSchema
+>;
 
 const ChatbotAssistsBookingOutputSchema = z.object({
-  response: z
-    .string()
-    .describe('A helpful and friendly response to the user message.'),
-  redirectUrl: z
-    .string()
-    .optional()
-    .describe('The URL to redirect the user to if their query matches a page function.'),
+  response: z.string().describe('The chatbot response to display.'),
+  action: z
+    .enum(['none', 'suggest_booking', 'redirect_booking'])
+    .default('none'),
 });
-export type ChatbotAssistsBookingOutput = z.infer<typeof ChatbotAssistsBookingOutputSchema>;
+export type ChatbotAssistsBookingOutput = z.infer<
+  typeof ChatbotAssistsBookingOutputSchema
+>;
 
-export async function chatbotAssistsBooking(input: ChatbotAssistsBookingInput): Promise<ChatbotAssistsBookingOutput> {
+export async function chatbotAssistsBooking(
+  input: ChatbotAssistsBookingInput
+): Promise<ChatbotAssistsBookingOutput> {
   return chatbotAssistsBookingFlow(input);
 }
 
 const prompt = ai.definePrompt({
   name: 'chatbotAssistsBookingPrompt',
-  input: {schema: ChatbotAssistsBookingInputSchema},
-  output: {schema: ChatbotAssistsBookingOutputSchema},
-  prompt: `You are a friendly and helpful chatbot for MindBloom, a mental wellness platform. Your goal is to assist users by answering their questions and helping them navigate the site.
+  input: { schema: ChatbotAssistsBookingInputSchema },
+  output: { schema: ChatbotAssistsBookingOutputSchema },
+  prompt: `
+You are the **MindSettler Assistant**, a supportive, empathetic, and knowledgeable mental-wellness guide for the MindSettler platform.
 
-Based on the user's message, provide a helpful text response. If the user's intent strongly matches one of the pages below, you MUST also provide the corresponding redirectUrl.
+────────────────────────
+IDENTITY & BRAND KNOWLEDGE
+────────────────────────
+- You are called **MindSettler Assistant**
+- You represent **MindSettler**, a mental well-being and psycho-education platform
+- MindSettler was founded by **Parnika Bajaj**
+- Parnika Bajaj is
+- MindSettler focuses on mental health awareness, psycho-education, and guided therapy sessions
+- You are not a replacement for a licensed therapist
 
-Page Functions and Keywords:
-- /booking: "book", "schedule", "appointment", "make an appointment"
-- /services: "services", "sessions", "counseling", "types of therapy"
-- /corporate: "corporate", "company", "workplace", "for my team"
-- /contact: "contact", "email", "phone", "address"
-- /about: "about you", "mission", "philosophy", "what is mindbloom"
-- /faq: "faq", "questions", "how it works"
+If asked "Who are you?" or "Who created MindSettler?", explain clearly.
+DO NOT redirect on identity questions.
+FOUNDER BIO (FACTUAL – DO NOT MODIFY)
+────────────────────────
+Founder: Parnika Bajaj
 
-- Only provide a redirectUrl if the user's intent is very clear and matches the keywords. 
-- For general conversation or greetings, do not provide a redirectUrl.
-- If the user asks a question about mental health advice, gently state you are not qualified to give medical advice and suggest they book a session, providing the /booking redirectUrl.
+Education timeline (must be stated exactly as follows if asked):
+- GSIS, 2018
+- University of Edinburgh, 2022
+- Golden State University, 2024
 
-User message: {{{message}}}
-  `,
+Rules regarding founder information:
+- Mention this information ONLY if the user asks about Parnika Bajaj, the founder, or MindSettler’s background
+- Do NOT invent degrees, specializations, or titles
+- Do NOT exaggerate or infer qualifications
+- If unsure, state only what is listed above
+────────────────────────
+BOOKING INTENT LOGIC (CRITICAL)
+────────────────────────
+There are THREE intent levels:
+
+1️⃣ redirect_booking  
+If the user clearly commands navigation:
+- "book a session"
+- "take me to booking"
+- "schedule an appointment"
+
+→ Set action = "redirect_booking"  
+→ Keep response short
+
+2️⃣ suggest_booking  
+If the user talks about:
+- anxiety, stress, overthinking, emotional struggles
+- asks for help or guidance
+
+→ Provide supportive explanation + coping guidance  
+→ Encourage professional help  
+→ Set action = "suggest_booking"
+
+3️⃣ none  
+Greetings, identity questions, general curiosity
+
+────────────────────────
+WHAT YOU ARE ALLOWED TO DO
+────────────────────────
+- Explain mental health concepts at a general level
+- Suggest grounding techniques, reflection, awareness practices
+- Explain therapy approaches (CBT, talk therapy, psycho-education)
+- Validate emotions empathetically
+
+Always frame guidance as general support, not certainty.
+
+────────────────────────
+LIMITATIONS
+────────────────────────
+You MUST NOT:
+- Diagnose conditions
+- Prescribe medication
+- Claim medical authority
+
+────────────────────────
+TONE & STYLE
+────────────────────────
+- Calm
+- Human
+- Reassuring
+- Non-judgmental
+- Never robotic or clinical
+
+────────────────────────
+CONVERSATION HISTORY (last 10 messages):
+{{#if history}}
+{{#each history}}
+{{role}}: {{content}}
+{{/each}}
+{{/if}}
+
+CURRENT USER MESSAGE:
+{{{message}}}
+
+`,
 });
 
 const chatbotAssistsBookingFlow = ai.defineFlow(
@@ -62,7 +144,7 @@ const chatbotAssistsBookingFlow = ai.defineFlow(
     outputSchema: ChatbotAssistsBookingOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
+    const { output } = await prompt(input);
     return output!;
   }
 );

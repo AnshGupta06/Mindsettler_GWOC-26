@@ -28,7 +28,7 @@ export function Chatbot() {
     {
       role: 'bot',
       content:
-        "Hello! I'm here to help you learn about MindSettler and book a session. How can I assist you today?",
+        "Hi 🌱 I’m here to listen and guide you. You can ask about sessions, services, or anything you’re unsure about.",
     },
   ]);
   const [input, setInput] = useState('');
@@ -46,46 +46,66 @@ export function Chatbot() {
   }, [messages]);
 
   const handleSendMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!input.trim()) return;
+  e.preventDefault();
+  if (!input.trim()) return;
 
-    const userMessage: Message = { role: 'user', content: input };
-    setMessages(prev => [...prev, userMessage]);
-    setInput('');
-    setIsLoading(true);
+  const userMessage: Message = { role: 'user', content: input };
+  setMessages(prev => [...prev, userMessage]);
+  setInput('');
+  setIsLoading(true);
 
-    try {
-      const response = await chatbotAssistsBooking({ message: input });
-      const botMessage: Message = { role: 'bot', content: response.response };
-      setMessages(prev => [...prev, botMessage]);
+  try {
+    const result = await chatbotAssistsBooking({
+  message: input,
+  history: messages
+    .filter(m => !m.content.startsWith('__'))
+    .slice(-10),
+});
 
-      if (response.redirectUrl) {
-        // Add a message indicating redirection
-        const redirectMessage: Message = { role: 'bot', content: `One moment, redirecting you to the ${response.redirectUrl.replace('/', '')} page...` };
-        setMessages(prev => [...prev, redirectMessage]);
-        
-        setTimeout(() => {
-          router.push(response.redirectUrl!);
-          setIsOpen(false);
-        }, 1500);
-      }
-    } catch (error) {
-      const errorMessage: Message = {
+
+    setMessages(prev => [
+      ...prev,
+      { role: 'bot', content: result.response },
+    ]);
+
+    // DIRECT REDIRECT
+    if (result.action === 'redirect_booking') {
+      setTimeout(() => {
+        router.push('/booking');
+        setIsOpen(false);
+      }, 700);
+    }
+
+    // SOFT SUGGESTION (BUTTON)
+    if (result.action === 'suggest_booking') {
+      setMessages(prev => [
+        ...prev,
+        {
+          role: 'bot',
+          content: '__BOOK_SESSION_BUTTON__',
+        },
+      ]);
+    }
+  } catch (err) {
+    setMessages(prev => [
+      ...prev,
+      {
         role: 'bot',
         content:
-          "I'm sorry, but I'm having trouble connecting right now. Please try again later.",
-      };
-      setMessages(prev => [...prev, errorMessage]);
-      console.error('Chatbot error:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+          "I’m having a little trouble right now. Please try again in a moment.",
+      },
+    ]);
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 
   return (
     <>
+      {/* Floating Trigger Button */}
       <Button
-        className="fixed bottom-6 right-6 h-16 w-16 rounded-full shadow-lg"
+        className="ms-chatbot-trigger fixed bottom-6 right-6 h-16 w-16 rounded-full"
         onClick={() => setIsOpen(true)}
         aria-label="Open chatbot"
       >
@@ -93,16 +113,16 @@ export function Chatbot() {
       </Button>
 
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
-        <SheetContent className="flex h-full flex-col sm:max-w-md">
-          <SheetHeader className="pr-8">
-            <SheetTitle className="font-headline text-2xl">
+        <SheetContent className="ms-chatbot-sheet flex h-full flex-col sm:max-w-md">
+          <SheetHeader className="ms-chatbot-header pr-8">
+            <SheetTitle className="text-2xl">
               MindSettler Assistant
             </SheetTitle>
             <SheetDescription>
-              Your guide to our services. Ask me about booking, our approach, or
-              anything else you need to know.
+              A calm space to understand our services and take the next step.
             </SheetDescription>
           </SheetHeader>
+
           <div className="flex-1 overflow-hidden">
             <ScrollArea className="h-full" ref={scrollAreaRef}>
               <div className="space-y-6 p-4">
@@ -113,7 +133,7 @@ export function Chatbot() {
                       'flex items-start gap-3',
                       message.role === 'user'
                         ? 'flex-row-reverse'
-                        : 'flex-row',
+                        : 'flex-row'
                     )}
                   >
                     <Avatar>
@@ -125,33 +145,59 @@ export function Chatbot() {
                         )}
                       </AvatarFallback>
                     </Avatar>
+
                     <div
                       className={cn(
-                        'max-w-[80%] rounded-lg p-3 text-sm',
+                        'ms-chatbot-message max-w-[80%] rounded-lg p-3 text-sm',
                         message.role === 'user'
-                          ? 'bg-primary text-primary-foreground'
-                          : 'bg-card',
+                          ? 'ms-chatbot-user'
+                          : 'ms-chatbot-bot'
                       )}
                     >
-                      {message.content}
+                     {message.content === '__BOOK_SESSION_BUTTON__' ? (
+  <Button
+    className="mt-2 w-fit bg-[#b8aaf3] text-white hover:bg-[#a79bf0]"
+    onClick={() => {
+      router.push('/booking');
+      setIsOpen(false);
+    }}
+  >
+    Book a session with MindSettler
+  </Button>
+) : (
+  message.content
+)}
+
                     </div>
                   </div>
                 ))}
+
                 {isLoading && (
-                  <div className="flex items-start gap-3">
-                    <Avatar>
-                      <AvatarFallback>
-                        <Bot className="h-5 w-5" />
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="rounded-lg bg-card p-3">
-                      <Loader className="h-5 w-5 animate-spin text-muted-foreground" />
-                    </div>
-                  </div>
-                )}
+  <div className="flex flex-col gap-1 pl-12">
+    {/* Typing text */}
+    <div className="text-xs text-muted-foreground italic">
+      MindSettler Assistant is typing…
+    </div>
+
+    {/* Loader bubble */}
+    <div className="flex items-start gap-3">
+      <Avatar>
+        <AvatarFallback>
+          <Bot className="h-5 w-5" />
+        </AvatarFallback>
+      </Avatar>
+
+      <div className="ms-chatbot-bot rounded-lg p-3">
+        <Loader className="ms-chatbot-loader h-5 w-5 animate-spin" />
+      </div>
+    </div>
+  </div>
+)}
+
               </div>
             </ScrollArea>
           </div>
+
           <form
             onSubmit={handleSendMessage}
             className="flex items-center gap-2 border-t p-4"
@@ -161,9 +207,13 @@ export function Chatbot() {
               onChange={e => setInput(e.target.value)}
               placeholder="Type your message..."
               disabled={isLoading}
-              className="flex-1"
+              className="ms-chatbot-input flex-1"
             />
-            <Button type="submit" disabled={isLoading || !input.trim()} size="icon">
+            <Button
+              type="submit"
+              disabled={isLoading || !input.trim()}
+              size="icon"
+            >
               <Send className="h-4 w-4" />
             </Button>
           </form>
