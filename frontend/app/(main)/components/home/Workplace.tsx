@@ -2,7 +2,7 @@
 
 import { Building2 } from "lucide-react";
 import { CharReveal, SlideUp } from "../common/RevealComponent";
-
+import Link from "next/link";
 export default function WorkplaceWellnessSection() {
   return (
     <section className="py-12 sm:py-16 md:py-20 lg:py-24 px-4 sm:px-6 md:px-8 bg-white">
@@ -48,11 +48,13 @@ export default function WorkplaceWellnessSection() {
 
         {/* Button */}
         <SlideUp delay={0.4}>
+          <Link href="/corporate">
           <button className="w-full sm:w-auto relative px-8 sm:px-10 py-3 sm:py-4 rounded-full bg-[#Dd1764] text-white font-bold text-sm sm:text-base tracking-wide overflow-hidden group transition-all duration-300 hover:shadow-2xl hover:shadow-[#3F2965]/20 hover:-translate-y-1">
                 <span className="absolute top-0 left-[-25%] w-[80%] h-full bg-gradient-to-r from-[#3F2965] to-[#513681] -skew-x-12 -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-left" />
                 <span className="absolute top-0 right-[-25%] w-[80%] h-full bg-gradient-to-l from-[#3F2965] to-[#513681] -skew-x-12 translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-right" />
                 <span className="relative z-10 flex items-center justify-center gap-2">Explore Corporate Services</span>
           </button>
+          </Link>
         </SlideUp>
       </div>
     </section>

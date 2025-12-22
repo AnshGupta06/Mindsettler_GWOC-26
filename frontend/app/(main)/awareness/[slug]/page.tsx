@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { awarenessContent } from "./awarenessData";
 import { CharReveal, MaskedReveal, SlideUp, StaggerContainer, StaggerItem, ImageWipeReveal } from "../../components/common/RevealComponent";
 import { AlertTriangle,   } from "lucide-react";
@@ -430,10 +431,12 @@ export default async function AwarenessDetailPage({
         <div className="flex flex-col sm:flex-row gap-4 justify-center pt-6">
           
           <StaggerItem>
+            <Link href="/book">
             <button className="group relative px-10 py-4 rounded-full bg-white text-primary font-semibold shadow-lg transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 overflow-hidden">
               <span className="absolute inset-0 bg-gradient-to-r from-white to-white/70 opacity-0 group-hover:opacity-100 transition-opacity" />
               <span className="relative z-10">Book a Session</span>
             </button>
+            </Link>
           </StaggerItem>
 
           <StaggerItem>
