@@ -71,7 +71,6 @@ export default function AdminBookingsPage() {
 
   const updateStatus = async (id: string, status: "CONFIRMED" | "REJECTED") => {
     const token = await auth.currentUser?.getIdToken();
-    // Optimistic UI update
     setBookings(prev => prev.map(b => b.id === id ? { ...b, status } : b));
 
     try {
@@ -83,7 +82,6 @@ export default function AdminBookingsPage() {
         },
         body: JSON.stringify({ status }),
       });
-      // Refresh to ensure sync
       const refreshedToken = await auth.currentUser?.getIdToken();
       if(refreshedToken) await fetchBookings(refreshedToken);
     } catch (err) {
@@ -92,20 +90,17 @@ export default function AdminBookingsPage() {
     }
   };
 
-  // Stats Calculation
   const stats = {
     total: bookings.length,
     pending: bookings.filter(b => b.status === "PENDING").length,
     confirmed: bookings.filter(b => b.status === "CONFIRMED").length,
   };
 
-  // Filter Logic
   const filteredBookings = bookings.filter(b => {
     if (filter === "ALL") return true;
     return b.status === filter;
   });
 
-  // 🔒 ACCESS DENIED UI
   if (error === "Admin access only") {
     return (
       <div className="min-h-screen bg-[#F9F6FF] flex items-center justify-center px-4">
@@ -120,41 +115,68 @@ export default function AdminBookingsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F9F6FF] px-6 md:px-12 pt-24 pb-12 text-[#3F2965]">
+    <div className="min-h-screen bg-[#F9F6FF] px-4 md:px-8 lg:px-12 pt-20 md:pt-24 pb-12 text-[#3F2965]">
       
       {/* 1. HEADER & ACTIONS */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
         <div>
-          <h1 className="text-3xl font-bold flex items-center gap-3">
+          <h1 className="text-2xl md:text-3xl font-bold flex items-center gap-3">
             <LayoutDashboard className="text-[#Dd1764]" />
             Admin Dashboard
           </h1>
-          <p className="text-[#3F2965]/60 mt-1">Manage appointments and schedules</p>
+          <p className="text-[#3F2965]/60 mt-1 text-sm md:text-base">Manage appointments and schedules</p>
         </div>
         
         <button
           onClick={() => router.push("/admin/slots")}
-          className="px-6 py-3 bg-[#3F2965] text-white rounded-full font-bold shadow-lg hover:shadow-[#3F2965]/20 hover:scale-105 transition-all flex items-center gap-2"
+          className="w-full md:w-auto justify-center px-6 py-3 bg-[#3F2965] text-white rounded-full font-bold shadow-lg hover:shadow-[#3F2965]/20 hover:scale-105 transition-all flex items-center gap-2"
         >
           <Calendar size={18} />
           Manage Slots
         </button>
       </div>
 
-      {/* 2. STATS CARDS */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-        <StatCard label="Total Requests" value={stats.total} color="bg-white" textColor="text-[#3F2965]" />
-        <StatCard label="Pending Action" value={stats.pending} color="bg-yellow-50" textColor="text-yellow-700" />
-        <StatCard label="Confirmed Sessions" value={stats.confirmed} color="bg-green-50" textColor="text-green-700" />
+      {/* 2. CIRCULAR STATS (Responsive) */}
+      <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-12 px-2 md:px-8">
+        <StatCircle 
+          label="Total Requests" 
+          value={stats.total} 
+          icon={LayoutDashboard} 
+          color="border-[#3F2965]" 
+          bg="bg-[#3F2965]/5"
+          textColor="text-[#3F2965]"
+        />
+        
+        <div className="hidden md:block h-px flex-1 bg-gradient-to-r from-[#3F2965]/5 via-[#3F2965]/20 to-[#3F2965]/5" />
+        
+        <StatCircle 
+          label="Pending Action" 
+          value={stats.pending} 
+          icon={Clock} 
+          color="border-orange-400" 
+          bg="bg-orange-50"
+          textColor="text-orange-600"
+        />
+        
+        <div className="hidden md:block h-px flex-1 bg-gradient-to-r from-[#3F2965]/5 via-[#3F2965]/20 to-[#3F2965]/5" />
+        
+        <StatCircle 
+          label="Confirmed" 
+          value={stats.confirmed} 
+          icon={CheckCircle} 
+          color="border-emerald-500" 
+          bg="bg-emerald-50"
+          textColor="text-emerald-600"
+        />
       </div>
 
-      {/* 3. FILTERS */}
-      <div className="flex flex-wrap gap-2 mb-8 border-b border-[#3F2965]/10 pb-4">
+      {/* 3. FILTERS (Scrollable on mobile) */}
+      <div className="flex overflow-x-auto pb-4 mb-4 md:mb-8 border-b border-[#3F2965]/10 gap-2 no-scrollbar">
         {["ALL", "PENDING", "CONFIRMED", "REJECTED"].map((f) => (
           <button
             key={f}
             onClick={() => setFilter(f as any)}
-            className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${
+            className={`whitespace-nowrap px-4 py-2 rounded-full text-xs md:text-sm font-bold transition-all ${
               filter === f 
                 ? "bg-[#3F2965] text-white shadow-md" 
                 : "bg-white text-[#3F2965]/60 hover:bg-white hover:text-[#3F2965]"
@@ -165,7 +187,7 @@ export default function AdminBookingsPage() {
         ))}
       </div>
 
-      {/* 4. BOOKINGS GRID */}
+      {/* 4. BOOKINGS GRID (Adaptive Columns) */}
       {loading ? (
         <div className="text-center py-20 text-[#3F2965]/50 animate-pulse">Loading dashboard data...</div>
       ) : filteredBookings.length === 0 ? (
@@ -173,7 +195,7 @@ export default function AdminBookingsPage() {
           <p className="text-[#3F2965]/40">No bookings found in this category.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
           {filteredBookings.map((b) => (
             <BookingCard key={b.id} booking={b} onUpdate={updateStatus} />
           ))}
@@ -185,11 +207,38 @@ export default function AdminBookingsPage() {
 
 // ---------------- SUB-COMPONENTS ---------------- //
 
-function StatCard({ label, value, color, textColor }: { label: string, value: number, color: string, textColor: string }) {
+function StatCircle({ 
+  label, 
+  value, 
+  icon: Icon, 
+  color,
+  bg,
+  textColor
+}: { 
+  label: string, 
+  value: number, 
+  icon: any, 
+  color: string,
+  bg: string,
+  textColor: string
+}) {
   return (
-    <div className={`${color} p-6 rounded-2xl border border-black/5 shadow-sm`}>
-      <p className="text-sm font-bold opacity-60 mb-1">{label}</p>
-      <p className={`text-4xl font-extrabold ${textColor}`}>{value}</p>
+    <div className={`relative w-36 h-36 md:w-48 md:h-48 rounded-full border-[4px] md:border-[6px] ${color} ${bg} flex flex-col items-center justify-center shadow-xl md:shadow-2xl shadow-[#3F2965]/10 hover:scale-105 transition-all duration-300 group`}>
+      
+      {/* Icon Badge */}
+      <div className={`absolute -top-4 md:-top-5 p-2 md:p-3 rounded-full bg-white shadow-md border ${color} group-hover:-translate-y-1 transition-transform`}>
+        <Icon className={`${textColor} w-5 h-5 md:w-6 md:h-6`} strokeWidth={2.5} />
+      </div>
+      
+      {/* Number */}
+      <p className={`text-3xl md:text-5xl font-black ${textColor} mt-2`}>
+        {value}
+      </p>
+      
+      {/* Label */}
+      <p className="text-[9px] md:text-[11px] font-bold uppercase tracking-widest text-[#3F2965]/60 mt-1 md:mt-2">
+        {label}
+      </p>
     </div>
   );
 }
@@ -199,39 +248,41 @@ function BookingCard({ booking, onUpdate }: { booking: Booking, onUpdate: (id: s
   const time = `${new Date(booking.slot.startTime).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})} - ${new Date(booking.slot.endTime).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}`;
   
   return (
-    <div className="bg-white p-6 rounded-2xl shadow-sm border border-[#3F2965]/5 hover:shadow-md transition-all flex flex-col md:flex-row gap-6">
+    <div className="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-[#3F2965]/5 hover:shadow-md transition-all flex flex-col md:flex-row gap-4 md:gap-6">
       
       {/* Date Badge */}
-      <div className="flex flex-col items-center justify-center bg-[#F9F6FF] text-[#3F2965] rounded-xl p-4 min-w-[100px] text-center border border-[#3F2965]/5">
-        <span className="text-xs font-bold uppercase opacity-60">Session</span>
-        <span className="text-xl font-bold mt-1">{date}</span>
-        <span className="text-xs font-medium mt-1">{time}</span>
-        <span className={`mt-2 px-2 py-0.5 rounded text-[10px] font-bold ${booking.slot.mode === 'ONLINE' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}`}>
-          {booking.slot.mode}
-        </span>
+      <div className="flex flex-row md:flex-col items-center justify-between md:justify-center bg-[#F9F6FF] text-[#3F2965] rounded-xl p-3 md:p-4 min-w-full md:min-w-[120px] text-center border border-[#3F2965]/5">
+        <div className="flex flex-col md:items-center text-left md:text-center">
+          <span className="text-[10px] font-bold uppercase opacity-60">Session</span>
+          <span className="text-lg font-bold mt-0 md:mt-1">{date}</span>
+        </div>
+        <div className="text-right md:text-center">
+          <span className="text-xs font-medium block">{time}</span>
+          <span className={`inline-block mt-1 md:mt-2 px-2 py-0.5 rounded text-[10px] font-bold ${booking.slot.mode === 'ONLINE' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}`}>
+            {booking.slot.mode}
+          </span>
+        </div>
       </div>
 
       {/* Info & Actions */}
-      <div className="flex-1 flex flex-col justify-between">
+      <div className="flex-1 flex flex-col justify-between gap-3">
         <div className="space-y-3">
-          {/* User Info */}
-          <div className="flex items-start justify-between">
+          <div className="flex flex-wrap items-start justify-between gap-2">
             <div>
-              <h3 className="font-bold text-lg text-[#3F2965]">{booking.user.name || "Unknown User"}</h3>
+              <h3 className="font-bold text-base md:text-lg text-[#3F2965]">{booking.user.name || "Unknown User"}</h3>
               <div className="flex flex-col gap-1 mt-1">
-                <p className="text-sm text-[#3F2965]/60 flex items-center gap-2">
-                  <Mail size={14} /> {booking.user.email}
+                <p className="text-xs md:text-sm text-[#3F2965]/60 flex items-center gap-2">
+                  <Mail size={12} /> <span className="break-all">{booking.user.email}</span>
                 </p>
                 {booking.user.phone && (
-                  <p className="text-sm text-[#3F2965]/60 flex items-center gap-2">
-                    <Phone size={14} /> {booking.user.phone}
+                  <p className="text-xs md:text-sm text-[#3F2965]/60 flex items-center gap-2">
+                    <Phone size={12} /> {booking.user.phone}
                   </p>
                 )}
               </div>
             </div>
             
-            {/* Status Badge */}
-            <span className={`px-3 py-1 rounded-full text-xs font-bold ${
+            <span className={`px-2 py-1 rounded-full text-[10px] font-bold ${
               booking.status === 'CONFIRMED' ? 'bg-green-100 text-green-700' : 
               booking.status === 'REJECTED' ? 'bg-red-100 text-red-700' : 
               'bg-yellow-100 text-yellow-700'
@@ -240,35 +291,31 @@ function BookingCard({ booking, onUpdate }: { booking: Booking, onUpdate: (id: s
             </span>
           </div>
 
-          {/* Reason / Type */}
           <div className="bg-[#F9F6FF] p-3 rounded-lg border border-[#3F2965]/5">
             <div className="flex items-center gap-2 mb-1">
-              <span className="text-xs font-bold bg-[#3F2965] text-white px-2 py-0.5 rounded">
+              <span className="text-[10px] font-bold bg-[#3F2965] text-white px-2 py-0.5 rounded">
                 {booking.type === "FIRST" ? "First Session" : "Follow-up"}
               </span>
             </div>
-            {booking.reason ? (
-              <p className="text-sm text-[#3F2965]/80 italic">"{booking.reason}"</p>
-            ) : (
-              <p className="text-sm text-[#3F2965]/40 italic">No specific reason provided.</p>
-            )}
+            <p className="text-xs md:text-sm text-[#3F2965]/80 italic">
+              {booking.reason ? `"${booking.reason}"` : <span className="opacity-50">No specific reason provided.</span>}
+            </p>
           </div>
         </div>
 
-        {/* Action Buttons (Only for Pending) */}
         {booking.status === "PENDING" && (
-          <div className="flex gap-3 mt-4 pt-4 border-t border-[#3F2965]/5">
+          <div className="flex gap-3 pt-3 border-t border-[#3F2965]/5">
             <button
               onClick={() => onUpdate(booking.id, "CONFIRMED")}
-              className="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg text-sm font-bold transition-colors flex items-center justify-center gap-2"
+              className="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg text-xs md:text-sm font-bold transition-colors flex items-center justify-center gap-2"
             >
-              <CheckCircle size={16} /> Confirm
+              <CheckCircle size={14} /> Confirm
             </button>
             <button
               onClick={() => onUpdate(booking.id, "REJECTED")}
-              className="flex-1 bg-white border border-red-200 text-red-600 hover:bg-red-50 py-2 rounded-lg text-sm font-bold transition-colors flex items-center justify-center gap-2"
+              className="flex-1 bg-white border border-red-200 text-red-600 hover:bg-red-50 py-2 rounded-lg text-xs md:text-sm font-bold transition-colors flex items-center justify-center gap-2"
             >
-              <XCircle size={16} /> Reject
+              <XCircle size={14} /> Reject
             </button>
           </div>
         )}
