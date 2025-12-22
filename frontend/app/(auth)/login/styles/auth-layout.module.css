@@ -1,0 +1,17 @@
+.page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0f2743, #1b3a5f);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 120px;
+}
+
+.card {
+  width: 100%;
+  max-width: 420px;
+  background: #ffffff;
+  padding: 36px;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
