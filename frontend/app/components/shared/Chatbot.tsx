@@ -71,7 +71,7 @@ export function Chatbot() {
     // DIRECT REDIRECT
     if (result.action === 'redirect_booking') {
       setTimeout(() => {
-        router.push('/booking');
+        router.push('/book');
         setIsOpen(false);
       }, 700);
     }
@@ -158,7 +158,7 @@ export function Chatbot() {
   <Button
     className="mt-2 w-fit bg-[#b8aaf3] text-white hover:bg-[#a79bf0]"
     onClick={() => {
-      router.push('/booking');
+      router.push('/book');
       setIsOpen(false);
     }}
   >
