@@ -1,17 +1,19 @@
 import admin from "../config/firebaseAdmin.js";
 
-export default async function requireAuth(req, res, next) {
+export const requireAuth = async (req, res, next) => {
+  const header = req.headers.authorization || "";
+  const token = header.startsWith("Bearer ") ? header.split(" ")[1] : null;
+
+  if (!token) {
+    return res.status(401).json({ error: "No token" });
+  }
+
   try {
-    const header = req.headers.authorization;
-    if (!header) return res.status(401).json({ error: "No token" });
-
-    const token = header.split(" ")[1];
     const decoded = await admin.auth().verifyIdToken(token);
-    console.log("DECODED:", decoded.uid, decoded.email); 
-
-    req.firebaseUser = decoded; // { uid, email, name }
+    req.user = decoded;
     next();
-  } catch {
+  } catch (err) {
+    console.error("Auth error:", err);
     res.status(401).json({ error: "Invalid token" });
   }
-}
+};

@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   createUserWithEmailAndPassword,
-  onAuthStateChanged,
   sendEmailVerification,
 } from "firebase/auth";
 import { auth } from "../../../lib/firebase";
@@ -23,65 +22,11 @@ export default function SignupForm() {
 
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [waitingVerification, setWaitingVerification] = useState(false);
-
-  // 👀 Watch for verification & auto-sync
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (!user) return;
-
-      if (!user.emailVerified) {
-        setWaitingVerification(true);
-
-        const interval = setInterval(async () => {
-          await user.reload();
-          const refreshed = auth.currentUser;
-
-          if (refreshed?.emailVerified) {
-            clearInterval(interval);
-
-            const token = await refreshed.getIdToken();
-            await fetch("http://localhost:5000/api/auth/sync-user", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-              },
-              body: JSON.stringify({
-                name: `${firstName} ${lastName}`,
-                phone,
-              }),
-            });
-
-            router.push("/");
-          }
-        }, 3000);
-
-        return;
-      }
-
-      // Edge case: already verified
-      const token = await user.getIdToken();
-      await fetch("http://localhost:5000/api/auth/sync-user", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          name: `${firstName} ${lastName}`,
-          phone,
-        }),
-      });
-
-      router.push("/");
-    });
-
-    return () => unsubscribe();
-  }, [router, firstName, lastName, phone]);
+  const [info, setInfo] = useState("");
 
   const handleSignup = async () => {
     setError("");
+    setInfo("");
 
     if (!firstName || !lastName) {
       setError("Please enter your full name.");
@@ -97,12 +42,38 @@ export default function SignupForm() {
 
     try {
       const cred = await createUserWithEmailAndPassword(auth, email, password);
+
+      // 🔔 Send verification mail
       await sendEmailVerification(cred.user);
+      setInfo("Verification email sent. Please verify to continue.");
 
-      setWaitingVerification(true);
-      setError("Verification email sent. Please check your inbox.");
+      // 🔁 Poll until user verifies email
+      const interval = setInterval(async () => {
+        await cred.user.reload();
 
+        if (cred.user.emailVerified) {
+          clearInterval(interval);
+
+          const token = await cred.user.getIdToken();
+
+          // 🔥 Sync to Supabase once verified
+          await fetch("http://localhost:5000/api/auth/sync-user", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              name: `${firstName} ${lastName}`,
+              phone,
+            }),
+          });
+
+          router.push("/");
+        }
+      }, 3000); // check every 3s
     } catch (err: any) {
+      console.error(err);
       setError(err.message || "Signup failed.");
       setLoading(false);
     }
@@ -123,108 +94,77 @@ export default function SignupForm() {
         </div>
       )}
 
-      {waitingVerification && (
-        <div className="mt-4 text-sm text-[#3F2965] bg-[#3F2965]/10 p-3 rounded-lg">
-          Waiting for email verification… Once verified, you’ll be redirected ✨
+      {info && (
+        <div className="mt-4 text-sm text-green-700 bg-green-100 p-3 rounded-lg">
+          {info}
         </div>
       )}
 
       <div className="mt-5 space-y-3">
-        {/* Name */}
         <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label className="text-sm font-medium text-[#3F2965]">
-              First Name
-            </label>
-            <input
-              className="w-full mt-1 px-4 py-2.5 border border-[#3F2965]/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#Dd1764]"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-            />
-          </div>
-
-          <div>
-            <label className="text-sm font-medium text-[#3F2965]">
-              Last Name
-            </label>
-            <input
-              className="w-full mt-1 px-4 py-2.5 border border-[#3F2965]/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#Dd1764]"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-            />
-          </div>
-        </div>
-
-        {/* Phone */}
-        <div>
-          <label className="text-sm font-medium text-[#3F2965]">
-            Phone (optional)
-          </label>
           <input
-            type="tel"
-            placeholder="+91 9XXXXXXXXX"
-            className="w-full mt-1 px-4 py-2.5 border border-[#3F2965]/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#Dd1764]"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
+            placeholder="First name"
+            className="px-4 py-2.5 border rounded-lg"
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
+          />
+          <input
+            placeholder="Last name"
+            className="px-4 py-2.5 border rounded-lg"
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
           />
         </div>
 
-        {/* Email */}
-        <div>
-          <label className="text-sm font-medium text-[#3F2965]">Email</label>
-          <input
-            type="email"
-            className="w-full mt-1 px-4 py-2.5 border border-[#3F2965]/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#Dd1764]"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </div>
+        <input
+          placeholder="Phone (optional)"
+          className="px-4 py-2.5 border rounded-lg"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+        />
 
-        {/* Password */}
-        <div>
-          <label className="text-sm font-medium text-[#3F2965]">
-            Password
-          </label>
-          <input
-            type="password"
-            className="w-full mt-1 px-4 py-2.5 border border-[#3F2965]/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#Dd1764]"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </div>
+        <input
+          type="email"
+          placeholder="Email"
+          className="px-4 py-2.5 border rounded-lg"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
 
-        {/* Confirm */}
-        <div>
-          <label className="text-sm font-medium text-[#3F2965]">
-            Confirm Password
-          </label>
-          <input
-            type="password"
-            className="w-full mt-1 px-4 py-2.5 border border-[#3F2965]/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#Dd1764]"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-          />
-        </div>
+        <input
+          type="password"
+          placeholder="Password"
+          className="px-4 py-2.5 border rounded-lg"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+
+        <input
+          type="password"
+          placeholder="Confirm password"
+          className="px-4 py-2.5 border rounded-lg"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+        />
 
         <button
           onClick={handleSignup}
-          disabled={loading || waitingVerification}
-          className="w-full mt-3 py-2.5 rounded-full bg-[#Dd1764] text-white font-bold tracking-wide transition hover:shadow-lg hover:shadow-[#3F2965]/30 disabled:opacity-60"
+          disabled={loading}
+          className="w-full mt-3 py-2.5 rounded-full bg-[#Dd1764] text-white font-bold disabled:opacity-60"
         >
           {loading ? "Creating account..." : "Sign Up"}
         </button>
       </div>
 
-      {/* Divider */}
       <div className="my-5 flex items-center gap-3">
-        <div className="flex-1 h-px bg-[#3F2965]/20" />
-        <span className="text-xs text-[#3F2965]/50">OR</span>
-        <div className="flex-1 h-px bg-[#3F2965]/20" />
+        <div className="flex-1 h-px bg-gray-200" />
+        <span className="text-xs text-gray-400">OR</span>
+        <div className="flex-1 h-px bg-gray-200" />
       </div>
 
       <GoogleButton />
 
-      <p className="mt-5 text-sm text-center text-[#3F2965]/70">
+      <p className="mt-5 text-sm text-center text-gray-500">
         Already have an account?{" "}
         <Link href="/login" className="text-[#Dd1764] font-semibold">
           Sign in

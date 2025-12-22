@@ -1,34 +1,37 @@
 import prisma from "../config/prisma.js";
 
-export async function syncUser(req, res) {
-  const { uid, email, name: tokenName } = req.firebaseUser;
-  const { name, phone } = req.body;
-
+export const syncUser = async (req, res) => {
   try {
-    let user = await prisma.user.findUnique({
-      where: { firebaseUid: uid },
+    const decoded = req.user; // from requireAuth middleware
+
+    const { name, phone } = req.body || {};
+
+    console.log("🔥 Syncing user:", decoded.uid, decoded.email);
+
+    const user = await prisma.user.upsert({
+      where: { firebaseUid: decoded.uid },
+      update: {
+        email: decoded.email,
+        name: name ?? undefined,
+        phone: phone ?? undefined,
+      },
+      create: {
+        firebaseUid: decoded.uid,
+        email: decoded.email,
+        name: name ?? null,
+        phone: phone ?? null,
+      },
     });
 
-    if (!user) {
-      user = await prisma.user.create({
-        data: {
-          firebaseUid: uid,
-          email,
-          name: name || tokenName || "",
-          phone: phone || null,
-        },
-      });
-    }
-
-    res.json({ success: true, user });
+    res.json(user);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "User sync failed" });
+    console.error("Sync user error:", err);
+    res.status(500).json({ error: "Failed to sync user" });
   }
-}
+};
 export async function getMe(req, res) {
   try {
-    const { uid } = req.firebaseUser;
+    const { uid } = req.user;
 
     const user = await prisma.user.findUnique({
       where: { firebaseUid: uid },

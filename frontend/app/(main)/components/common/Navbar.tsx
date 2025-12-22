@@ -13,16 +13,33 @@ import {
   Briefcase,
   BookOpen,
   Mail,
+  ShieldCheck,
+  User as UserIcon,
 } from "lucide-react";
 import { onAuthStateChanged, User, signOut } from "firebase/auth";
-import { auth } from "../../../lib/firebase";
+import { auth } from "../../../lib/firebase"; 
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
+
+  const ADMIN_EMAILS = ["shsheth2006@gmail.com"];
+
+  // 🔤 Helper to get Initials (e.g., "Siddharth Sheth" -> "SS")
+  const getInitials = (name: string | null | undefined) => {
+    if (!name) return "Profile";
+    const parts = name.trim().split(" ");
+    if (parts.length === 0) return "Profile";
+    
+    const firstInitial = parts[0][0];
+    const lastInitial = parts.length > 1 ? parts[parts.length - 1][0] : "";
+    
+    return (firstInitial + lastInitial).toUpperCase();
+  };
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -31,7 +48,14 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (u) => setUser(u));
+    const unsub = onAuthStateChanged(auth, (u) => {
+      setUser(u);
+      if (u && u.email && ADMIN_EMAILS.includes(u.email)) {
+        setIsAdmin(true);
+      } else {
+        setIsAdmin(false);
+      }
+    });
     return () => unsub();
   }, []);
 
@@ -41,16 +65,24 @@ export default function Navbar() {
 
   const handleLogout = async () => {
     await signOut(auth);
+    setIsAdmin(false);
     router.push("/login");
   };
 
   const menuItems = [
     { href: "/", label: "Home", icon: <Home size={24} /> },
     { href: "/about", label: "About", icon: <Info size={24} /> },
-    { href: "/services", label: "Services", icon: <Briefcase size={24} /> },
+    { href: "/awareness", label: "Awareness", icon: <Briefcase size={24} /> },
     { href: "/resources", label: "Resources", icon: <BookOpen size={24} /> },
     { href: "/contact", label: "Contact", icon: <Mail size={24} /> },
   ];
+  if (isAdmin) {
+    menuItems.push({
+      href: "/admin",
+      label: "Admin Dashboard",
+      icon: <ShieldCheck size={24} className="text-[#Dd1764]" />,
+    });
+  }
 
   return (
     <>
@@ -101,17 +133,30 @@ export default function Navbar() {
               </>
             ) : (
               <>
+                {isAdmin && (
+                  <Link href="/admin">
+                    <button className="px-5 py-2 rounded-full bg-[#3F2965] text-white text-sm font-bold hover:bg-[#513681] transition flex items-center gap-2">
+                      <ShieldCheck size={16} />
+                      Dashboard
+                    </button>
+                  </Link>
+                )}
+
+                {/* 👤 User Initials Button */}
                 <Link href="/profile">
-                  <button className="px-5 py-2 rounded-full border border-[#3F2965]/30 text-[#3F2965] text-sm font-bold hover:bg-[#F9F6FF] transition">
-                    Profile
+                  <button className="px-4 py-2 rounded-full border border-[#3F2965]/30 text-[#3F2965] text-sm font-bold hover:bg-[#3F2965] hover:text-white transition flex items-center gap-2">
+                    <UserIcon size={16} />
+                    {getInitials(user.displayName)}
                   </button>
                 </Link>
 
-                <Link href="/book">
-                  <button className="px-6 py-3 rounded-full bg-[#Dd1764] text-white text-sm font-bold tracking-wide hover:shadow-lg hover:shadow-[#3F2965]/20 transition">
-                    Book Session
-                  </button>
-                </Link>
+                {!isAdmin && (
+                  <Link href="/book">
+                    <button className="px-6 py-3 rounded-full bg-[#Dd1764] text-white text-sm font-bold tracking-wide hover:shadow-lg hover:shadow-[#3F2965]/20 transition">
+                      Book Session
+                    </button>
+                  </Link>
+                )}
 
                 <button
                   onClick={handleLogout}
@@ -179,16 +224,19 @@ export default function Navbar() {
           ) : (
             <div className="flex flex-col gap-3 w-full max-w-sm">
               <Link href="/profile" onClick={() => setMobileMenuOpen(false)}>
-                <button className="w-full py-3 rounded-xl border border-[#3F2965]/30 text-[#3F2965] font-bold">
-                  Profile
+                <button className="w-full py-3 rounded-xl border border-[#3F2965]/30 text-[#3F2965] font-bold flex items-center justify-center gap-2">
+                  <UserIcon size={18} />
+                  {getInitials(user.displayName)}
                 </button>
               </Link>
 
-              <Link href="/book" onClick={() => setMobileMenuOpen(false)}>
-                <button className="w-full py-4 rounded-2xl bg-[#Dd1764] text-white font-bold text-lg">
-                  Book Your Session
-                </button>
-              </Link>
+              {!isAdmin && (
+                <Link href="/book" onClick={() => setMobileMenuOpen(false)}>
+                  <button className="w-full py-4 rounded-2xl bg-[#Dd1764] text-white font-bold text-lg">
+                    Book Your Session
+                  </button>
+                </Link>
+              )}
 
               <button
                 onClick={handleLogout}
