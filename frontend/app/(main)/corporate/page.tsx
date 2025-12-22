@@ -7,7 +7,7 @@ import { Loader2, Zap, Users, Shield, Check, ChevronLeft, ChevronRight } from 'l
 import { motion, useInView } from 'framer-motion';
 import { useState, useRef, useEffect } from 'react';
 
-import { Button } from '../components/ui/button';
+import { Button } from '../../components/ui/button';
 import {
   Form,
   FormControl,
@@ -15,10 +15,10 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '../components/ui/form';
-import { Input } from '../components/ui/input';
-import { Textarea } from '../components/ui/textarea';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
+} from '../../components/ui/form';
+import { Input } from '../../components/ui/input';
+import { Textarea } from '../../components/ui/textarea';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 
 const corporateFormSchema = z.object({
