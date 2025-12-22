@@ -1,5 +1,5 @@
 import prisma from "../config/prisma.js";
-
+import { sendEmail } from "../services/emailService.js";
 /**
  * Get all available (not booked) slots
  */
@@ -65,6 +65,19 @@ export const createBooking = async (req, res) => {
     });
 
     res.json(result);
+    const adminEmail = "shsheth2006@gmail.com";
+const emailContent = `
+  <h3>New Booking Request!</h3>
+  <p><strong>User:</strong> ${user.name || user.email}</p>
+  <p><strong>Type:</strong> ${type}</p>
+  <p><strong>Reason:</strong> ${reason}</p>
+  <p>Login to your Admin Dashboard to accept or reject.</p>
+`;
+
+// Don't await this so it doesn't slow down the response
+sendEmail(adminEmail, "🔔 New MindSettler Booking Request", emailContent);
+
+res.json(result);
   } catch (err) {
     console.error("❌ Create booking error:", err);
 

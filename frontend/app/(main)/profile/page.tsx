@@ -98,7 +98,19 @@ export default function ProfilePage() {
       setUpdatingPhone(false);
     }
   };
+ const getGoogleCalendarUrl = (booking: Booking) => {
+  const formatTime = (dateString: string) => {
+    return new Date(dateString).toISOString().replace(/-|:|\.\d+/g, "");
+  };
 
+  const start = formatTime(booking.slot.startTime);
+  const end = formatTime(booking.slot.endTime);
+  const title = "MindSettler Therapy Session";
+  const details = `Type: ${booking.type} | Reason: ${booking.reason || "N/A"}`;
+  const location = booking.slot.mode === "ONLINE" ? "Online (Link will be shared)" : "MindSettler Studio";
+
+  return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${start}/${end}&details=${encodeURIComponent(details)}&location=${encodeURIComponent(location)}`;
+};
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center text-[#3F2965] bg-[#F9F6FF]">
@@ -231,6 +243,16 @@ export default function ProfilePage() {
                         <span className={`px-4 py-1.5 rounded-full text-xs font-bold border ${statusStyles[b.status]}`}>
                           {b.status}
                         </span>
+                        {b.status === "CONFIRMED" && (
+        <a
+          href={getGoogleCalendarUrl(b)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-xs font-bold text-[#Dd1764] hover:underline flex items-center gap-1"
+        >
+          📅 Add to Calendar
+        </a>
+      )}
                         {b.status === "PENDING" && (
                           <span className="text-xs text-[#3F2965]/40">Awaiting approval</span>
                         )}
