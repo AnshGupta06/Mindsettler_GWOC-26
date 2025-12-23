@@ -144,7 +144,6 @@ type CarouselItem = {
   title: string;
   description: string;
   image: string;
-  overlay: string;
   stats?: Array<{ label: string; value: string }>;
   highlight?: string;
 };
@@ -159,7 +158,6 @@ const CorporateWellnessCarousel = () => {
       title: "Corporate Wellness Programs",
       description: "Invest in your team's most valuable asset: their mental well-being. We partner with organizations to build healthier, more resilient workplaces.",
       image: "https://images.unsplash.com/photo-1573164713988-8665fc963095?q=80&w=2069&auto=format&fit=crop",
-      overlay: "bg-gradient-to-br from-[#3f2965]/80 via-[#5a3d8a]/70 to-[#3f2965]/80",
       stats: [
         { label: "Employee Satisfaction", value: "89%" },
         { label: "Productivity Increase", value: "25%" },
@@ -170,35 +168,30 @@ const CorporateWellnessCarousel = () => {
       title: "Increased Productivity",
       description: "Companies with wellness programs see up to 25% increase in employee productivity and 30% reduction in healthcare costs.",
       image: "https://images.unsplash.com/photo-1551434678-e076c223a692?q=80&w=2070&auto=format&fit=crop",
-      overlay: "bg-gradient-to-br from-pink-600/80 via-purple-600/70 to-pink-600/80",
       highlight: "25% Productivity Boost"
     },
     {
       title: "Reduced Absenteeism",
       description: "Wellness initiatives can reduce absenteeism by up to 28% through better health management and preventive care.",
       image: "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=2070&auto=format&fit=crop",
-      overlay: "bg-gradient-to-br from-purple-600/80 via-pink-600/70 to-purple-600/80",
       highlight: "28% Less Absenteeism"
     },
     {
       title: "Higher Retention",
       description: "87% of employees consider health and wellness offerings when choosing an employer, leading to 40% lower turnover.",
       image: "https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=2070&auto=format&fit=crop",
-      overlay: "bg-gradient-to-br from-pink-500/80 via-purple-500/70 to-pink-500/80",
       highlight: "40% Lower Turnover"
     },
     {
       title: "Better Mental Health",
       description: "Mental wellness programs reduce stress levels by 33% and improve focus by 42%, creating healthier work environments.",
       image: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?q=80&w=2032&auto=format&fit=crop",
-      overlay: "bg-gradient-to-br from-purple-500/80 via-pink-500/70 to-purple-500/80",
       highlight: "42% Better Focus"
     },
     {
       title: "ROI on Wellness",
       description: "For every $1 invested in employee wellness, companies see an average return of $3-4 in reduced costs and increased productivity.",
       image: "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?q=80&w=2070&auto=format&fit=crop",
-      overlay: "bg-gradient-to-br from-pink-700/80 via-purple-700/70 to-pink-700/80",
       highlight: "$3-4 ROI per $1"
     }
   ];
@@ -262,16 +255,16 @@ const CorporateWellnessCarousel = () => {
               }}
             />
             
-            {/* Overlay */}
-            <div className={`absolute inset-0 z-1 ${item.overlay}`} />
+            {/* Light overlay for better text readability */}
+            <div className="absolute inset-0 bg-black/60" />
             
             {/* Content */}
             <div className="relative z-10 h-full flex items-center">
               <div className="container mx-auto px-4 py-8">
-                <div className="max-w-4xl mx-auto text-center text-white">
+                <div className="max-w-4xl mx-auto text-center">
                   {item.type === 'intro' ? (
                     <>
-                      <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
+                      <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight text-white">
                         {item.title}
                       </h1>
                       <p className="text-lg md:text-xl text-white/90 mb-10 max-w-2xl mx-auto">
@@ -283,7 +276,7 @@ const CorporateWellnessCarousel = () => {
                             key={idx}
                             className="bg-white/20 backdrop-blur-sm rounded-xl p-4 md:p-6 min-w-[140px] md:min-w-[180px]"
                           >
-                            <div className="text-2xl md:text-3xl font-bold">{stat.value}</div>
+                            <div className="text-2xl md:text-3xl font-bold text-white">{stat.value}</div>
                             <div className="text-white/80 text-sm md:text-base mt-2">{stat.label}</div>
                           </div>
                         ))}
@@ -294,7 +287,7 @@ const CorporateWellnessCarousel = () => {
                       <div className="inline-block bg-white/30 backdrop-blur-sm px-4 py-2 rounded-full mb-6">
                         <span className="text-white font-semibold text-sm md:text-base">{item.highlight}</span>
                       </div>
-                      <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-6">
+                      <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-6 text-white">
                         {item.title}
                       </h2>
                       <p className="text-lg md:text-xl text-white/90 max-w-2xl mx-auto">
