@@ -91,11 +91,11 @@ export default function AboutPage() {
 
                     <SlideUp delay={0.2}>
                         <div className="relative">
-                            <div className="absolute -top-12 -left-8 text-8xl text-[#3F2965]/10 font-serif">"</div>
+                            <div className="absolute -top-12 -left-8 text-8xl text-[#3F2965]/10 font-serif">&quot;</div>
                             <h3 className="text-2xl md:text-4xl font-medium text-[#3F2965] leading-tight mb-8">
                                 To create a world where every individual has the tools to <span className="text-[#Dd1764] decoration-wavy decoration-[#Dd1764]/30 ">understand their mind</span>, heal their trauma, and unlock their <span className="text-[#Dd1764]">limitless potential.</span>
                             </h3>
-                            <div className="absolute -bottom-1 -right-1 text-8xl text-[#3F2965]/10 font-serif rotate-180">"</div>
+                            <div className="absolute -bottom-1 -right-1 text-8xl text-[#3F2965]/10 font-serif rotate-180">&quot;</div>
                         </div>
                     </SlideUp>
 
@@ -148,13 +148,15 @@ export default function AboutPage() {
                             </SlideUp>
 
                             <SlideUp delay={0.4}>
-                                <h4 className="text-2xl font-semibold text-[#3F2965] mb-4">"A Message from the Heart"</h4>
+                                <h4 className="text-2xl font-semibold text-[#3F2965] mb-4">
+                                    &quot;A Message from the Heart&quot;
+                                    </h4>
                                 <p className="text-lg text-[#3F2965]/70 leading-relaxed">
                                     My journey began with a simple question: What if we could design our own minds? Mindsettler is the answer to that question. It is the culmination of years of research, practice, and a deep desire to see people thrive.
                                 </p>
                                 <br />
                                 <p className="text-lg text-[#3F2965]/70 leading-relaxed">
-                                    I invite you to watch my story and understand the "Why" behind everything we do.
+                                    I invite you to watch my story and understand the {"Why"} behind everything we do.
                                 </p>
                             </SlideUp>
                         </div>
@@ -198,7 +200,7 @@ export default function AboutPage() {
                                 </video>
                             </div>
                             <p className="text-center text-sm text-[#3F2965]/60 mt-4 italic">
-                                Hover on video to play the founder's message
+                                Hover on video to play the founder&apos;s message
                             </p>
                         </SlideUp>
 
