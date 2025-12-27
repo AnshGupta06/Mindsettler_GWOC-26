@@ -73,7 +73,7 @@ export default function AboutPage() {
             </section>
 
             {/* --- VISION SECTION (Redesigned) --- */}
-            <section className="py-32 px-4 sm:px-6 relative overflow-hidden bg-white">
+            <section className="py-26 px-4 sm:px-6 relative overflow-hidden bg-white">
                 {/* Creative Typographic Background */}
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full text-center pointer-events-none opacity-[0.03] select-none">
                     <h2 className="text-[15rem] font-black text-[#3F2965]">VISION</h2>
@@ -110,9 +110,9 @@ export default function AboutPage() {
             </section>
 
             {/* --- FOUNDER SECTION (Left Aligned Title) --- */}
-            <section className="py-24 px-4 sm:px-6 bg-white relative overflow-hidden">
+            <section className="py-8 px-4 sm:px-6 bg-white relative overflow-hidden">
                 {/* Background Decoration */}
-                <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#f3ecff] rounded-full blur-[100px] translate-x-1/2 -translate-y-1/2" />
+                <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-white rounded-full blur-[100px] translate-x-1/2 -translate-y-1/2" />
 
                 <div className="max-w-6xl mx-auto w-full relative z-10">
                     <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -185,6 +185,8 @@ export default function AboutPage() {
                                     if (videoRef.current) {
                                         videoRef.current.pause();
                                         videoRef.current.currentTime = 0;
+
+                                        videoRef.current.load();
                                     }
                                 }}
                             >
@@ -194,6 +196,12 @@ export default function AboutPage() {
                                     playsInline
                                     className="w-full h-full object-cover"
                                     poster="/assets/aboutus_videointro.jpeg"
+                                    onEnded={() => {
+                                    if (videoRef.current) {
+                                        videoRef.current.currentTime = 0;
+                                        videoRef.current.load();
+                                    }
+                                }}
                                 >
                                     <source src="/assets/aboutus_video.mp4" type="video/mp4" />
                                     Your browser does not support the video tag.
