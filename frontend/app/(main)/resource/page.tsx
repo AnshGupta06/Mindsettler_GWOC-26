@@ -1,48 +1,76 @@
+"use client";
 import { resources } from '@/data/resources';
 import ResourceCard from '@/components/resource/ResourceCard';
+import Link from 'next/link';
 
 export default function ResourcesPage() {
+    const categories = ["Core Books", "Academic & Clinical", "Video & Lecture"] as const;
+
     return (
-        <div className="min-h-screen bg-slate-50">
-            {/* Hero Section */}
-            <section className="relative bg-primary pt-32 pb-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
-                <div className="absolute inset-0 opacity-10 pattern-grid-lg"></div>
-                <div className="relative max-w-7xl mx-auto text-center">
-                    <h1 className="text-4xl md:text-5xl font-bold text-white mb-6 tracking-tight">
-                        Psychotherapy <span className="text-accent">Resources</span>
-                    </h1>
-                    <p className="text-lg md:text-xl text-slate-300 max-w-2xl mx-auto leading-relaxed">
-                        Explore our curated collection of articles, videos, and tools designed to support your mental well-being journey.
-                    </p>
+        <div className="min-h-screen bg-white">
+            {/* Hero Section - Matching Awareness Page Style + Integration Fixes */}
+            <section className="relative overflow-hidden">
+                {/* Background gradient to connect header to page better */}
+                <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-white/0 h-3/4"></div>
+
+                <div className="relative max-w-6xl mx-auto px-6 pt-24 pb-12 text-center">
+                    {/* Added shadow-lg and backdrop-blur to make it 'pop' but stay grounded */}
+                    <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-12 md:p-16 border border-white ring-1 ring-slate-100/50">
+                        <span className="inline-block px-4 py-2 rounded-full bg-primary/10 text-primary font-medium text-sm mb-6">
+                            Knowledge Hub
+                        </span>
+                        <h1 className="text-4xl md:text-5xl font-bold text-primary leading-tight mb-6">
+                            Psychotherapy <span className="text-accent">Resources</span>
+                        </h1>
+                        <p className="text-lg text-gray-700 max-w-3xl mx-auto leading-relaxed">
+                            Explore our curated collection of core books, academic materials, and video lectures.
+                            Handpicked to support your journey in understanding psychotherapy process and practice.
+                        </p>
+                    </div>
                 </div>
             </section>
 
-            {/* Filter/Search Section (Placeholder for future) */}
-            <div className="bg-white border-b border-slate-200">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-                    <p className="text-sm text-slate-500">Showing {resources.length} resources</p>
-                </div>
-            </div>
+            {/* Resources Content */}
+            <section className="max-w-7xl mx-auto px-6 py-12">
+                {categories.map((category) => {
+                    const categoryResources = resources.filter(r => r.category === category);
 
-            {/* Resources Grid */}
-            <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {resources.map((resource) => (
-                        <ResourceCard key={resource.id} resource={resource} />
-                    ))}
-                </div>
+                    return (
+                        <div key={category} className="mb-20 last:mb-0">
+                            <div className="text-center mb-10">
+                                <h2 className="text-3xl font-bold text-gray-800 relative inline-block">
+                                    {category}
+                                    <span className="absolute -bottom-2 left-0 w-full h-1 bg-gradient-to-r from-primary/20 via-accent/50 to-primary/20 rounded-full"></span>
+                                </h2>
+                                <p className="mt-3 text-gray-600">
+                                    {category === "Core Books" && "Process-Focused, Gold Standard Reading"}
+                                    {category === "Academic & Clinical" && "Highly Reliable Free Resources"}
+                                    {category === "Video & Lecture" && "Process in Action"}
+                                </p>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                                {categoryResources.map((resource) => (
+                                    <ResourceCard key={resource.id} resource={resource} />
+                                ))}
+                            </div>
+                        </div>
+                    );
+                })}
             </section>
 
             {/* Call to Action */}
             <section className="bg-white py-20 px-4">
                 <div className="max-w-4xl mx-auto text-center bg-gradient-to-br from-primary/5 to-accent/5 rounded-3xl p-10 md:p-16 border border-slate-100">
-                    <h2 className="text-3xl font-bold text-slate-800 mb-4">Need personalized support?</h2>
+                    <h2 className="text-3xl font-bold text-slate-800 mb-4">Have a resource to suggest?</h2>
                     <p className="text-slate-600 mb-8 max-w-lg mx-auto">
-                        Our professional therapists are here to guide you through your unique journey.
+                        We are always looking to expand our library with high-quality, evidence-based materials.
                     </p>
-                    <button className="bg-primary text-white px-8 py-3 rounded-full font-semibold hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20">
-                        Book a Session
-                    </button>
+                    <Link href="/contact">
+                        <button className="bg-primary text-white px-8 py-3 rounded-full font-semibold hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20 cursor-pointer">
+                            Contact Us
+                        </button>
+                    </Link>
                 </div>
             </section>
         </div>
