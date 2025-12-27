@@ -180,9 +180,14 @@ export default function ServicesPage() {
               <SlideUp delay={0.4}>
                 <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                   <Link href="/book">
-                    <button className="px-8 py-4 rounded-full bg-[#3F2965] text-white font-bold text-lg hover:bg-[#513681] transition-all shadow-lg hover:shadow-xl hover:-translate-y-1">
-                      Book a Session
-                    </button>
+                   <button className="w-full relative px-6 py-3 rounded-full bg-[#Dd1764] text-white text-sm font-bold tracking-wide overflow-hidden group transition-all duration-300 hover:shadow-lg hover:shadow-[#3F2965]/20 hover:-translate-y-0.5">
+                          <span className="absolute top-0 left-[-25%] w-[80%] h-full bg-gradient-to-r from-[#3F2965] to-[#513681] -skew-x-12 -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-left" />
+                          <span className="absolute top-0 right-[-25%] w-[80%] h-full bg-gradient-to-l from-[#3F2965] to-[#513681] -skew-x-12 translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-right" />
+                          <span className="relative z-10 flex items-center justify-center gap-2">
+                            <CalendarDays className="h-4 w-4" />
+                            Book Session
+                          </span>
+                        </button>
                   </Link>
                 </div>
               </SlideUp>
