@@ -3,7 +3,6 @@ import Link from "next/link";
 import { awarenessContent } from "./awarenessData";
 import { CharReveal, SlideUp, StaggerContainer, StaggerItem, ImageWipeReveal } from "../../components/common/RevealComponent";
 import { AlertTriangle } from "lucide-react";
-import Footer from "app/(main)/components/common/Footer";
 
 interface AwarenessPageProps {
   params: {
@@ -37,7 +36,6 @@ export default async function AwarenessDetailPage({
   }
 
   return (
-    <>
       <main className="min-h-screen bg-white">
         {/* Hero Section */}
         <section className="relative overflow-hidden">
@@ -455,7 +453,5 @@ export default async function AwarenessDetailPage({
           </SlideUp>
         </div>
       </main>
-      <Footer />
-    </>
   );
 }

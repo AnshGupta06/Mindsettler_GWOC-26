@@ -1,8 +1,7 @@
 @import "tailwindcss";
 @config "../tailwind.config.js";
 
-/* 
-  Variable definitions. 
+/* Variable definitions. 
   Since tailwind.config.js uses "var(--name)" without HSL wrapper, 
   we must provide the FULL color value here (e.g., hex or hsl(..)).
 */
@@ -64,7 +63,6 @@
 
       --secondary: hsl(204 10% 20%);
       --secondary-foreground: hsl(222.2 47.4% 11.2%);
-      /* inferred fallback */
 
       --muted: hsl(204 10% 20%);
       --muted-foreground: hsl(180 10% 60%);
@@ -87,6 +85,11 @@
 
   body {
     @apply bg-background text-foreground;
+  }
+
+  /* ✅ FIX: Ensure standard inputs don't become invisible in mixed themes */
+  input, textarea, select {
+    @apply bg-transparent text-foreground placeholder:text-muted-foreground;
   }
 }
 
@@ -135,6 +138,9 @@
   background-color: #f1effa !important;
   border-radius: 999px;
   border: 1px solid #ddd;
+  
+  /* ✅ FIX: Force dark text because background is always light */
+  color: #171717 !important; 
 }
 
 .ms-chatbot-input::placeholder {
@@ -152,4 +158,7 @@
 
 .ms-chatbot-loader {
   color: #7a768f;
+}
+button{
+  cursor: pointer;
 }

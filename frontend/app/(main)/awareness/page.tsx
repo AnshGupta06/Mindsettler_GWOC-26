@@ -3,14 +3,10 @@ import Link from "next/link";
 import HeroCarousel from "./components/HeroCarousel";
 import Image from "next/image";
 import { awarenessAreas } from "./awarenessCardsData";
-import Footer from "../components/common/Footer";
 import { CharReveal, SlideUp, StaggerContainer, StaggerItem } from "../components/common/RevealComponent";
 
-
 export default function AwarenessPage() {
-
   return (
-    <>
       <main className="min-h-screen bg-white">
         <HeroCarousel />
 
@@ -117,12 +113,7 @@ export default function AwarenessPage() {
               ))}
             </div>
           </StaggerContainer>
-
-
         </section>
       </main>
-      <Footer />
-    </>
   );
 }
-

@@ -10,6 +10,7 @@ import { CharReveal, SlideUp } from "../components/common/RevealComponent";
 export default function AboutPage() {
     const videoRef = React.useRef<HTMLVideoElement>(null);
     return (
+        <>
         <main className="bg-white">
             {/* --- HERO SECTION: Simple & Elegant --- */}
             <section className="min-h-[85vh] flex items-center pt-24 pb-12 px-4 sm:px-6 md:px-8 relative overflow-hidden bg-white">
@@ -217,5 +218,6 @@ export default function AboutPage() {
             </section>
 
         </main >
+                </>
     );
 }
