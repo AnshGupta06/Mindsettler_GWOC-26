@@ -25,19 +25,20 @@ export async function createSlot(req, res) {
   }
 }
 
-// Get all slots
+// Get all slots (With Auto-Cleanup & Better Sorting)
+// Get all slots (Simple Version - No Auto-Delete)
 export async function getAllSlots(req, res) {
   try {
     const slots = await prisma.sessionSlot.findMany({
-      orderBy: { startTime: "asc" },
+      orderBy: { startTime: "desc" }, // Sorts by Newest First
     });
+    
     res.json(slots);
   } catch (err) {
-    console.error("Get slots error:", err);
+    console.error("❌ Get slots error:", err); // CHECK TERMINAL FOR THIS LOG
     res.status(500).json({ error: "Failed to fetch slots" });
   }
 }
-
 // Delete a slot
 export async function deleteSlot(req, res) {
   try {

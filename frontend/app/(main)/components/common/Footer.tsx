@@ -5,7 +5,7 @@ export default function Footer() {
     <footer className="relative bg-[#3F2965] text-white/80 overflow-hidden">
 
       {/* Curved top shape */}
-      <div className="absolute top-0 left-0 w-full h-24 bg-[#F9F6FF] rounded-b-[100%] translate-y-[-50%]" />
+      <div className="absolute top-0 left-0 w-full h-24 bg-white rounded-b-[100%] translate-y-[-50%]" />
 
       <div className="relative max-w-7xl mx-auto px-6 sm:px-10 lg:px-24 pt-28 pb-16 lg:pb-20">
 

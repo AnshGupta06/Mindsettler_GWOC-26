@@ -46,7 +46,7 @@
     --lightBg: #F9F7FC;
   }
 
-  @media (prefers-color-scheme: dark) {
+  @media (prefers-color-scheme: light) {
     :root {
       /* Converting previous HSL channels to full HSL strings */
       --background: hsl(204 10% 10%);
@@ -87,17 +87,10 @@
     @apply bg-background text-foreground;
   }
 
-  /* ✅ FIX: Ensure standard inputs don't become invisible in mixed themes */
   input, textarea, select {
     @apply bg-transparent text-foreground placeholder:text-muted-foreground;
   }
 }
-
-
-/* =========================
-   MindSettler Chatbot Theme
-========================= */
-
 .ms-chatbot-trigger {
   background: linear-gradient(135deg, #6d5bd0, #ec407a);
   color: white;
@@ -138,9 +131,7 @@
   background-color: #f1effa !important;
   border-radius: 999px;
   border: 1px solid #ddd;
-  
-  /* ✅ FIX: Force dark text because background is always light */
-  color: #171717 !important; 
+    color: #171717 !important; 
 }
 
 .ms-chatbot-input::placeholder {

@@ -136,18 +136,21 @@ export default function LoginForm() {
         </div>
 
         <button
-          onClick={handleLogin}
-          disabled={loading}
-          className="w-full py-3.5 rounded-xl bg-gradient-to-r from-[#3F2965] to-[#5D3F92] hover:to-[#3F2965] text-white font-bold shadow-lg shadow-[#3F2965]/20 hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-        >
-          {loading ? (
-            <>
-              <Loader2 className="w-5 h-5 animate-spin" /> Signing In...
-            </>
-          ) : (
-            "Sign In"
-          )}
-        </button>
+  onClick={handleLogin}
+  disabled={loading}
+  className="w-full relative py-4 rounded-xl bg-[#Dd1764] text-white font-bold text-lg tracking-wide overflow-hidden group transition-all duration-300 hover:shadow-2xl hover:shadow-[#3F2965]/20 hover:-translate-y-1 disabled:opacity-70 disabled:cursor-not-allowed"
+>  <span className="absolute top-0 left-[-25%] w-[75%] h-full bg-gradient-to-r from-[#3F2965] to-[#513681] -skew-x-12 -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-left" />
+  <span className="absolute top-0 right-[-25%] w-[75%] h-full bg-gradient-to-l from-[#3F2965] to-[#513681] -skew-x-12 translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-right" />
+  <span className="relative z-10 flex items-center justify-center gap-2">
+    {loading ? (
+      <>
+        <Loader2 className="w-5 h-5 animate-spin" /> Signing In...
+      </>
+    ) : (
+      "Sign In"
+    )}
+  </span>
+</button>
       </div>
 
       <div className="my-8 flex items-center gap-4">
