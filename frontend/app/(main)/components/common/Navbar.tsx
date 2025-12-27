@@ -15,9 +15,17 @@ import {
   Mail,
   ShieldCheck,
   User as UserIcon,
+  Library,
 } from "lucide-react";
+
+// ... (lines 19-71 are unchanged, but I need to make sure I don't break the file structure by replacing huge chunks inappropriately. The tool works by replacing chunks.)
+
+// I will use replace_file_content to just replace the imports and then another call/chunk for the menuItems and logic.
+// Actually, I can do it in one go with multi_replace if I am careful, or just replace the whole file? No, replace_file_content is better for contiguous blocks.
+// I will use multi_replace for imports + menuItems + Desktop Nav.
+
 import { onAuthStateChanged, User, signOut } from "firebase/auth";
-import { auth } from "../../../lib/firebase"; 
+import { auth } from "../../../lib/firebase";
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -34,10 +42,10 @@ export default function Navbar() {
     if (!name) return "Profile";
     const parts = name.trim().split(" ");
     if (parts.length === 0) return "Profile";
-    
+
     const firstInitial = parts[0][0];
     const lastInitial = parts.length > 1 ? parts[parts.length - 1][0] : "";
-    
+
     return (firstInitial + lastInitial).toUpperCase();
   };
 
@@ -72,8 +80,9 @@ export default function Navbar() {
   const menuItems = [
     { href: "/", label: "Home", icon: <Home size={24} /> },
     { href: "/about", label: "About", icon: <Info size={24} /> },
-    { href: "/services", label: "Services", icon: <BookOpen size={24} /> },
     { href: "/awareness", label: "Awareness", icon: <Briefcase size={24} /> },
+    { href: "/resource", label: "Resources", icon: <Library size={24} /> },
+    { href: "/services", label: "Services", icon: <BookOpen size={24} /> },
     { href: "/contact", label: "Contact", icon: <Mail size={24} /> },
   ];
   if (isAdmin) {
@@ -87,11 +96,10 @@ export default function Navbar() {
   return (
     <>
       <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          scrolled || mobileMenuOpen
-            ? "bg-white/90 backdrop-blur-md shadow-sm py-4"
-            : "bg-transparent py-4 md:py-6"
-        }`}
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled || mobileMenuOpen
+          ? "bg-white/90 backdrop-blur-md shadow-sm py-4"
+          : "bg-transparent py-4 md:py-6"
+          }`}
       >
         <nav className="max-w-[1440px] mx-auto px-6 md:px-8 flex items-center justify-between">
           {/* LOGO */}
@@ -112,6 +120,7 @@ export default function Navbar() {
             <NavLink href="/" active={pathname === "/"}>Home</NavLink>
             <NavLink href="/about" active={pathname === "/about"}>About</NavLink>
             <NavLink href="/awareness" active={pathname === "/awareness"}>Awareness</NavLink>
+            <NavLink href="/resource" active={pathname.startsWith("/resource")}>Resources</NavLink>
             <NavLink href="/services" active={pathname === "/services"}>Services</NavLink>
             <NavLink href="/contact" active={pathname === "/contact"}>Contact</NavLink>
           </ul>
@@ -180,9 +189,8 @@ export default function Navbar() {
 
       {/* MOBILE MENU */}
       <div
-        className={`fixed inset-0 z-40 bg-gradient-to-br from-[#F9F6FF] via-white to-[#F9F6FF] flex flex-col md:hidden transition-all duration-500 ${
-          mobileMenuOpen ? "translate-x-0 opacity-100" : "translate-x-full opacity-0"
-        }`}
+        className={`fixed inset-0 z-40 bg-gradient-to-br from-[#F9F6FF] via-white to-[#F9F6FF] flex flex-col md:hidden transition-all duration-500 ${mobileMenuOpen ? "translate-x-0 opacity-100" : "translate-x-full opacity-0"
+          }`}
       >
         <div className="relative z-10 flex flex-col items-center justify-center flex-1 px-6 pt-24 pb-8">
           <ul className="flex flex-col gap-3 w-full max-w-sm mb-8">
@@ -190,11 +198,10 @@ export default function Navbar() {
               <li key={item.href} onClick={() => setMobileMenuOpen(false)}>
                 <Link href={item.href}>
                   <div
-                    className={`flex items-center justify-between px-6 py-4 rounded-2xl transition ${
-                      pathname === item.href
-                        ? "bg-gradient-to-r from-[#3F2965] to-[#513681] text-white"
-                        : "bg-white text-[#3F2965]"
-                    }`}
+                    className={`flex items-center justify-between px-6 py-4 rounded-2xl transition ${pathname === item.href
+                      ? "bg-gradient-to-r from-[#3F2965] to-[#513681] text-white"
+                      : "bg-white text-[#3F2965]"
+                      }`}
                   >
                     <div className="flex items-center gap-4">
                       {item.icon}
@@ -265,11 +272,10 @@ function NavLink({
     <li>
       <Link
         href={href}
-        className={`block px-5 py-2 rounded-full text-sm font-bold transition ${
-          active
-            ? "bg-white text-[#3F2965] shadow-sm"
-            : "text-[#3F2965]/70 hover:bg-white/50 hover:text-[#3F2965]"
-        }`}
+        className={`block px-5 py-2 rounded-full text-sm font-bold transition ${active
+          ? "bg-white text-[#3F2965] shadow-sm"
+          : "text-[#3F2965]/70 hover:bg-white/50 hover:text-[#3F2965]"
+          }`}
       >
         {children}
       </Link>
