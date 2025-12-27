@@ -249,7 +249,7 @@ export const resources: Resource[] = [
     description: 'Best for understanding the human side of therapy. Focuses on the therapist–client relationship, presence, and process over technique. Very readable and conversational.',
     type: 'Book',
     category: 'Core Books',
-    link: 'https://www.yalom.com/the-gift-of-therapy',
+    link: 'https://www.amazon.in/Gift-Therapy-generation-therapists-patients/dp/0749923733/ref=sr_1_2?crid=SV351HA1QV39&dib=eyJ2IjoiMSJ9.vUi5qUnoG9g5VKnLjR5dOLzE6XgERuBlAKFP72TNNdx5NaqU8WzOlNv3Ov3q3jz_5nAmKse0Jg8189hSs9eGdNntQZ0iX7EAp0Y21ASPZglvyuabAs2KcRu7AZtDVq-4uF5MzAPGl7PVXff9UvjsA4my6wanWSQJ6BVaHQPU0Tx2E1hmqpwf4XlYHPXp0h_svTxp0g5ePR5RPDUQkRm0rvaOuzz8CLg5pvUwWueQJFhyRsOElByuAgfYHFGku84w4_7dtid_i2CHPpQroHpsQL8q0hySlxTSVLAP7rXBaIY.L9Fr5jozwcuj-49MmBX9anyiXMFBKpFDf_mtwxZ3KQo&dib_tag=se&keywords=gift+of+therapy+book&qid=1766830244&sprefix=gift+of+th%2Caps%2C401&sr=8-2',
     longSummary: detailedSummaries.giftOfTherapy,
   },
   {
@@ -259,7 +259,7 @@ export const resources: Resource[] = [
     description: 'The most structured overview explaining how therapy actually unfolds across different approaches. Covers intake, formulation, intervention, and termination.',
     type: 'Book',
     category: 'Core Books',
-    link: 'https://www.cengage.com/c/theory-and-practice-of-counseling-and-psychotherapy-10e-corey',
+    link: 'https://www.amazon.in/Theory-Practice-Counseling-Psychotherapy-Gerald/dp/9353502071/ref=sr_1_1?crid=SGKOAEDV65PS&dib=eyJ2IjoiMSJ9.UZcPCqpoGhjWTAzpZELHlTCiwg7qt2-qLQfbfebfo7xdzkagBviiOb-I4GVfmVPC-ISrj8mUkISVERn6kDjiEWtj3NiXWkJ8P0SNK8XA721YqlOAA0PC2xiAh6eD-gXj6YvPx-BWhroB5LMmtttMbm8L60BBdeHp_yMl-7UdHrdVjbVhJguszjxNnD3o3klrFp7M07jSoWS6U00w9l7yqoyID_R6oxZaOItukxfhq8k.Uvl5sc4rjaIjKLz7qn3a5rzyscg9Ro4cCTekJ_wLicI&dib_tag=se&keywords=Theory+and+Practice+of+Counseling+and+Psychotherapy&qid=1766830340&sprefix=theory+and+practice+of+counseling+and+psychotherapy%2Caps%2C471&sr=8-1',
     longSummary: detailedSummaries.theoryPractice,
   },
   {
@@ -269,7 +269,7 @@ export const resources: Resource[] = [
     description: 'Extremely practical guide showing what therapists say, why they say it, and when. Great for process-level understanding.',
     type: 'Book',
     category: 'Core Books',
-    link: 'https://www.guilford.com/books/The-Mental-Health-Clinicians-Workbook/James-Morrison/9781462532060',
+    link: 'https://www.amazon.in/Mental-Health-Clinicians-Workbook-Professional/dp/1462534856/ref=sr_1_1?crid=2PA5DFK8KNGAE&dib=eyJ2IjoiMSJ9.oqalveij7k73kWGueL1Shw.98rYNRD0-Y-iNYf7huYbQscxvUBSove3QUCCTwzktJw&dib_tag=se&keywords=The+Mental+Health+Clinician%E2%80%99s+Workbook+James+Morrison&qid=1766830380&sprefix=the+mental+health+clinician+s+workbook+james+morrison%2Caps%2C444&sr=8-1',
     longSummary: detailedSummaries.mentalHealthWorkbook,
   },
   {
@@ -279,7 +279,7 @@ export const resources: Resource[] = [
     description: 'Evidence-based look at what really helps: alliance, empathy, rupture-repair, and collaboration.',
     type: 'Book',
     category: 'Core Books',
-    link: 'https://global.oup.com/academic/product/psychotherapy-relationships-that-work-9780199964420',
+    link: 'https://www.amazon.in/Psychotherapy-Relationships-that-Work-Evidence-Based/dp/0190843950/ref=sr_1_1?crid=2XP9QRZMOMAPU&dib=eyJ2IjoiMSJ9.zMjP5BztZ-r6BtJxPsifK7ncxQbPkQh3IQwv1DsfWoaKisLvc1e1IrivoKWjhe5Ee2Et5v2gW797_bRKJhvFWA.wxhaOgWn_uYR5-syCEN-ZyJTipI1alElUPVcoCE43zE&dib_tag=se&keywords=Psychotherapy+Relationships+That+Work+John+Norcross&qid=1766830423&sprefix=psychotherapy+relationships+that+work+john+norcross%2Caps%2C416&sr=8-1',
     longSummary: detailedSummaries.relationshipsWork,
   },
   {
@@ -289,7 +289,7 @@ export const resources: Resource[] = [
     description: 'Explains the CBT process step-by-step: case conceptualization, thought records, and behavioral change.',
     type: 'Book',
     category: 'Core Books',
-    link: 'https://www.penguinrandomhouse.com/books/331393/cognitive-therapy-and-the-emotional-disorders-by-aaron-t-beck-md/',
+    link: 'https://www.amazon.in/Cognitive-Therapy-Emotional-Disorders-Aaron/dp/0140156895/ref=sr_1_1?crid=23CUAZPDKE00N&dib=eyJ2IjoiMSJ9.VJTGM38MeX46yJ8WnQqlrszBhmMnKggej56CjkrTwbjlE9O-Tf_lG-OGFGDO2dYRvw1vOHd85PcPv8F4itJxjQ.krEYRrAigGEfEJ4k2MMY4OtVSkQ6rMDo1kEITQ9-4AI&dib_tag=se&keywords=Cognitive+Therapy+and+the+Emotional+Disorders+Aaron+T.+Beck&nsdOptOutParam=true&qid=1766830463&sprefix=cognitive+therapy+and+the+emotional+disorders+aaron+t.+beck%2Caps%2C432&sr=8-1',
     longSummary: detailedSummaries.cbtBeck,
   },
   {
@@ -299,7 +299,7 @@ export const resources: Resource[] = [
     description: 'Deep dive into meaning, death, freedom, and isolation. Explains how conversations evolve in existential therapy.',
     type: 'Book',
     category: 'Core Books',
-    link: 'https://www.yalom.com/existential-psychotherapy',
+    link: 'https://www.amazon.in/Audible-Existential-Psychotherapy/dp/B0DPY13J1N/ref=sr_1_1?crid=3GFFP0QIHZEZ6&dib=eyJ2IjoiMSJ9.Any5Vk1CGRDhv4ZOQXtCmHxkGbV1IMfv7mMtcOx_2jS8TNKinHfy5FrrMoJi9-xZSLftUs2mzAPLhcSaZJ3-0j6_4A-Tg3j9Jy8BwfKBtsKFq5Es0-8Cd6xHt9RFSww_II9_lM1aZr3xVAoAOOwgX2zLmC3inGKc8QvBuYDiiUovMdrHqfhkDM6KZwwuysaBoe8ClASiju8qonGNqhFl6YnEjXaak2gBJYvnt146N4M.FKDnR17A1Rv6--voGgnVnP6w0GvLwyCX_4EL5-9pIK8&dib_tag=se&keywords=Existential+Psychotherapy+Irvin+D.+Yalom&qid=1766830489&sprefix=existential+psychotherapy+irvin+d.+yalom%2Caps%2C438&sr=8-1',
     longSummary: detailedSummaries.existentialYalom,
   },
   {
@@ -309,7 +309,7 @@ export const resources: Resource[] = [
     description: 'Comparative understanding of psychotherapy systems. Helps you see why processes differ across approaches.',
     type: 'Book',
     category: 'Core Books',
-    link: 'https://global.oup.com/ushe/product/systems-of-psychotherapy-9780190880415',
+    link: 'https://www.amazon.in/Systems-Psychotherapy-Transtheoretical-James-Prochaska/dp/0534590853/ref=sr_1_1?crid=NEDU2LLKZSWK&dib=eyJ2IjoiMSJ9.FG20iVNLwzrN_eZ543WBKKmq5iN2W2lkWZ1et6NUSwg3g5eh1j9Hnij2h95EeTiG.kPXv-jC7KEnoREJKCtQSlvXtkTtYhptUWx01a5eaKjw&dib_tag=se&keywords=Systems+of+Psychotherapy%3A+A+Transtheoretical+Analysis+Prochaska+%26+Norcross&nsdOptOutParam=true&qid=1766830524&sprefix=systems+of+psychotherapy+a+transtheoretical+analysis+prochaska+%26+norcross%2Caps%2C392&sr=8-1',
     longSummary: detailedSummaries.systemsProchaska,
   },
 
