@@ -435,11 +435,11 @@ export default async function AwarenessDetailPage({
 
                     <StaggerItem>
                       <Link href="/awareness">
-                      {/* <button className="group relative px-10 py-4 rounded-full border-2 border-primary text-primary font-semibold transition-all duration-300 hover:bg-primary hover:text-white hover:-translate-y-1">
+                        {/* <button className="group relative px-10 py-4 rounded-full border-2 border-primary text-primary font-semibold transition-all duration-300 hover:bg-primary hover:text-white hover:-translate-y-1">
                         Learn More
                       <div className="absolute inset-0 bg-[#Dd1764] scale-x-0 group-hover:scale-x-100 transition-transform duration-500 ease-out origin-left" />
                       </button> */}
-                      <button className="group relative px-10 py-4 rounded-full bg-white text-primary font-semibold shadow-lg transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 overflow-hidden">
+                        <button className="group relative px-10 py-4 rounded-full bg-white text-primary font-semibold shadow-lg transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 overflow-hidden">
                           <span className="relative z-10 group-hover:text-white">Learn More</span>
                           <div className="absolute inset-0 bg-[#Dd1764] scale-x-0 group-hover:scale-x-100 transition-transform duration-500  ease-out origin-left" />
                         </button>
