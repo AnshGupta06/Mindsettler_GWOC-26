@@ -56,6 +56,7 @@ export default function HeroSection() {
               <span className="relative z-10">Book Appointment</span>
             </button>
           </Link>
+          <Link href="#journey">
             <button className="w-full sm:w-auto relative px-6 sm:px-8 md:px-10 py-3 sm:py-3.5 md:py-4 rounded-full border-2 border-[#3F2965]/10 text-[#3F2965] font-bold text-sm sm:text-base tracking-wide overflow-hidden group transition-all duration-300 hover:border-[#3F2965] hover:-translate-y-1">
               <span className="absolute top-0 left-[-25%] w-[75%] h-full bg-gradient-to-r from-[#3F2965] to-[#513681] -skew-x-12 -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-left" />
               <span className="absolute top-0 right-[-25%] w-[75%] h-full bg-gradient-to-l from-[#3F2965] to-[#513681] -skew-x-12 translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-right" />
@@ -63,6 +64,7 @@ export default function HeroSection() {
                 How It Works
               </span>
             </button>
+            </Link>
           </SlideUp>
         </div>
 

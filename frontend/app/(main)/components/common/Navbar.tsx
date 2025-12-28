@@ -81,8 +81,8 @@ export default function Navbar() {
     { href: "/", label: "Home", icon: <Home size={24} /> },
     { href: "/about", label: "About", icon: <Info size={24} /> },
     { href: "/awareness", label: "Awareness", icon: <Briefcase size={24} /> },
-    { href: "/resource", label: "Resources", icon: <Library size={24} /> },
     { href: "/services", label: "Services", icon: <BookOpen size={24} /> },
+    { href: "/resource", label: "Resources", icon: <Library size={24} /> },
     { href: "/contact", label: "Contact", icon: <Mail size={24} /> },
   ];
   if (isAdmin) {
@@ -120,8 +120,8 @@ export default function Navbar() {
             <NavLink href="/" active={pathname === "/"}>Home</NavLink>
             <NavLink href="/about" active={pathname === "/about"}>About</NavLink>
             <NavLink href="/awareness" active={pathname === "/awareness"}>Awareness</NavLink>
-            <NavLink href="/resource" active={pathname.startsWith("/resource")}>Resources</NavLink>
             <NavLink href="/services" active={pathname === "/services"}>Services</NavLink>
+            <NavLink href="/resource" active={pathname.startsWith("/resource")}>Resources</NavLink>
             <NavLink href="/contact" active={pathname === "/contact"}>Contact</NavLink>
           </ul>
 

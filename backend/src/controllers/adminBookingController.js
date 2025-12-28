@@ -10,7 +10,7 @@ export const getAllBookings = async (req, res) => {
         slot: true,
       },
     });
-
+    
     res.json(bookings);
   } catch (err) {
     console.error("❌ Admin fetch bookings:", err);

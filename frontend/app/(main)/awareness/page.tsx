@@ -38,11 +38,13 @@ export default function AwarenessPage() {
 
                 <div className="mt-10 flex flex-col sm:flex-row justify-center gap-6">
                   <SlideUp delay={0.4}>
+                    <Link href="/resource">
                     <button className="w-full sm:w-auto relative px-6 sm:px-8 md:px-10 py-3 sm:py-3.5 md:py-4 rounded-full bg-[#Dd1764] text-white font-bold text-sm sm:text-base tracking-wide overflow-hidden group transition-all duration-300 hover:shadow-2xl hover:shadow-[#3F2965]/20 hover:-translate-y-1">
                       <span className="absolute top-0 left-[-25%] w-[80%] h-full bg-gradient-to-r from-[#3F2965] to-[#513681] -skew-x-12 -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-left" />
                       <span className="absolute top-0 right-[-25%] w-[80%] h-full bg-gradient-to-l from-[#3F2965] to-[#513681] -skew-x-12 translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-right" />
-                      <span className="relative z-10">Explore Awareness</span>
+                      <span className="relative z-10">Explore Resources</span>
                     </button>
+                    </Link>
                   </SlideUp>
 
                   <Link href="/services">
