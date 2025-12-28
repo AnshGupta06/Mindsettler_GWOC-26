@@ -81,7 +81,7 @@ export default function AboutSection() {
 
         {/* 1. THE IMAGE */}
         <Image 
-          src="/assets/therapy.png"
+          src="/assets/new_homepage-1.jpg"
           alt="Compassionate therapy session"
           fill
           className="object-cover transition-transform duration-700 group-hover:scale-105"
