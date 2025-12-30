@@ -7,6 +7,8 @@ interface WrapperProps {
   children: React.ReactNode;
   className?: string;
   delay?: number;
+  onMouseEnter?: () => void;
+  onMouseLeave?: () => void;
 }
 
 interface CharRevealProps {
@@ -46,7 +48,7 @@ export const CharReveal = ({ children, className = "", delay = 0 }: CharRevealPr
     </motion.h1>
   );
 };
-  
+
 // --- 2. Masked Slide Up (Block Reveal) ---
 export const MaskedReveal = ({ children, className = "", delay = 0 }: WrapperProps) => {
   return (
@@ -55,10 +57,10 @@ export const MaskedReveal = ({ children, className = "", delay = 0 }: WrapperPro
       <motion.div
         initial={{ y: "110%" }}
         whileInView={{ y: 0 }}
-        transition={{ 
-            duration: 0.75, 
-            ease: [0.33, 1, 0.68, 1],
-            delay: delay 
+        transition={{
+          duration: 0.75,
+          ease: [0.33, 1, 0.68, 1],
+          delay: delay
         }}
         viewport={{ once: true }}
       >
@@ -69,7 +71,7 @@ export const MaskedReveal = ({ children, className = "", delay = 0 }: WrapperPro
 };
 
 // --- 3. Standard Slide Up ---
-export const SlideUp = ({ children, className = "", delay = 0 }: WrapperProps) => {
+export const SlideUp = ({ children, className = "", delay = 0, ...props }: WrapperProps) => {
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
@@ -77,6 +79,7 @@ export const SlideUp = ({ children, className = "", delay = 0 }: WrapperProps) =
       transition={{ duration: 0.6, delay: delay, ease: "easeOut" }}
       viewport={{ once: true }}
       className={className}
+      {...props}
     >
       {children}
     </motion.div>
