@@ -60,7 +60,6 @@ export const updateBookingStatus = async (req, res) => {
         data: { status },
       });
 
-      // 📧 SEND EMAIL NOTIFICATION (Only if Confirmed)
       if (status === "CONFIRMED") {
          const userEmail = booking.user.email;
          const userName = booking.user.name || "there";

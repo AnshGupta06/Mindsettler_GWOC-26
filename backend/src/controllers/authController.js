@@ -2,8 +2,7 @@ import prisma from "../config/prisma.js";
 
 export const syncUser = async (req, res) => {
   try {
-    const decoded = req.user; // from requireAuth middleware
-
+    const decoded = req.user; 
     const { name, phone } = req.body || {};
     const user = await prisma.user.upsert({
       where: { firebaseUid: decoded.uid },

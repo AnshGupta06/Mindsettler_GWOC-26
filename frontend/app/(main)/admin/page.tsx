@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../../lib/firebase";
+import { API_URL } from "@/app/lib/api";
 import { 
   Calendar, 
   Clock, 
@@ -45,7 +46,7 @@ export default function AdminBookingsPage() {
 
   const fetchBookings = async (token: string) => {
     try {
-      const res = await fetch("http://localhost:5000/api/admin/bookings", {
+      const res = await fetch(`${API_URL}/api/admin/bookings`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -74,7 +75,7 @@ export default function AdminBookingsPage() {
     setBookings(prev => prev.map(b => b.id === id ? { ...b, status } : b));
 
     try {
-      await fetch(`http://localhost:5000/api/admin/bookings/${id}`, {
+      await fetch(`${API_URL}/api/admin/bookings/${id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",

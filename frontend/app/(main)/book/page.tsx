@@ -4,10 +4,11 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../../lib/firebase";
+import { API_URL } from "@/app/lib/api";
 import Link from "next/link";
 import { 
   Calendar, Clock, MapPin, CheckCircle, AlertCircle, ShieldCheck, 
-  CreditCard, Sparkles, ArrowRight, Wallet, User 
+  CreditCard, Sparkles, ArrowRight, Wallet, User, Banknote // 👈 Added Banknote icon
 } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -24,11 +25,22 @@ export default function BookPage() {
   const [slots, setSlots] = useState<Slot[]>([]);
   const [selectedSlot, setSelectedSlot] = useState<Slot | null>(null);
   const [type, setType] = useState<"FIRST" | "FOLLOW_UP">("FIRST");
+  
+  // 💰 New Payment State
+  const [paymentMethod, setPaymentMethod] = useState<"UPI" | "CASH">("UPI");
+  
   const [reason, setReason] = useState("");
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [agreed, setAgreed] = useState(false);
+
+  // 🔄 Auto-reset to UPI if user switches to Online
+  useEffect(() => {
+    if (selectedSlot?.mode === "ONLINE") {
+      setPaymentMethod("UPI");
+    }
+  }, [selectedSlot]);
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (user) => {
@@ -37,7 +49,7 @@ export default function BookPage() {
         return;
       }
       try {
-        const res = await fetch("http://localhost:5000/api/bookings/slots");
+        const res = await fetch(`${API_URL}/api/bookings/slots`);
         const data = await res.json();
         setSlots(data);
       } catch (err) {
@@ -73,12 +85,12 @@ export default function BookPage() {
       if (!user) return;
       const token = await user.getIdToken();
 
-      await fetch("http://localhost:5000/api/auth/sync-user", {
+      await fetch(`${API_URL}/api/auth/sync-user`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      const res = await fetch("http://localhost:5000/api/bookings", {
+      const res = await fetch(`${API_URL}/api/bookings`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -88,6 +100,7 @@ export default function BookPage() {
           slotId: selectedSlot.id,
           type,
           reason,
+          paymentMethod, // 👈 Send payment choice to backend
         }),
       });
 
@@ -316,21 +329,57 @@ export default function BookPage() {
                     animate={{ opacity: 1, height: "auto" }}
                     className="space-y-4 pt-4 border-t border-gray-100"
                   >
+                    
+                    {/* 💳 CONDITIONAL PAYMENT TOGGLE */}
+                    {selectedSlot.mode === "OFFLINE" && (
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold text-[#3F2965]/60 uppercase">Payment Method</label>
+                        <div className="grid grid-cols-2 gap-2 bg-[#F9F6FF] p-1 rounded-xl">
+                          <button 
+                            onClick={() => setPaymentMethod("UPI")}
+                            className={`py-2.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-2 ${paymentMethod === "UPI" ? "bg-white text-[#Dd1764] shadow-sm" : "text-gray-400 hover:text-[#3F2965]"}`}
+                          >
+                            <Wallet size={14} /> UPI
+                          </button>
+                          <button 
+                            onClick={() => setPaymentMethod("CASH")}
+                            className={`py-2.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-2 ${paymentMethod === "CASH" ? "bg-white text-[#Dd1764] shadow-sm" : "text-gray-400 hover:text-[#3F2965]"}`}
+                          >
+                            <Banknote size={14} /> Cash
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
                     <div className="bg-[#F9F6FF] p-4 rounded-xl border border-[#3F2965]/5">
                       <div className="flex items-center gap-2 mb-3">
-                        <Wallet size={16} className="text-[#Dd1764]" />
-                        <span className="text-sm font-bold text-[#3F2965]">Payment Required</span>
+                        {paymentMethod === "UPI" ? (
+                           <Wallet size={16} className="text-[#Dd1764]" />
+                        ) : (
+                           <Banknote size={16} className="text-[#Dd1764]" />
+                        )}
+                        <span className="text-sm font-bold text-[#3F2965]">
+                          {paymentMethod === "UPI" ? "Payment Required" : "Pay at Studio"}
+                        </span>
                       </div>
                       
-                      <div className="flex items-center justify-between bg-white p-3 rounded-lg border border-gray-100 shadow-sm">
-                         <span className="text-xs text-gray-400 font-medium">UPI ID</span>
-                         <code className="font-mono text-sm font-bold text-[#3F2965] select-all">
-                           mindsettler@upi
-                         </code>
-                      </div>
-                      <p className="text-[10px] text-center text-gray-400 mt-2">
-                        Complete payment via any UPI app to confirm.
-                      </p>
+                      {paymentMethod === "UPI" ? (
+                        <>
+                          <div className="flex items-center justify-between bg-white p-3 rounded-lg border border-gray-100 shadow-sm">
+                            <span className="text-xs text-gray-400 font-medium">UPI ID</span>
+                            <code className="font-mono text-sm font-bold text-[#3F2965] select-all">
+                              mindsettler@upi
+                            </code>
+                          </div>
+                          <p className="text-[10px] text-center text-gray-400 mt-2">
+                            Complete payment via any UPI app.
+                          </p>
+                        </>
+                      ) : (
+                        <p className="text-xs text-[#3F2965]/70 leading-relaxed italic bg-white p-3 rounded-lg border border-gray-100">
+                          Please bring the exact amount in cash to your session.
+                        </p>
+                      )}
                     </div>
 
                     <label className="flex items-start gap-3 cursor-pointer group p-2 rounded-lg hover:bg-gray-50 transition-colors">
