@@ -7,7 +7,7 @@ import GoogleButton from "./GoogleButton";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Mail, Lock, Loader2, ArrowLeft, CheckCircle2 } from "lucide-react";
-
+import { API_URL } from "@/app/lib/api";
 export default function LoginForm() {
   const router = useRouter();
   const [email, setEmail] = useState("");
@@ -28,7 +28,7 @@ export default function LoginForm() {
       const cred = await signInWithEmailAndPassword(auth, email, password);
       const token = await cred.user.getIdToken();
 
-      await fetch("http://localhost:5000/api/auth/sync-user", {
+      await fetch(`${API_URL}/api/auth/sync-user`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
       });

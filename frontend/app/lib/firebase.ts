@@ -2,9 +2,6 @@ import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
-/**
- * Firebase config (env based – GOOD PRACTICE)
- */
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY!,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN!,
@@ -14,22 +11,11 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID!,
 };
 
-/**
- * Initialize app safely (prevents duplicate apps)
- */
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 
-/**
- * Core services
- */
 export const auth = getAuth(app);
 export const db = getFirestore(app);
-
-/**
- * Providers (NO POPUP HERE)
-*/
 export const googleProvider = new GoogleAuthProvider();
 googleProvider.setCustomParameters({
   prompt: "select_account",
 });
-console.log("🔥 Firebase config:", firebaseConfig);

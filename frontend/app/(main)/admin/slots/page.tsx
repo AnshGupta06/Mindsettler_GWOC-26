@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../../../lib/firebase"; 
+import { API_URL } from "@/app/lib/api";
 import { 
   Calendar, Trash2, Plus, MapPin, Wifi, Lock, ArrowLeft, LayoutGrid, ArrowUpDown, Search, X 
 } from "lucide-react";
@@ -36,7 +37,7 @@ export default function AdminSlotsPage() {
 
   const fetchSlots = async (token?: string) => {
     try {
-      const res = await fetch("http://localhost:5000/api/admin/slots", {
+      const res = await fetch(`${API_URL}/api/admin/slots`, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       const data = await res.json();
@@ -118,7 +119,7 @@ export default function AdminSlotsPage() {
       const user = auth.currentUser;
       const token = await user?.getIdToken();
 
-      const res = await fetch("http://localhost:5000/api/admin/slots", {
+      const res = await fetch(`${API_URL}/api/admin/slots`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -150,7 +151,7 @@ export default function AdminSlotsPage() {
     try {
       const user = auth.currentUser;
       const token = await user?.getIdToken();
-      await fetch(`http://localhost:5000/api/admin/slots/${id}`, {
+      await fetch(`${API_URL}/api/admin/slots/${id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });

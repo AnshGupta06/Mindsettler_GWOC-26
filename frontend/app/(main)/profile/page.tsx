@@ -4,7 +4,11 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { onAuthStateChanged, User } from "firebase/auth";
 import { auth } from "../../lib/firebase";
-import { Calendar, Clock, MapPin, Phone, User as UserIcon, AlertCircle } from "lucide-react";
+import { API_URL } from "@/app/lib/api";
+import { 
+  Calendar, Clock, MapPin, Phone, User as UserIcon, 
+  AlertCircle, XCircle, ExternalLink 
+} from "lucide-react";
 
 type Booking = {
   id: string;
@@ -35,6 +39,7 @@ export default function ProfilePage() {
   // Phone Update State
   const [newPhone, setNewPhone] = useState("");
   const [updatingPhone, setUpdatingPhone] = useState(false);
+  const [cancellingId, setCancellingId] = useState<string | null>(null);
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (currentUser) => {
@@ -52,15 +57,13 @@ export default function ProfilePage() {
     try {
       const token = await currentUser.getIdToken();
 
-      // 1. Fetch User Details (for phone check)
-      const userRes = await fetch("http://localhost:5000/api/auth/me", {
+      const userRes = await fetch(`${API_URL}/api/auth/me`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const userData = await userRes.json();
       setDbUser(userData);
 
-      // 2. Fetch Bookings
-      const bookingRes = await fetch("http://localhost:5000/api/bookings/my", {
+      const bookingRes = await fetch(`${API_URL}/api/bookings/my`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const bookingData = await bookingRes.json();
@@ -79,7 +82,7 @@ export default function ProfilePage() {
     try {
       const token = await user?.getIdToken();
       
-      await fetch("http://localhost:5000/api/auth/sync-user", {
+      await fetch(`${API_URL}/api/auth/sync-user`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -88,7 +91,6 @@ export default function ProfilePage() {
         body: JSON.stringify({ phone: newPhone }),
       });
 
-      // Refresh data
       if (user) await fetchProfileData(user);
       setNewPhone("");
     } catch (err) {
@@ -98,19 +100,58 @@ export default function ProfilePage() {
       setUpdatingPhone(false);
     }
   };
- const getGoogleCalendarUrl = (booking: Booking) => {
-  const formatTime = (dateString: string) => {
-    return new Date(dateString).toISOString().replace(/-|:|\.\d+/g, "");
+
+// ❌ Handle Cancellation with Logic
+// ❌ Handle Cancellation with Logic
+  const handleCancel = async (booking: Booking) => { // 👈 Change to 'booking: Booking'
+    
+    // 1. Logic to show different warnings
+    let warningMessage = "Are you sure you want to cancel this session?";
+    
+    if (booking.status === "CONFIRMED") {
+      warningMessage = "⚠️ NOTE: Since this session is confirmed, cancelling will initiate a manual refund request.\n\nOur team will contact you or process the refund within 24-48 hours.\n\nDo you want to proceed?";
+    }
+
+    if (!confirm(warningMessage)) return;
+    
+    setCancellingId(booking.id); // 👈 Access ID from object
+    try {
+      const token = await user?.getIdToken();
+      const res = await fetch(`${API_URL}/api/bookings/${booking.id}`, { // 👈 Access ID from object
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!res.ok) throw new Error("Failed to cancel");
+
+      setBookings((prev) => prev.filter((b) => b.id !== booking.id)); // 👈 Access ID from object
+      
+      alert(booking.status === "CONFIRMED" 
+        ? "Session cancelled. Admin has been notified for refund." 
+        : "Session cancelled successfully."
+      );
+
+    } catch (err) {
+      console.error(err);
+      alert("Could not cancel booking. Please try again.");
+    } finally {
+      setCancellingId(null);
+    }
+  };
+    const getGoogleCalendarUrl = (booking: Booking) => {
+    const formatTime = (dateString: string) => {
+      return new Date(dateString).toISOString().replace(/-|:|\.\d+/g, "");
+    };
+
+    const start = formatTime(booking.slot.startTime);
+    const end = formatTime(booking.slot.endTime);
+    const title = "MindSettler Therapy Session";
+    const details = `Type: ${booking.type} | Reason: ${booking.reason || "N/A"}`;
+    const location = booking.slot.mode === "ONLINE" ? "Online (Link will be shared)" : "MindSettler Studio";
+
+    return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${start}/${end}&details=${encodeURIComponent(details)}&location=${encodeURIComponent(location)}`;
   };
 
-  const start = formatTime(booking.slot.startTime);
-  const end = formatTime(booking.slot.endTime);
-  const title = "MindSettler Therapy Session";
-  const details = `Type: ${booking.type} | Reason: ${booking.reason || "N/A"}`;
-  const location = booking.slot.mode === "ONLINE" ? "Online (Link will be shared)" : "MindSettler Studio";
-
-  return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${start}/${end}&details=${encodeURIComponent(details)}&location=${encodeURIComponent(location)}`;
-};
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center text-[#3F2965] bg-[#F9F6FF]">
@@ -125,10 +166,9 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen bg-[#F9F6FF] pt-24 pb-12 px-6 md:px-12 flex flex-col md:flex-row gap-8">
       
-      {/* LEFT SIDEBAR: User Info */}
+      {/* LEFT SIDEBAR */}
       <div className="w-full md:w-1/3 lg:w-1/4 flex flex-col gap-6">
         <div className="bg-white p-8 rounded-3xl shadow-sm border border-[#3F2965]/5 h-fit sticky top-28">
-          
           <div className="flex flex-col items-center text-center mb-8">
             <div className="w-24 h-24 bg-[#3F2965]/10 rounded-full flex items-center justify-center text-[#3F2965] mb-4">
               <UserIcon size={40} />
@@ -146,22 +186,16 @@ export default function ProfilePage() {
               </div>
               <div>
                 <p className="text-xs text-[#3F2965]/50 font-bold uppercase tracking-wider">Phone</p>
-                <p className="font-medium">
-                  {dbUser?.phone || "Not set"}
-                </p>
+                <p className="font-medium">{dbUser?.phone || "Not set"}</p>
               </div>
             </div>
 
-            {/* Missing Phone Warning */}
             {!dbUser?.phone && (
               <div className="bg-yellow-50 border border-yellow-100 p-4 rounded-xl">
                 <div className="flex items-center gap-2 text-yellow-800 mb-2">
                   <AlertCircle size={16} />
                   <p className="text-xs font-bold">Action Required</p>
                 </div>
-                <p className="text-xs text-yellow-700 mb-3 leading-relaxed">
-                  Please add your phone number so counselors can reach you.
-                </p>
                 <div className="flex gap-2">
                   <input 
                     type="text" 
@@ -208,6 +242,9 @@ export default function ProfilePage() {
                 const date = new Date(b.slot.date).toDateString();
                 const start = new Date(b.slot.startTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
                 const end = new Date(b.slot.endTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+                
+                // 🕒 Check if session is in the past
+                const isPast = new Date(b.slot.startTime) < new Date();
 
                 const statusStyles = {
                   CONFIRMED: "bg-green-100 text-green-700 border-green-200",
@@ -239,23 +276,45 @@ export default function ProfilePage() {
                         </div>
                       </div>
 
-                      <div className="flex flex-col items-end gap-2">
+                      <div className="flex flex-col items-end gap-3">
+                        {/* Status Badge */}
                         <span className={`px-4 py-1.5 rounded-full text-xs font-bold border ${statusStyles[b.status]}`}>
                           {b.status}
                         </span>
-                        {b.status === "CONFIRMED" && (
-        <a
-          href={getGoogleCalendarUrl(b)}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-xs font-bold text-[#Dd1764] hover:underline flex items-center gap-1"
-        >
-          📅 Add to Calendar
-        </a>
-      )}
-                        {b.status === "PENDING" && (
-                          <span className="text-xs text-[#3F2965]/40">Awaiting approval</span>
-                        )}
+
+                        {/* Actions Row */}
+                        <div className="flex items-center gap-3">
+                          
+                          {/* 📅 Add to Calendar (Only if Confirmed & Future) */}
+                          {!isPast && b.status === "CONFIRMED" && (
+                            <a
+                              href={getGoogleCalendarUrl(b)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="px-3 py-1.5 bg-blue-50 text-blue-600 border border-blue-100 rounded-lg text-xs font-bold hover:bg-blue-100 transition-colors flex items-center gap-1.5"
+                            >
+                              <ExternalLink size={12} /> Google Cal
+                            </a>
+                          )}
+
+                         {/* ❌ Cancel Button */}
+{!isPast && (
+  <button
+    onClick={() => handleCancel(b)} // 👈 FIXED: Pass 'b', not 'b.id'
+    disabled={cancellingId === b.id}
+    className="px-3 py-1.5 bg-red-50 text-red-600 border border-red-100 rounded-lg text-xs font-bold hover:bg-red-100 transition-colors flex items-center gap-1.5 disabled:opacity-50"
+  >
+    {cancellingId === b.id ? (
+      "Cancelling..."
+    ) : (
+      <>
+        <XCircle size={12} /> Cancel
+      </>
+    )}
+  </button>
+)}
+                        </div>
+
                       </div>
 
                     </div>

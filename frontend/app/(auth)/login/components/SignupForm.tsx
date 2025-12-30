@@ -7,7 +7,7 @@ import GoogleButton from "./GoogleButton";
 import Link from "next/link"; 
 import { useRouter } from "next/navigation";
 import { User, Mail, Lock, Phone, Loader2, CheckCircle2, ArrowLeft } from "lucide-react"; 
-
+import { API_URL } from "@/app/lib/api";
 export default function SignupForm() {
   const router = useRouter();
 
@@ -49,7 +49,7 @@ export default function SignupForm() {
           clearInterval(interval);
           const token = await cred.user.getIdToken();
 
-          await fetch("http://localhost:5000/api/auth/sync-user", {
+          await fetch(`${API_URL}/api/auth/sync-user`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",

@@ -1,8 +1,6 @@
 import prisma from "../config/prisma.js";
 import { sendEmail } from "../services/emailService.js";
-/**
- * Get all available (not booked) slots
- */
+
 export const getSlots = async (req, res) => {
   try {
     const now = new Date();
@@ -23,9 +21,6 @@ export const getSlots = async (req, res) => {
   }
 };
 
-/**
- * Create booking request (PENDING)
- */
 export const createBooking = async (req, res) => {
   try {
     const { slotId, type, reason } = req.body;
@@ -78,7 +73,6 @@ const emailContent = `
   <p>Login to your Admin Dashboard to accept or reject.</p>
 `;
 
-// Don't await this so it doesn't slow down the response
 sendEmail(adminEmail, "🔔 New MindSettler Booking Request", emailContent);
 
 res.json(result);
@@ -118,3 +112,57 @@ export async function getMyBookings(req, res) {
     res.status(500).json({ error: "Failed to fetch bookings" });
   }
 }
+export const cancelBooking = async (req, res) => {
+  try {
+    const { id } = req.params; 
+    const firebaseUid = req.user.uid;
+
+    const user = await prisma.user.findUnique({
+      where: { firebaseUid },
+    });
+
+    // 1. Check booking details before deleting
+    const booking = await prisma.booking.findUnique({
+      where: { id },
+      include: { slot: true },
+    });
+
+    if (!booking || booking.userId !== user.id) {
+      return res.status(404).json({ error: "Booking not found or unauthorized" });
+    }
+
+    // 2. Transaction: Delete booking AND Free up the slot
+    await prisma.$transaction([
+      prisma.sessionSlot.update({
+        where: { id: booking.slotId },
+        data: { isBooked: false }, // 🔓 Make slot available again
+      }),
+      prisma.booking.delete({
+        where: { id },
+      }),
+    ]);
+
+    // 🔔 3. IF PAID: Notify Admin to Refund
+    if (booking.status === "CONFIRMED" || booking.status === "ACCEPTED") {
+      const adminEmail = "shsheth2006@gmail.com"; // Your email
+      const emailSubject = "💰 REFUND REQUIRED: Booking Cancelled";
+      const emailBody = `
+        <h3>Booking Cancelled by User</h3>
+        <p><strong>User:</strong> ${user.name} (${user.email})</p>
+        <p><strong>Phone:</strong> ${user.phone}</p>
+        <p><strong>Session Date:</strong> ${new Date(booking.slot.date).toDateString()}</p>
+        <p><strong>Status was:</strong> ${booking.status}</p>
+        <br/>
+        <p style="color: red; font-weight: bold;">ACTION: Please check if they paid via UPI and process the refund manually.</p>
+      `;
+      
+      // Send email without waiting (fire and forget)
+      sendEmail(adminEmail, emailSubject, emailBody);
+    }
+
+    res.json({ success: true, message: "Booking cancelled successfully" });
+  } catch (err) {
+    console.error("❌ Cancel booking error:", err);
+    res.status(500).json({ error: "Failed to cancel booking" });
+  }
+};

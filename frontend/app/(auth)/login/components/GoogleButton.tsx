@@ -3,6 +3,7 @@
 import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { auth } from "../../../lib/firebase";
 import { useRouter } from "next/navigation";
+import { API_URL } from "@/app/lib/api";
 
 export default function GoogleButton() {
   const router = useRouter();
@@ -21,7 +22,7 @@ export default function GoogleButton() {
 
       // 3. 🔥 Sync to Backend immediately with Name
       // We send 'name' from Google. Phone is left blank for now.
-      await fetch("http://localhost:5000/api/auth/sync-user", {
+      await fetch(`${API_URL}/api/auth/sync-user`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
