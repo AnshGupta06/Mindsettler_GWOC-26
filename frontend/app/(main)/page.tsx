@@ -19,7 +19,6 @@ export default function HomePage() {
       <PersonalPathSection />
       <WorkplaceWellnessSection />
       <FAQSection />
-      <Footer />
     </main>
   );
 }

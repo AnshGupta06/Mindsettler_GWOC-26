@@ -11,20 +11,20 @@ export default function Footer() {
 
         {/* Brand + CTA */}
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-10 pb-12 border-b border-white/10">
-          
+
           {/* Brand */}
           <div>
-           <Link href="/" className="flex items-center gap-3 z-50">
-  <div className="relative rounded-xl flex items-center justify-center overflow-hidden py-2 px-3">
-    <Image
-      src="/assets/Mindsettler-logo.png"
-      alt="MindSettler Logo"
-      width={140}
-      height={1}
-      className="object-contain w-[120px] md:w-[170px] invert"
-    />
-  </div>
-</Link>
+            <Link href="/" className="flex items-center gap-3 z-50">
+              <div className="relative rounded-xl flex items-center justify-center overflow-hidden py-2 px-3">
+                <Image
+                  src="/assets/Mindsettler-logo.png"
+                  alt="MindSettler Logo"
+                  width={140}
+                  height={1}
+                  className="object-contain w-[120px] md:w-[170px] invert"
+                />
+              </div>
+            </Link>
             <p className="max-w-xl text-sm leading-relaxed text-white/70">
               A psycho-education and mental well-being practice dedicated to helping
               you understand your mind, build emotional clarity, and access structured,

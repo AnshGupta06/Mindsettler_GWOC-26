@@ -3,6 +3,8 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { CharReveal } from "../../components/common/RevealComponent";
+
 
 const slides = [
   {
@@ -57,27 +59,13 @@ export default function HeroStory() {
   };
 
   return (
-    // Normal hero section, no sticky/scroll magic, so no extra blank space.
     <section className="relative bg-[#f9f6ff] rounded-2xl">
       {/* Page Heading */}
-<div className="relative max-w-7xl mx-auto px-6 pt-10 pb-6 text-center overflow-hidden">
-  
-  {/* Label */}
-  <div className="relative mb-4">
-    <span className="inline-block px-4 py-2 rounded-full bg-primary/10 text-primary font-semibold text-sm tracking-wide">
-      Awareness Hub
-    </span>
-  </div>
+<div className="relative max-w-7xl mx-auto px-6 pt-8 pb-2 text-center overflow-hidden">
 
-  {/* Title */}
-  <h1 className="relative text-4xl md:text-5xl font-extrabold text-primary leading-tight">
-    Mental Health Awareness
-  </h1>
+  <CharReveal delay={0.1} className="relative text-4xl md:text-5xl font-extrabold text-primary leading-tight justify-center"> Mental Health Awareness
+</CharReveal>
 
-  {/* Subtitle */}
-  <p className="relative mt-4 text-base md:text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
-    Learn, understand, and take the first step toward clarity and healing with MindSettler.
-  </p>
 </div>
 
 

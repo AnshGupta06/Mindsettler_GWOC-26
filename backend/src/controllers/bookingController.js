@@ -5,9 +5,13 @@ import { sendEmail } from "../services/emailService.js";
  */
 export const getSlots = async (req, res) => {
   try {
+    const now = new Date();
     const slots = await prisma.sessionSlot.findMany({
       where: {
         isBooked: false,
+        startTime:{
+          gt:now,
+        },
       },
       orderBy: { startTime: "asc" },
     });

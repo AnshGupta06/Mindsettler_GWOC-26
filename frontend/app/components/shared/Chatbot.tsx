@@ -105,7 +105,7 @@ export function Chatbot() {
     <>
       {/* Floating Trigger Button */}
       <Button
-        className="ms-chatbot-trigger fixed bottom-6 right-6 h-16 w-16 rounded-full"
+        className="ms-chatbot-trigger fixed bottom-6 right-6 h-16 w-16 rounded-full z-49"
         onClick={() => setIsOpen(true)}
         aria-label="Open chatbot"
       >
