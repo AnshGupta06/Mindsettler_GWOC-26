@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import {  CharRevealWord } from "../../components/common/RevealComponent";
+import {  CharReveal } from "../../components/common/RevealComponent";
 
 
 const slides = [
@@ -62,12 +62,12 @@ export default function HeroStory() {
     <section className="relative bg-[#f9f6ff] rounded-2xl">
       {/* Page Heading */}
       <div className="relative max-w-7xl mx-auto px-6 pt-8 pb-2 text-center overflow-hidden">
-
-        <CharRevealWord delay={0.1} className="relative text-4xl md:text-5xl font-extrabold text-primary leading-tight justify-center"> Mental Health Awareness
-        </CharRevealWord>
-
+        <div className="relative text-4xl md:text-5xl font-extrabold text-primary leading-tight justify-center">
+            <CharReveal delay={0.1}>
+                Mental Health Awareness
+            </CharReveal>
+        </div>
       </div>
-
 
       <div className="container mx-auto px-6 py-16 md:py-10">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">

@@ -3,7 +3,7 @@ import Link from "next/link";
 import HeroCarousel from "./components/HeroCarousel";
 import Image from "next/image";
 import { awarenessAreas } from "./awarenessCardsData";
-import { CharReveal, CharRevealWord, SlideUp, StaggerContainer, StaggerItem } from "../components/common/RevealComponent";
+import { CharReveal, SlideUp, StaggerContainer, StaggerItem } from "../components/common/RevealComponent";
 
 export default function AwarenessPage() {
   return (
@@ -19,12 +19,17 @@ export default function AwarenessPage() {
           <SlideUp>
             <div className="bg-[#f9f6ff] rounded-3xl shadow-xl p-12 md:p-16 border border-gray-100">
               <h1 className="text-4xl md:text-5xl font-bold text-primary leading-tight">
-                <CharRevealWord delay={0.1} className="justify-center">
-                  Understanding Your Mind
-                </CharRevealWord>
-                <CharRevealWord delay={0.2} className="justify-center">
-                  Is the First Step Toward Healing
-                </CharRevealWord>
+                {/* Updated to use the new CharReveal for character-level animation */}
+                <div className="mb-2">
+                    <CharReveal delay={0.1}>
+                    Understanding Your Mind
+                    </CharReveal>
+                </div>
+                <div>
+                    <CharReveal delay={0.2}>
+                    Is the First Step Toward Healing
+                    </CharReveal>
+                </div>
               </h1>
 
               <SlideUp delay={0.3}>
@@ -68,7 +73,8 @@ export default function AwarenessPage() {
       <section className="max-w-7xl mx-auto px-6 py-10">
         <div className="text-center mb-14">
           <h2 className="text-3xl md:text-4xl font-bold text-primary">
-            <CharReveal delay={0.2} className="justify-center">
+            {/* Updated to use CharReveal */}
+            <CharReveal delay={0.2}>
               Areas of Awareness
             </CharReveal>
           </h2>

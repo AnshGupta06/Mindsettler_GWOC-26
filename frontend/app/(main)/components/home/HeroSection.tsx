@@ -21,7 +21,7 @@ export default function HeroSection() {
             </div>
           </Reveal>
 
-          {/* Heading - Fixed for mobile */}
+          {/* Heading */}
           <div className="text-3xl sm:text-4xl md:text-5xl lg:text-[4rem] leading-tight sm:leading-[1.1] font-bold text-[#3F2965] tracking-tight mb-4 sm:mb-6 md:mb-8 w-full">
             <div className="mb-1 sm:mb-2">
               <CharReveal delay={0}>
@@ -29,41 +29,41 @@ export default function HeroSection() {
               </CharReveal>
             </div>
             <div className="mb-1 sm:mb-2">
-              <CharReveal delay={0.3}>
+              <CharReveal delay={0.2}>
                 Your Mind.
               </CharReveal>
             </div>
             <div className="text-[#Dd1764]">
-              <CharReveal delay={0.6}>
+              <CharReveal delay={0.4}>
                 Supporting Your Healing.
               </CharReveal>
             </div>
           </div>
 
           {/* Paragraph */}
-          <SlideUp delay={0.8} className="mb-6 sm:mb-8 md:mb-10 w-full">
+          <SlideUp delay={0.6} className="mb-6 sm:mb-8 md:mb-10 w-full">
             <p className="text-base sm:text-lg md:text-xl leading-relaxed text-[#3F2965]/70 max-w-lg font-medium">
               A structured path to mental clarity. We combine professional psychotherapy with psycho-education to help you navigate life's challenges.
             </p>
           </SlideUp>
 
           {/* Buttons */}
-          <SlideUp delay={1.0} className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 md:gap-5 w-full sm:w-auto">
-          <Link href="/book">
-            <button className="w-full sm:w-auto relative px-6 sm:px-8 md:px-10 py-3 sm:py-3.5 md:py-4 rounded-full bg-[#Dd1764] text-white font-bold text-sm sm:text-base tracking-wide overflow-hidden group transition-all duration-300 hover:shadow-2xl hover:shadow-[#3F2965]/20 hover:-translate-y-1">
-              <span className="absolute top-0 left-[-25%] w-[75%] h-full bg-gradient-to-r from-[#3F2965] to-[#513681] -skew-x-12 -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-left" />
-              <span className="absolute top-0 right-[-25%] w-[75%] h-full bg-gradient-to-l from-[#3F2965] to-[#513681] -skew-x-12 translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-right" />
-              <span className="relative z-10">Book Appointment</span>
-            </button>
-          </Link>
-          <Link href="#journey">
-            <button className="w-full sm:w-auto relative px-6 sm:px-8 md:px-10 py-3 sm:py-3.5 md:py-4 rounded-full border-2 border-[#3F2965]/10 text-[#3F2965] font-bold text-sm sm:text-base tracking-wide overflow-hidden group transition-all duration-300 hover:border-[#3F2965] hover:-translate-y-1">
-              <span className="absolute top-0 left-[-25%] w-[75%] h-full bg-gradient-to-r from-[#3F2965] to-[#513681] -skew-x-12 -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-left" />
-              <span className="absolute top-0 right-[-25%] w-[75%] h-full bg-gradient-to-l from-[#3F2965] to-[#513681] -skew-x-12 translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-right" />
-              <span className="relative z-10 group-hover:text-white transition-colors duration-300">
-                How It Works
-              </span>
-            </button>
+          <SlideUp delay={0.8} className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 md:gap-5 w-full sm:w-auto">
+            <Link href="/book">
+              <button className="w-full sm:w-auto relative px-6 sm:px-8 md:px-10 py-3 sm:py-3.5 md:py-4 rounded-full bg-[#Dd1764] text-white font-bold text-sm sm:text-base tracking-wide overflow-hidden group transition-all duration-300 hover:shadow-2xl hover:shadow-[#3F2965]/20 hover:-translate-y-1">
+                <span className="absolute top-0 left-[-25%] w-[75%] h-full bg-gradient-to-r from-[#3F2965] to-[#513681] -skew-x-12 -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-left" />
+                <span className="absolute top-0 right-[-25%] w-[75%] h-full bg-gradient-to-l from-[#3F2965] to-[#513681] -skew-x-12 translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-right" />
+                <span className="relative z-10">Book Appointment</span>
+              </button>
+            </Link>
+            <Link href="#journey">
+              <button className="w-full sm:w-auto relative px-6 sm:px-8 md:px-10 py-3 sm:py-3.5 md:py-4 rounded-full border-2 border-[#3F2965]/10 text-[#3F2965] font-bold text-sm sm:text-base tracking-wide overflow-hidden group transition-all duration-300 hover:border-[#3F2965] hover:-translate-y-1">
+                <span className="absolute top-0 left-[-25%] w-[75%] h-full bg-gradient-to-r from-[#3F2965] to-[#513681] -skew-x-12 -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-left" />
+                <span className="absolute top-0 right-[-25%] w-[75%] h-full bg-gradient-to-l from-[#3F2965] to-[#513681] -skew-x-12 translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-right" />
+                <span className="relative z-10 group-hover:text-white transition-colors duration-300">
+                  How It Works
+                </span>
+              </button>
             </Link>
           </SlideUp>
         </div>
