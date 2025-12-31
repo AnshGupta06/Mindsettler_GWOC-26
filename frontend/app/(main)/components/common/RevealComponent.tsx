@@ -49,6 +49,55 @@ export const CharReveal = ({ children, className = "", delay = 0 }: CharRevealPr
   );
 };
 
+//ADDED THIS FOR AWARNESS PAGE TO BE RESPONSIVE 
+//  Character-by-Character Slide (Word Preserving) 
+export const CharRevealWord = ({ children, className = "", delay = 0 }: CharRevealProps) => {
+  // Split by whitespace but keep the whitespace segments
+  const segments = children.split(/(\s+)/);
+
+  return (
+    <motion.h1
+      className={`flex flex-wrap w-full overflow-hidden pb-2 ${className}`}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.4 }}
+      transition={{ staggerChildren: 0.03, delayChildren: delay }}
+    >
+      {segments.map((segment, i) => {
+        // Render whitespace as-is
+        if (segment.match(/^\s+$/)) {
+          return (
+            <span key={i} className="whitespace-pre">
+              {segment}
+            </span>
+          );
+        }
+        // Render word wrapped in nowrap
+        return (
+          <span key={i} className="whitespace-nowrap inline-flex">
+            {segment.split("").map((char, charIndex) => (
+              <motion.span
+                key={`${i}-${charIndex}`}
+                variants={{
+                  hidden: { x: 20, opacity: 0 },
+                  visible: {
+                    x: 0,
+                    opacity: 1,
+                    transition: { duration: 0.5, ease: "easeOut" },
+                  },
+                }}
+                className="inline-block whitespace-pre"
+              >
+                {char}
+              </motion.span>
+            ))}
+          </span>
+        );
+      })}
+    </motion.h1>
+  );
+};
+
 // --- 2. Masked Slide Up (Block Reveal) ---
 export const MaskedReveal = ({ children, className = "", delay = 0 }: WrapperProps) => {
   return (
