@@ -7,9 +7,9 @@ import { auth } from "../../lib/firebase";
 import Link from "next/link";
 import { 
   Calendar, Clock, MapPin, CheckCircle, AlertCircle, ShieldCheck, 
-  CreditCard, Sparkles, ArrowRight, Wallet, User 
+  CreditCard, Sparkles, ArrowRight, Wallet, User, Tag, ChevronDown, X
 } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 type Slot = {
   id: string;
@@ -17,6 +17,15 @@ type Slot = {
   startTime: string;
   endTime: string;
   mode: "ONLINE" | "OFFLINE";
+};
+
+type Discount = {
+  code: string;
+  type: "PERCENTAGE" | "FIXED";
+  value: number;
+  minAmount?: number;
+  description: string;
+  expiresAt?: string;
 };
 
 export default function BookPage() {
@@ -29,6 +38,20 @@ export default function BookPage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [agreed, setAgreed] = useState(false);
+  
+  // Discount states
+  const [discountCode, setDiscountCode] = useState("");
+  const [appliedDiscount, setAppliedDiscount] = useState<Discount | null>(null);
+  const [isApplyingDiscount, setIsApplyingDiscount] = useState(false);
+  const [discountError, setDiscountError] = useState("");
+  const [showDiscountInput, setShowDiscountInput] = useState(false);
+  const [availableDiscounts, setAvailableDiscounts] = useState<Discount[]>([]);
+
+  // Prices
+  const PRICES = {
+    FIRST: 2500,
+    FOLLOW_UP: 2000
+  };
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (user) => {
@@ -40,6 +63,13 @@ export default function BookPage() {
         const res = await fetch("http://localhost:5000/api/bookings/slots");
         const data = await res.json();
         setSlots(data);
+        
+        // Load available discounts
+        const discountsRes = await fetch("http://localhost:5000/api/discounts/available");
+        if (discountsRes.ok) {
+          const discountsData = await discountsRes.json();
+          setAvailableDiscounts(discountsData);
+        }
       } catch (err) {
         console.error(err);
         setError("Failed to load slots.");
@@ -49,6 +79,74 @@ export default function BookPage() {
     });
     return () => unsub();
   }, [router]);
+
+  // Calculate price with discount
+  const calculatePrice = () => {
+    const basePrice = PRICES[type];
+    if (!appliedDiscount) return basePrice;
+    
+    if (appliedDiscount.type === "PERCENTAGE") {
+      const discountAmount = (basePrice * appliedDiscount.value) / 100;
+      return Math.max(0, basePrice - discountAmount);
+    } else {
+      return Math.max(0, basePrice - appliedDiscount.value);
+    }
+  };
+
+  const finalPrice = calculatePrice();
+  const discountAmount = appliedDiscount ? PRICES[type] - finalPrice : 0;
+
+  // Apply discount code
+  const handleApplyDiscount = async () => {
+    if (!discountCode.trim()) {
+      setDiscountError("Please enter a discount code");
+      return;
+    }
+
+    setIsApplyingDiscount(true);
+    setDiscountError("");
+
+    try {
+      const user = auth.currentUser;
+      if (!user) return;
+      const token = await user.getIdToken();
+
+      const res = await fetch("http://localhost:5000/api/discounts/validate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          code: discountCode,
+          amount: PRICES[type],
+          type
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Invalid discount code");
+      }
+
+      setAppliedDiscount(data.discount);
+      setDiscountCode("");
+      setShowDiscountInput(false);
+    } catch (err: any) {
+      console.error(err);
+      setDiscountError(err.message);
+    } finally {
+      setIsApplyingDiscount(false);
+    }
+  };
+
+  // Remove applied discount
+  const handleRemoveDiscount = () => {
+    setAppliedDiscount(null);
+    setDiscountCode("");
+    setDiscountError("");
+  };
 
   // 🗓️ Helper: Group slots by Date String
   const safeSlots = Array.isArray(slots) ? slots : [];
@@ -88,6 +186,7 @@ export default function BookPage() {
           slotId: selectedSlot.id,
           type,
           reason,
+          discountCode: appliedDiscount?.code,
         }),
       });
 
@@ -137,7 +236,11 @@ export default function BookPage() {
               ].map((item) => (
                 <button
                   key={item.id}
-                  onClick={() => setType(item.id as any)}
+                  onClick={() => {
+                    setType(item.id as any);
+                    // Reset discount when type changes
+                    setAppliedDiscount(null);
+                  }}
                   className={`relative p-6 rounded-3xl border-2 text-left transition-all duration-300 group overflow-hidden ${
                     type === item.id
                       ? "border-[#Dd1764] bg-white shadow-xl shadow-[#Dd1764]/10"
@@ -158,6 +261,13 @@ export default function BookPage() {
                   <p className="text-sm text-[#3F2965]/60 leading-relaxed">
                     {item.desc}
                   </p>
+                  
+                  {/* Price badge */}
+                  <div className={`mt-3 text-sm font-bold ${
+                    type === item.id ? "text-[#Dd1764]" : "text-[#3F2965]/60"
+                  }`}>
+                    ₹{PRICES[item.id as keyof typeof PRICES]}
+                  </div>
                 </button>
               ))}
             </div>
@@ -295,6 +405,122 @@ export default function BookPage() {
                   </div>
                 )}
 
+                {/* Price Breakdown */}
+                {selectedSlot && (
+                  <motion.div 
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    className="space-y-3 pt-4 border-t border-gray-100"
+                  >
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-[#3F2965]/60">Session Fee</span>
+                        <span className="font-medium">₹{PRICES[type]}</span>
+                      </div>
+                      
+                      {/* Discount Section */}
+                      <AnimatePresence>
+                        {appliedDiscount && (
+                          <motion.div 
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            className="flex justify-between items-center bg-green-50 p-3 rounded-lg"
+                          >
+                            <div className="flex items-center gap-2">
+                              <Tag size={14} className="text-green-600" />
+                              <div>
+                                <span className="text-sm font-medium text-green-700">
+                                  {appliedDiscount.type === "PERCENTAGE" 
+                                    ? `${appliedDiscount.value}% OFF`
+                                    : `₹${appliedDiscount.value} OFF`}
+                                </span>
+                                <p className="text-xs text-green-600">
+                                  {appliedDiscount.code}
+                                </p>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className="font-bold text-green-700">-₹{discountAmount}</span>
+                              <button 
+                                onClick={handleRemoveDiscount}
+                                className="p-1 hover:bg-green-100 rounded-full transition-colors"
+                              >
+                                <X size={14} className="text-green-600" />
+                              </button>
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+
+                      {/* Apply Discount Button */}
+                      {!appliedDiscount && !showDiscountInput && (
+                        <button
+                          onClick={() => setShowDiscountInput(true)}
+                          className="w-full py-2 text-sm text-[#Dd1764] hover:text-[#c91559] font-medium flex items-center justify-center gap-2 hover:bg-[#F9F6FF] rounded-lg transition-colors"
+                        >
+                          <Tag size={14} />
+                          Have a discount code?
+                          <ChevronDown size={14} className={`transition-transform ${showDiscountInput ? 'rotate-180' : ''}`} />
+                        </button>
+                      )}
+
+                      {/* Discount Input */}
+                      <AnimatePresence>
+                        {showDiscountInput && !appliedDiscount && (
+                          <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            className="space-y-2"
+                          >
+                            <div className="flex gap-2">
+                              <input
+                                type="text"
+                                value={discountCode}
+                                onChange={(e) => setDiscountCode(e.target.value.toUpperCase())}
+                                placeholder="Enter discount code"
+                                className="flex-1 bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#Dd1764]"
+                                disabled={isApplyingDiscount}
+                              />
+                              <button
+                                onClick={handleApplyDiscount}
+                                disabled={isApplyingDiscount || !discountCode.trim()}
+                                className="px-4 py-2 bg-[#Dd1764] text-white rounded-lg text-sm font-medium hover:bg-[#c91559] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                              >
+                                {isApplyingDiscount ? "..." : "Apply"}
+                              </button>
+                            </div>
+                            {discountError && (
+                              <p className="text-xs text-red-500">{discountError}</p>
+                            )}
+                            <button
+                              onClick={() => {
+                                setShowDiscountInput(false);
+                                setDiscountError("");
+                              }}
+                              className="text-xs text-gray-400 hover:text-gray-600"
+                            >
+                              Cancel
+                            </button>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+
+                      {/* Total */}
+                      <div className="flex justify-between items-center pt-3 border-t border-gray-100">
+                        <span className="font-bold text-[#3F2965]">Total Amount</span>
+                        <div className="text-right">
+                          {appliedDiscount && (
+                            <span className="text-xs text-gray-400 line-through block">₹{PRICES[type]}</span>
+                          )}
+                          <span className="text-xl font-bold text-[#Dd1764]">₹{finalPrice}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+
                 {/* Optional Reason Input */}
                 <div>
                     <label className="text-xs font-bold text-[#3F2965]/60 mb-2 block uppercase tracking-wider">
@@ -309,7 +535,7 @@ export default function BookPage() {
                     />
                 </div>
 
-                {/* Payment Section (Only shows when slot selected) */}
+                {/* Payment Section */}
                 {selectedSlot && (
                   <motion.div 
                     initial={{ opacity: 0, height: 0 }}
@@ -361,7 +587,7 @@ export default function BookPage() {
                     >
                       {submitting ? "Processing..." : (
                         <>
-                          Confirm Booking <ShieldCheck size={18} />
+                          Pay ₹{finalPrice} <ShieldCheck size={18} />
                         </>
                       )}
                     </button>
