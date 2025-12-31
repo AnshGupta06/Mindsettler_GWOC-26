@@ -1,42 +1,82 @@
-@config "../tailwind.config.mjs";
 @import "tailwindcss";
+@config "../tailwind.config.js";
+
+/* Variable definitions. 
+  Since tailwind.config.js uses "var(--name)" without HSL wrapper, 
+  we must provide the FULL color value here (e.g., hex or hsl(..)).
+*/
 
 @layer base {
   :root {
-    --background: 169 65% 92%;
-    --foreground: 224 71.4% 4.1%;
-    --card: 0 0% 100%;
-    --card-foreground: 224 71.4% 4.1%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 224 71.4% 4.1%;
-    --primary: 169 41% 61%;
-    --primary-foreground: 169 100% 10%;
-    --secondary: 169 30% 85%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 169 30% 88%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 54 38% 55%;
-    --accent-foreground: 54 100% 10%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 169 30% 80%;
-    --input: 0 0% 100%;
-    --ring: 169 41% 61%;
+    --background: #ffffff;
+    --foreground: #171717;
+
+    --card: #ffffff;
+    --card-foreground: #171717;
+
+    --popover: #ffffff;
+    --popover-foreground: #171717;
+
+    --primary: #3F2965;
+    /* MindSettler Purple */
+    --primary-foreground: #ffffff;
+
+    --secondary: #f1f5f9;
+    --secondary-foreground: #0f172a;
+
+    --muted: #f1f5f9;
+    --muted-foreground: #64748b;
+
+    --accent: #DD1764;
+    /* MindSettler Pink */
+    --accent-foreground: #ffffff;
+
+    --destructive: #ef4444;
+    --destructive-foreground: #ffffff;
+
+    --border: #e2e8f0;
+    --input: #e2e8f0;
+    --ring: #3F2965;
+
     --radius: 0.75rem;
+
+    /* Custom colors if needed as vars, though config has them hardcoded too */
+    --softPurple: #C7BEDA;
+    --softPink: #F7C6D6;
+    --lightBg: #F9F7FC;
   }
 
-  .dark {
-    --background: 204 10% 10%;
-    --foreground: 180 10% 95%;
-    --card: 204 10% 15%;
-    --card-foreground: 180 10% 95%;
-    --popover: 204 10% 10%;
-    --popover-foreground: 180 10% 95%;
-    --secondary: 204 10% 20%;
-    --muted: 204 10% 20%;
-    --muted-foreground: 180 10% 60%;
-    --border: 204 10% 25%;
-    --input: 204 10% 20%;
+  @media (prefers-color-scheme: light) {
+    :root {
+      /* Converting previous HSL channels to full HSL strings */
+      --background: hsl(204 10% 10%);
+      --foreground: hsl(180 10% 95%);
+
+      --card: hsl(204 10% 15%);
+      --card-foreground: hsl(180 10% 95%);
+
+      --popover: hsl(204 10% 10%);
+      --popover-foreground: hsl(180 10% 95%);
+
+      --primary: hsl(169 41% 61%);
+      --primary-foreground: hsl(169 100% 10%);
+
+      --secondary: hsl(204 10% 20%);
+      --secondary-foreground: hsl(222.2 47.4% 11.2%);
+
+      --muted: hsl(204 10% 20%);
+      --muted-foreground: hsl(180 10% 60%);
+
+      --accent: hsl(54 38% 55%);
+      --accent-foreground: hsl(54 100% 10%);
+
+      --destructive: hsl(0 84.2% 60.2%);
+      --destructive-foreground: hsl(0 0% 98%);
+
+      --border: hsl(204 10% 25%);
+      --input: hsl(204 10% 20%);
+      --ring: hsl(169 41% 61%);
+    }
   }
 
   * {
@@ -46,21 +86,70 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  input, textarea, select {
+    @apply bg-transparent text-foreground placeholder:text-muted-foreground;
+  }
+}
+.ms-chatbot-trigger {
+  background: linear-gradient(135deg, #6d5bd0, #ec407a);
+  color: white;
+  box-shadow: 0 12px 30px rgba(109, 91, 208, 0.35);
 }
 
-/* Plain CSS (outside Tailwind layers) */
-* {
-  box-sizing: border-box;
+.ms-chatbot-sheet {
+  background: #f8f7fb;
 }
 
-html,
-body {
-  margin: 0;
-  padding: 0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont;
-  overflow-x: hidden;
+.ms-chatbot-header h2 {
+  color: #6d5bd0;
+  font-weight: 600;
 }
 
-button {
+.ms-chatbot-header p {
+  color: #7a768f;
+}
+
+.ms-chatbot-bot {
+  background: #f1effa;
+  color: #2d2a38;
+  border-radius: 14px 14px 14px 4px;
+}
+
+.ms-chatbot-user {
+  background: #ec407a;
+  color: white;
+  border-radius: 14px 14px 4px 14px;
+}
+
+.ms-chatbot-sheet .rounded-full {
+  background-color: #e6e1fb !important;
+  color: #6d5bd0 !important;
+}
+
+.ms-chatbot-input {
+  background-color: #f1effa !important;
+  border-radius: 999px;
+  border: 1px solid #ddd;
+    color: #171717 !important; 
+}
+
+.ms-chatbot-input::placeholder {
+  color: #7a768f;
+}
+
+.ms-chatbot-sheet button[type='submit'] {
+  background: #6d5bd0;
+  color: white;
+}
+
+.ms-chatbot-sheet button[type='submit']:hover {
+  background: #5b4bc4;
+}
+
+.ms-chatbot-loader {
+  color: #7a768f;
+}
+button{
   cursor: pointer;
 }

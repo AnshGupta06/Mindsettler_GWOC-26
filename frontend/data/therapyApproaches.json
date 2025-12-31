@@ -1,0 +1,122 @@
+[
+  {
+    "id": 1,
+    "title": "Cognitive Behavioural Therapy (CBT)",
+    "points": [
+      "Identify and change unhelpful thought patterns",
+      "Develop better coping skills and emotional regulation",
+      "Improve problem-solving in everyday life",
+      "Structured, goal-oriented approach"
+    ],
+    "image": "/images/therapy/cbt-new.png",
+    "availableOnline": true,
+    "availableOffline": true
+  },
+  {
+    "id": 2,
+    "title": "Dialectical Behavioural Therapy (DBT)",
+    "points": [
+      "Build emotional regulation skills",
+      "Develop distress tolerance techniques",
+      "Improve interpersonal effectiveness",
+      "Practice mindfulness in daily life"
+    ],
+    "image": "/images/therapy/dbt-new.png",
+    "availableOnline": true,
+    "availableOffline": true
+  },
+  {
+    "id": 3,
+    "title": "Acceptance & Commitment Therapy (ACT)",
+    "points": [
+      "Develop psychological flexibility",
+      "Learn to accept difficult thoughts and feelings",
+      "Commit to values-aligned actions",
+      "Focus on meaningful living"
+    ],
+    "image": "/images/therapy/act.png",
+    "availableOnline": true,
+    "availableOffline": true
+  },
+  {
+    "id": 4,
+    "title": "Schema Therapy",
+    "points": [
+      "Explore deep-rooted patterns from early life",
+      "Understand long-standing emotional challenges",
+      "Create healthier ways of thinking and relating",
+      "Address core emotional needs"
+    ],
+    "image": "/images/therapy/st.png",
+    "availableOnline": false,
+    "availableOffline": true
+  },
+  {
+    "id": 5,
+    "title": "Emotion-Focused Therapy (EFT)",
+    "points": [
+      "Understand and process emotions effectively",
+      "Build emotional awareness and resilience",
+      "Develop healthier responses to challenges",
+      "Create lasting emotional change"
+    ],
+    "image": "/images/therapy/eft.png",
+    "availableOnline": true,
+    "availableOffline": true
+  },
+  {
+    "id": 6,
+    "title": "Emotion-Focused Couples Therapy",
+    "points": [
+      "Strengthen emotional bonds between partners",
+      "Improve communication and rebuild trust",
+      "Create secure, supportive relationships",
+      "Structured, research-based approach"
+    ],
+    "image": "/images/therapy/efct.png",
+    "availableOnline": false,
+    "availableOffline": true
+  },
+  {
+    "id": 7,
+    "title": "Mindfulness-Based Cognitive Therapy (MBCT)",
+    "points": [
+      "Combine cognitive techniques with mindfulness",
+      "Increase awareness of thoughts and emotions",
+      "Reduce emotional reactivity",
+      "Promote mental balance and clarity"
+    ],
+    "image": "/images/therapy/mbct.png",
+    "availableOnline": true,
+    "availableOffline": true
+  },
+  {
+    "id": 8,
+    "title": "Client-Centred Therapy",
+    "points": [
+      "Person-centered therapeutic process",
+      "Emphasis on empathy and acceptance",
+      "Self-exploration at your own pace",
+      "Non-directive, compassionate approach"
+    ],
+    "image": "/images/therapy/cct.png",
+    "availableOnline": true,
+    "availableOffline": false
+  },
+  {
+    "id": 9,
+    "title": "Custom Therapy Plan",
+    "points": [
+      "Personalized approach tailored to your unique needs",
+      "Combine multiple therapeutic techniques",
+      "Flexible scheduling based on your availability",
+      "Continuous adaptation to your progress",
+      "Holistic integration of mind, body, and spirit"
+    ],
+    "image": "/images/therapy/ctp.png",
+    "availableOnline": true,
+    "availableOffline": true,
+    "isCustom": true,
+    "customDescription": "Don't see what you're looking for? Let us create a personalized therapy plan that combines the best approaches for your specific journey."
+  }
+]

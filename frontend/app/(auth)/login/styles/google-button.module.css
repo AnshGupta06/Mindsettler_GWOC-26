@@ -1,0 +1,13 @@
+.googleButton {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #d0d5dd;
+  background: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+.icon { width: 18px; height: 18px; }
