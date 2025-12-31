@@ -6,11 +6,12 @@ import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../../lib/firebase";
 import { API_URL } from "@/app/lib/api";
 import Link from "next/link";
-import { 
-  Calendar, Clock, MapPin, CheckCircle, AlertCircle, ShieldCheck, 
-  CreditCard, Sparkles, ArrowRight, Wallet, User, Banknote 
+import {
+  Calendar, Clock, MapPin, CheckCircle, AlertCircle, ShieldCheck,
+  CreditCard, Sparkles, ArrowRight, Wallet, User, Banknote
 } from "lucide-react";
 import { motion } from "framer-motion";
+import DiscountBanner from "./components/DiscountBanner";
 
 type Slot = {
   id: string;
@@ -25,10 +26,10 @@ export default function BookPage() {
   const [slots, setSlots] = useState<Slot[]>([]);
   const [selectedSlot, setSelectedSlot] = useState<Slot | null>(null);
   const [type, setType] = useState<"FIRST" | "FOLLOW_UP">("FIRST");
-  
+
   // 💰 New Payment State
   const [paymentMethod, setPaymentMethod] = useState<"UPI" | "CASH">("UPI");
-  
+
   const [reason, setReason] = useState("");
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -64,9 +65,9 @@ export default function BookPage() {
 
   // 🗓️ Helper: Group slots by Date String
   const safeSlots = Array.isArray(slots) ? slots : [];
-  const groupedSlots = safeSlots.reduce((acc, slot) => { 
-    const dateStr = new Date(slot.date).toLocaleDateString('en-US', { 
-      weekday: 'long', month: 'long', day: 'numeric' 
+  const groupedSlots = safeSlots.reduce((acc, slot) => {
+    const dateStr = new Date(slot.date).toLocaleDateString('en-US', {
+      weekday: 'long', month: 'long', day: 'numeric'
     });
     if (!acc[dateStr]) acc[dateStr] = [];
     acc[dateStr].push(slot);
@@ -76,7 +77,7 @@ export default function BookPage() {
   const handleSubmit = async () => {
     if (!selectedSlot) { setError("Please select a time slot."); return; }
     if (!agreed) { setError("You must agree to the Confidentiality Policy."); return; }
-    
+
     setSubmitting(true);
     setError("");
 
@@ -100,7 +101,7 @@ export default function BookPage() {
           slotId: selectedSlot.id,
           type,
           reason,
-          paymentMethod, 
+          paymentMethod,
         }),
       });
 
@@ -122,18 +123,18 @@ export default function BookPage() {
   return (
     // 1. Outer Container: White background with top padding for navbar
     <div className="min-h-screen bg-white pt-20 sm:pt-24 pb-8 sm:pb-12 px-4 sm:px-6 md:px-8">
-      
+
       {/* 2. Inner Container: The 'Purple Box' that starts below navbar */}
       <div className="max-w-[1440px] mx-auto bg-[#F9F6FF] rounded-[2.5rem] p-6 md:p-12 lg:p-10 text-[#3F2965] shadow-sm relative overflow-hidden">
-        
+
         {/* Subtle Decorative Circle (Optional) */}
         <div className="absolute top-0 right-0 w-96 h-96 bg-[#Dd1764]/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
 
         <div className="grid lg:grid-cols-12 gap-8 lg:gap-12 relative z-10">
-          
+
           {/* ================= LEFT COLUMN: SELECTION AREA ================= */}
           <div className="lg:col-span-8 space-y-12">
-            
+
             {/* Header */}
             <div className="space-y-3">
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-tight">
@@ -150,7 +151,7 @@ export default function BookPage() {
                 <div className="w-10 h-10 rounded-2xl bg-[#3F2965] text-white flex items-center justify-center font-bold text-lg shadow-lg shadow-[#3F2965]/20">1</div>
                 <h2 className="text-2xl font-bold">Choose Session Type</h2>
               </div>
-              
+
               <div className="grid sm:grid-cols-2 gap-5">
                 {[
                   { id: "FIRST", label: "First Session", desc: "For new clients. We'll explore your history and goals.", icon: Sparkles },
@@ -159,22 +160,20 @@ export default function BookPage() {
                   <button
                     key={item.id}
                     onClick={() => setType(item.id as any)}
-                    className={`relative p-6 rounded-3xl border-2 text-left transition-all duration-300 group overflow-hidden ${
-                      type === item.id
-                        ? "border-[#Dd1764] bg-white shadow-xl shadow-[#Dd1764]/10"
-                        : "border-transparent bg-white/60 hover:bg-white hover:border-[#3F2965]/10"
-                    }`}
+                    className={`relative p-6 rounded-3xl border-2 text-left transition-all duration-300 group overflow-hidden ${type === item.id
+                      ? "border-[#Dd1764] bg-white shadow-xl shadow-[#Dd1764]/10"
+                      : "border-transparent bg-white/60 hover:bg-white hover:border-[#3F2965]/10"
+                      }`}
                   >
                     <div className={`absolute top-0 right-0 p-4 opacity-0 transition-opacity ${type === item.id ? 'opacity-100' : ''}`}>
                       <CheckCircle className="text-[#Dd1764] fill-[#Dd1764]/10" size={24} />
                     </div>
-                    
-                    <div className={`w-12 h-12 rounded-2xl mb-4 flex items-center justify-center transition-colors ${
-                      type === item.id ? "bg-[#Dd1764] text-white" : "bg-[#F9F6FF] text-[#3F2965]"
-                    }`}>
+
+                    <div className={`w-12 h-12 rounded-2xl mb-4 flex items-center justify-center transition-colors ${type === item.id ? "bg-[#Dd1764] text-white" : "bg-[#F9F6FF] text-[#3F2965]"
+                      }`}>
                       <item.icon size={20} />
                     </div>
-                    
+
                     <h3 className="font-bold text-lg mb-1">{item.label}</h3>
                     <p className="text-sm text-[#3F2965]/60 leading-relaxed">
                       {item.desc}
@@ -193,11 +192,11 @@ export default function BookPage() {
 
               {loading && (
                 <div className="p-12 text-center">
-                  <div className="animate-spin w-8 h-8 border-4 border-[#Dd1764] border-t-transparent rounded-full mx-auto mb-4"/>
+                  <div className="animate-spin w-8 h-8 border-4 border-[#Dd1764] border-t-transparent rounded-full mx-auto mb-4" />
                   <p className="text-[#3F2965]/50">Loading availability...</p>
                 </div>
               )}
-              
+
               {!loading && slots.length === 0 && (
                 <div className="bg-white p-10 rounded-3xl text-center border-2 border-dashed border-[#3F2965]/10">
                   <Calendar className="mx-auto text-[#3F2965]/20 mb-4" size={48} />
@@ -211,11 +210,11 @@ export default function BookPage() {
                   <div key={dateString} className="relative">
                     {/* Sticky Date Header with Backdrop Blur */}
                     <div className="sticky top-0 z-10 -mx-4 px-4 bg-[#F9F6FF]/90 backdrop-blur-md py-4 mb-4 flex items-center gap-3">
-                       <div className="h-px flex-1 bg-[#3F2965]/10"></div>
-                       <span className="font-bold text-[#3F2965]/80 bg-white px-5 py-2 rounded-full text-sm shadow-sm border border-[#3F2965]/5">
-                          {dateString}
-                       </span>
-                       <div className="h-px flex-1 bg-[#3F2965]/10"></div>
+                      <div className="h-px flex-1 bg-[#3F2965]/10"></div>
+                      <span className="font-bold text-[#3F2965]/80 bg-white px-5 py-2 rounded-full text-sm shadow-sm border border-[#3F2965]/5">
+                        {dateString}
+                      </span>
+                      <div className="h-px flex-1 bg-[#3F2965]/10"></div>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -228,29 +227,27 @@ export default function BookPage() {
                           <button
                             key={slot.id}
                             onClick={() => setSelectedSlot(slot)}
-                            className={`relative p-5 rounded-2xl border transition-all duration-300 group ${
-                              isSelected
-                                ? "bg-[#3F2965] text-white border-[#3F2965] shadow-lg shadow-[#3F2965]/20 scale-[1.02]"
-                                : "bg-white border-transparent hover:border-[#Dd1764]/30 hover:shadow-md"
-                            }`}
+                            className={`relative p-5 rounded-2xl border transition-all duration-300 group ${isSelected
+                              ? "bg-[#3F2965] text-white border-[#3F2965] shadow-lg shadow-[#3F2965]/20 scale-[1.02]"
+                              : "bg-white border-transparent hover:border-[#Dd1764]/30 hover:shadow-md"
+                              }`}
                           >
                             <div className="flex justify-between items-center mb-3">
-                               <div className={`text-[10px] font-bold px-2 py-1 rounded-lg uppercase tracking-wider flex items-center gap-1.5 ${
-                                  slot.mode === 'ONLINE' 
-                                    ? (isSelected ? 'bg-white/20 text-white' : 'bg-green-50 text-green-700')
-                                    : (isSelected ? 'bg-white/20 text-white' : 'bg-blue-50 text-blue-700')
+                              <div className={`text-[10px] font-bold px-2 py-1 rounded-lg uppercase tracking-wider flex items-center gap-1.5 ${slot.mode === 'ONLINE'
+                                ? (isSelected ? 'bg-white/20 text-white' : 'bg-green-50 text-green-700')
+                                : (isSelected ? 'bg-white/20 text-white' : 'bg-blue-50 text-blue-700')
                                 }`}>
-                                  <MapPin size={10} />
-                                  {slot.mode}
-                                </div>
-                                {isSelected && <CheckCircle size={16} className="text-[#Dd1764] fill-white" />}
+                                <MapPin size={10} />
+                                {slot.mode}
+                              </div>
+                              {isSelected && <CheckCircle size={16} className="text-[#Dd1764] fill-white" />}
                             </div>
-                            
+
                             <p className="font-bold text-xl mb-1">
                               {start}
                             </p>
                             <p className={`text-xs ${isSelected ? "text-white/60" : "text-[#3F2965]/40"}`}>
-                               Until {end}
+                              Until {end}
                             </p>
                           </button>
                         );
@@ -265,10 +262,11 @@ export default function BookPage() {
           {/* ================= RIGHT COLUMN: SUMMARY & ACTION (Sticky) ================= */}
           <div className="lg:col-span-4">
             <div className="sticky top-8">
-              
+
               {/* Unified Ticket Card */}
+              <DiscountBanner />
               <div className="bg-white rounded-[2rem] shadow-2xl shadow-[#3F2965]/10 border border-[#3F2965]/5 overflow-hidden">
-                
+
                 {/* Header */}
                 <div className="bg-[#3F2965] p-6 text-white text-center relative overflow-hidden">
                   <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
@@ -278,7 +276,7 @@ export default function BookPage() {
 
                 {/* Body */}
                 <div className="p-6 md:p-8 space-y-6">
-                  
+
                   {/* Session Details */}
                   {!selectedSlot ? (
                     <div className="text-center py-6 border-2 border-dashed border-gray-100 rounded-2xl">
@@ -295,61 +293,61 @@ export default function BookPage() {
                           </p>
                         </div>
                         <div className="text-right">
-                           <p className="text-xs text-gray-400 font-bold uppercase tracking-wider">Time</p>
-                           <p className="font-bold text-[#3F2965]">
-                             {new Date(selectedSlot.startTime).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}
-                           </p>
+                          <p className="text-xs text-gray-400 font-bold uppercase tracking-wider">Time</p>
+                          <p className="font-bold text-[#3F2965]">
+                            {new Date(selectedSlot.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </p>
                         </div>
                       </div>
 
                       <div className="flex justify-between items-center">
-                         <div>
-                            <p className="text-xs text-gray-400 font-bold uppercase tracking-wider">Type</p>
-                            <p className="font-semibold text-[#Dd1764]">
-                              {type === "FIRST" ? "First Session" : "Follow-up"}
-                            </p>
-                         </div>
-                         <span className={`px-3 py-1 rounded-full text-xs font-bold ${selectedSlot.mode === 'ONLINE' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}`}>
-                            {selectedSlot.mode}
-                         </span>
+                        <div>
+                          <p className="text-xs text-gray-400 font-bold uppercase tracking-wider">Type</p>
+                          <p className="font-semibold text-[#Dd1764]">
+                            {type === "FIRST" ? "First Session" : "Follow-up"}
+                          </p>
+                        </div>
+                        <span className={`px-3 py-1 rounded-full text-xs font-bold ${selectedSlot.mode === 'ONLINE' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}`}>
+                          {selectedSlot.mode}
+                        </span>
                       </div>
                     </div>
                   )}
 
                   {/* Optional Reason Input */}
                   <div>
-                      <label className="text-xs font-bold text-[#3F2965]/60 mb-2 block uppercase tracking-wider">
-                        Anything to share? (Optional)
-                      </label>
-                      <textarea
-                        className="w-full bg-[#F9F6FF] border border-transparent focus:bg-white focus:border-[#Dd1764]/20 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#Dd1764]/10 resize-none transition-all"
-                        rows={2}
-                        value={reason}
-                        onChange={(e) => setReason(e.target.value)}
-                        placeholder="I'm feeling anxious about..."
-                      />
+                    <label className="text-xs font-bold text-[#3F2965]/60 mb-2 block uppercase tracking-wider">
+                      Anything to share? (Optional)
+                    </label>
+                    <textarea
+                      className="w-full bg-[#F9F6FF] border border-transparent focus:bg-white focus:border-[#Dd1764]/20 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#Dd1764]/10 resize-none transition-all"
+                      rows={2}
+                      value={reason}
+                      onChange={(e) => setReason(e.target.value)}
+                      placeholder="I'm feeling anxious about..."
+                    />
                   </div>
 
                   {/* Payment Section (Only shows when slot selected) */}
                   {selectedSlot && (
-                    <motion.div 
+                    <motion.div
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: "auto" }}
                       className="space-y-4 pt-4 border-t border-gray-100"
                     >
-                      
+
                       {/* 💳 CONDITIONAL PAYMENT TOGGLE */}
                       {selectedSlot.mode === "OFFLINE" && (
                         <div className="space-y-2">
                           <label className="text-xs font-bold text-[#3F2965]/60 uppercase">Payment Method</label>
                           <div className="grid grid-cols-2 gap-2 bg-[#F9F6FF] p-1 rounded-xl">
-                            <button 
+                            <button
                               onClick={() => setPaymentMethod("UPI")}
                               className={`py-2.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-2 ${paymentMethod === "UPI" ? "bg-white text-[#Dd1764] shadow-sm" : "text-gray-400 hover:text-[#3F2965]"}`}
                             >
                               <Wallet size={14} /> UPI
                             </button>
-                            <button 
+                            <button
                               onClick={() => setPaymentMethod("CASH")}
                               className={`py-2.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-2 ${paymentMethod === "CASH" ? "bg-white text-[#Dd1764] shadow-sm" : "text-gray-400 hover:text-[#3F2965]"}`}
                             >
@@ -362,15 +360,15 @@ export default function BookPage() {
                       <div className="bg-[#F9F6FF] p-4 rounded-xl border border-[#3F2965]/5">
                         <div className="flex items-center gap-2 mb-3">
                           {paymentMethod === "UPI" ? (
-                             <Wallet size={16} className="text-[#Dd1764]" />
+                            <Wallet size={16} className="text-[#Dd1764]" />
                           ) : (
-                             <Banknote size={16} className="text-[#Dd1764]" />
+                            <Banknote size={16} className="text-[#Dd1764]" />
                           )}
                           <span className="text-sm font-bold text-[#3F2965]">
                             {paymentMethod === "UPI" ? "Payment Required" : "Pay at Studio"}
                           </span>
                         </div>
-                        
+
                         {paymentMethod === "UPI" ? (
                           <>
                             <div className="flex items-center justify-between bg-white p-3 rounded-lg border border-gray-100 shadow-sm">
@@ -429,12 +427,12 @@ export default function BookPage() {
 
               {/* Trust Badges */}
               <div className="mt-6 flex justify-center gap-6 text-[#3F2965]/40 grayscale opacity-60">
-                  <div className="flex items-center gap-1.5 text-xs font-medium">
-                     <ShieldCheck size={14} /> Secure
-                  </div>
-                  <div className="flex items-center gap-1.5 text-xs font-medium">
-                     <User size={14} /> Private
-                  </div>
+                <div className="flex items-center gap-1.5 text-xs font-medium">
+                  <ShieldCheck size={14} /> Secure
+                </div>
+                <div className="flex items-center gap-1.5 text-xs font-medium">
+                  <User size={14} /> Private
+                </div>
               </div>
 
             </div>

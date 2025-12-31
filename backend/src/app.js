@@ -2,8 +2,9 @@ import express from "express";
 import cors from "cors";
 import authRoutes from "./routes/authRoutes.js";
 import bookingRoutes from "./routes/bookingRoutes.js";
-import adminSlotRoutes from "./routes/adminSlotRoutes.js"; 
+import adminSlotRoutes from "./routes/adminSlotRoutes.js";
 import adminBookingRoutes from "./routes/adminBookingRoutes.js";
+import discountRoutes from "./routes/discountRoutes.js";
 
 const app = express();
 
@@ -13,7 +14,8 @@ app.use(express.json());
 app.use("/api/admin/", adminBookingRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/bookings", bookingRoutes);
-app.use("/api/admin/slots", adminSlotRoutes); 
+app.use("/api/discounts", discountRoutes); // New Route
+app.use("/api/admin/slots", adminSlotRoutes);
 
 app.get("/", (req, res) => {
   res.json({ message: "MindSettler backend running" });

@@ -5,18 +5,19 @@ import { useRouter } from "next/navigation";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../../lib/firebase";
 import { API_URL } from "@/app/lib/api";
-import { 
-  Calendar, 
-  Clock, 
-  User, 
-  Mail, 
-  Phone, 
-  CheckCircle, 
-  XCircle, 
-  Filter, 
+import {
+  Calendar,
+  Clock,
+  User,
+  Mail,
+  Phone,
+  CheckCircle,
+  XCircle,
+  Filter,
   AlertCircle,
   MapPin,
-  LayoutDashboard
+  LayoutDashboard,
+  Award
 } from "lucide-react";
 
 type Booking = {
@@ -52,7 +53,7 @@ export default function AdminBookingsPage() {
       const data = await res.json();
 
       if (!res.ok) throw new Error(data.error || "Failed to fetch bookings");
-      
+
       setBookings(data);
     } catch (err: any) {
       setError(err.message || "Unable to load bookings");
@@ -84,7 +85,7 @@ export default function AdminBookingsPage() {
         body: JSON.stringify({ status }),
       });
       const refreshedToken = await auth.currentUser?.getIdToken();
-      if(refreshedToken) await fetchBookings(refreshedToken);
+      if (refreshedToken) await fetchBookings(refreshedToken);
     } catch (err) {
       console.error(err);
       alert("Failed to update status");
@@ -118,10 +119,10 @@ export default function AdminBookingsPage() {
   return (
     // 1. Outer Container: White background with top padding (Clears Navbar)
     <div className="min-h-screen bg-white pt-20 sm:pt-24 pb-8 sm:pb-12 px-4 sm:px-6 md:px-8">
-      
+
       {/* 2. Inner Container: Purple Box (Main Content) */}
       <div className="max-w-[1440px] mx-auto bg-[#F9F6FF] rounded-[2.5rem] p-6 md:p-12 shadow-sm min-h-[80vh] text-[#3F2965]">
-      
+
         {/* 1. HEADER & ACTIONS */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
           <div>
@@ -131,45 +132,54 @@ export default function AdminBookingsPage() {
             </h1>
             <p className="text-[#3F2965]/60 mt-1 text-sm md:text-base">Manage appointments and schedules</p>
           </div>
-          
-          <button
-            onClick={() => router.push("/admin/slots")}
-            className="w-full md:w-auto justify-center px-6 py-3 bg-[#3F2965] text-white rounded-full font-bold shadow-lg hover:shadow-[#3F2965]/20 hover:scale-105 transition-all flex items-center gap-2"
-          >
-            <Calendar size={18} />
-            Manage Slots
-          </button>
+
+          <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+            <button
+              onClick={() => router.push("/admin/discounts")}
+              className="justify-center px-6 py-3 bg-white text-[#3F2965] border border-[#3F2965]/10 rounded-full font-bold shadow-sm hover:bg-[#F9F6FF] transition-all flex items-center gap-2"
+            >
+              <Award size={18} className="text-[#Dd1764]" />
+              Discounts
+            </button>
+            <button
+              onClick={() => router.push("/admin/slots")}
+              className="justify-center px-6 py-3 bg-[#3F2965] text-white rounded-full font-bold shadow-lg hover:shadow-[#3F2965]/20 hover:scale-105 transition-all flex items-center gap-2"
+            >
+              <Calendar size={18} />
+              Manage Slots
+            </button>
+          </div>
         </div>
 
         {/* 2. CIRCULAR STATS (Responsive) */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-12 px-2 md:px-8">
-          <StatCircle 
-            label="Total Requests" 
-            value={stats.total} 
-            icon={LayoutDashboard} 
-            color="border-[#3F2965]" 
+          <StatCircle
+            label="Total Requests"
+            value={stats.total}
+            icon={LayoutDashboard}
+            color="border-[#3F2965]"
             bg="bg-[#3F2965]/5"
             textColor="text-[#3F2965]"
           />
-          
+
           <div className="hidden md:block h-px flex-1 bg-gradient-to-r from-[#3F2965]/5 via-[#3F2965]/20 to-[#3F2965]/5" />
-          
-          <StatCircle 
-            label="Pending Action" 
-            value={stats.pending} 
-            icon={Clock} 
-            color="border-orange-400" 
+
+          <StatCircle
+            label="Pending Action"
+            value={stats.pending}
+            icon={Clock}
+            color="border-orange-400"
             bg="bg-orange-50"
             textColor="text-orange-600"
           />
-          
+
           <div className="hidden md:block h-px flex-1 bg-gradient-to-r from-[#3F2965]/5 via-[#3F2965]/20 to-[#3F2965]/5" />
-          
-          <StatCircle 
-            label="Confirmed" 
-            value={stats.confirmed} 
-            icon={CheckCircle} 
-            color="border-emerald-500" 
+
+          <StatCircle
+            label="Confirmed"
+            value={stats.confirmed}
+            icon={CheckCircle}
+            color="border-emerald-500"
             bg="bg-emerald-50"
             textColor="text-emerald-600"
           />
@@ -181,11 +191,10 @@ export default function AdminBookingsPage() {
             <button
               key={f}
               onClick={() => setFilter(f as any)}
-              className={`whitespace-nowrap px-4 py-2 rounded-full text-xs md:text-sm font-bold transition-all ${
-                filter === f 
-                  ? "bg-[#3F2965] text-white shadow-md" 
-                  : "bg-white text-[#3F2965]/60 hover:bg-white hover:text-[#3F2965]"
-              }`}
+              className={`whitespace-nowrap px-4 py-2 rounded-full text-xs md:text-sm font-bold transition-all ${filter === f
+                ? "bg-[#3F2965] text-white shadow-md"
+                : "bg-white text-[#3F2965]/60 hover:bg-white hover:text-[#3F2965]"
+                }`}
             >
               {f === "ALL" ? "All Bookings" : f.charAt(0) + f.slice(1).toLowerCase()}
             </button>
@@ -213,34 +222,34 @@ export default function AdminBookingsPage() {
 
 // ---------------- SUB-COMPONENTS ---------------- //
 
-function StatCircle({ 
-  label, 
-  value, 
-  icon: Icon, 
+function StatCircle({
+  label,
+  value,
+  icon: Icon,
   color,
   bg,
   textColor
-}: { 
-  label: string, 
-  value: number, 
-  icon: any, 
+}: {
+  label: string,
+  value: number,
+  icon: any,
   color: string,
   bg: string,
   textColor: string
 }) {
   return (
     <div className={`relative w-36 h-36 md:w-48 md:h-48 rounded-full border-[4px] md:border-[6px] ${color} ${bg} flex flex-col items-center justify-center shadow-xl md:shadow-2xl shadow-[#3F2965]/10 hover:scale-105 transition-all duration-300 group`}>
-      
+
       {/* Icon Badge */}
       <div className={`absolute -top-4 md:-top-5 p-2 md:p-3 rounded-full bg-white shadow-md border ${color} group-hover:-translate-y-1 transition-transform`}>
         <Icon className={`${textColor} w-5 h-5 md:w-6 md:h-6`} strokeWidth={2.5} />
       </div>
-      
+
       {/* Number */}
       <p className={`text-3xl md:text-5xl font-black ${textColor} mt-2`}>
         {value}
       </p>
-      
+
       {/* Label */}
       <p className="text-[9px] md:text-[11px] font-bold uppercase tracking-widest text-[#3F2965]/60 mt-1 md:mt-2">
         {label}
@@ -251,11 +260,11 @@ function StatCircle({
 
 function BookingCard({ booking, onUpdate }: { booking: Booking, onUpdate: (id: string, status: any) => void }) {
   const date = new Date(booking.slot.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-  const time = `${new Date(booking.slot.startTime).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})} - ${new Date(booking.slot.endTime).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}`;
-  
+  const time = `${new Date(booking.slot.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${new Date(booking.slot.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+
   return (
     <div className="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-[#3F2965]/5 hover:shadow-md transition-all flex flex-col md:flex-row gap-4 md:gap-6">
-      
+
       {/* Date Badge */}
       <div className="flex flex-row md:flex-col items-center justify-between md:justify-center bg-[#F9F6FF] text-[#3F2965] rounded-xl p-3 md:p-4 min-w-full md:min-w-[120px] text-center border border-[#3F2965]/5">
         <div className="flex flex-col md:items-center text-left md:text-center">
@@ -287,12 +296,11 @@ function BookingCard({ booking, onUpdate }: { booking: Booking, onUpdate: (id: s
                 )}
               </div>
             </div>
-            
-            <span className={`px-2 py-1 rounded-full text-[10px] font-bold ${
-              booking.status === 'CONFIRMED' ? 'bg-green-100 text-green-700' : 
-              booking.status === 'REJECTED' ? 'bg-red-100 text-red-700' : 
-              'bg-yellow-100 text-yellow-700'
-            }`}>
+
+            <span className={`px-2 py-1 rounded-full text-[10px] font-bold ${booking.status === 'CONFIRMED' ? 'bg-green-100 text-green-700' :
+              booking.status === 'REJECTED' ? 'bg-red-100 text-red-700' :
+                'bg-yellow-100 text-yellow-700'
+              }`}>
               {booking.status}
             </span>
           </div>
