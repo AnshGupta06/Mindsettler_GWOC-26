@@ -77,9 +77,9 @@ export default function Footer() {
             </h4>
             <ul className="space-y-3 text-sm text-white/70">
               {[
-                { href: "/privacy", label: "Privacy Policy" },
+                { href: "/privacy-policy", label: "Privacy Policy" },
                 { href: "/confidentiality", label: "Confidentiality Policy" },
-                { href: "/refunds", label: "Non-Refund Policy" },
+                { href: "/refund-policy", label: "Non-Refund Policy" },
               ].map((item) => (
                 <li key={item.href}>
                   <Link href={item.href} className="hover:text-white transition-colors">

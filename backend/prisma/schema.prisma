@@ -23,14 +23,9 @@ enum SessionType {
   FOLLOW_UP
 }
 
-enum DiscountType {
-  PERCENTAGE
-  FIXED
-}
-
 model User {
   id           String    @id @default(uuid())
-  firebaseUid  String    @unique
+  firebaseUid String    @unique
   email        String    @unique
   name         String?
   phone        String?
@@ -50,51 +45,16 @@ model SessionSlot {
 }
 
 model Booking {
-  id              String        @id @default(uuid())
-  status          BookingStatus @default(PENDING)
-  type            SessionType
-  reason          String?
-  originalPrice   Float
-  finalPrice      Float
-  discountCode    String?
-  discountAmount  Float         @default(0)
+  id        String         @id @default(uuid())
+  status    BookingStatus @default(PENDING)
+  type      SessionType
+  reason    String?
 
-  userId          String
-  slotId          String @unique
+  userId    String
+  slotId    String @unique
 
-  user            User        @relation(fields: [userId], references: [id])
-  slot            SessionSlot @relation(fields: [slotId], references: [id])
+  user      User        @relation(fields: [userId], references: [id])
+  slot      SessionSlot @relation(fields: [slotId], references: [id])
 
-  createdAt       DateTime @default(now())
-
-  @@index([userId])
-  @@index([slotId])
-  @@index([discountCode])
-  @@index([createdAt])
-}
-
-model Discount {
-  id            String        @id @default(uuid())
-  code          String        @unique @db.VarChar(20)
-  type          DiscountType
-  value         Float
-  description   String
-  minAmount     Float         @default(0)
-  maxAmount     Float?
-  expiresAt     DateTime?
-  isActive      Boolean       @default(true)
-  singleUse     Boolean       @default(false)
-  allowedTypes  SessionType[]
-  usageCount    Int           @default(0)
-  maxUsage      Int?
-  
-  bookings      Booking[]
-  
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-
-  @@index([code])
-  @@index([isActive])
-  @@index([expiresAt])
-  @@index([createdAt])
+  createdAt DateTime @default(now())
 }
