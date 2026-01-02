@@ -3,6 +3,7 @@ import Navbar from "./components/common/Navbar";
 import { Chatbot } from '../components/shared/Chatbot';
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import ToastProvider from "./components/common/ToastProvider";
 import "../globals.css";
 
 const geistSans = Geist({
@@ -36,6 +37,7 @@ export default function RootLayout({
           src="https://unpkg.com/@google/model-viewer@latest/dist/model-viewer.min.js"
           strategy="beforeInteractive"
         />
+        <ToastProvider />
         {children}
         <Chatbot />
         <Footer />

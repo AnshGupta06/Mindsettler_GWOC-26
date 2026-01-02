@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import AlertModal from "../components/common/AlertModal"; // Ensure this path matches your project structure
+import toast from "react-hot-toast";
 
 type Slot = {
   id: string;
@@ -88,6 +89,8 @@ export default function BookPage() {
     if (!agreed) { setError("You must agree to the Confidentiality Policy."); return; }
     
     setSubmitting(true);
+    // Use a "Loading" toast that updates automatically!
+    const toastId = toast.loading("Confirming your session...");
     setError("");
 
     try {
@@ -121,11 +124,14 @@ export default function BookPage() {
         throw new Error(errData.error || "Booking failed");
       }
 
+      // SUCCESS: Update the loading toast to success
+      toast.success("Session Booked Successfully! 🎉", { id: toastId });
+      
       setSlots((prev) => prev.filter((s) => s.id !== selectedSlot.id));
       router.push("/profile");
     } catch (err: any) {
       console.error(err);
-      setError(err.message);
+      toast.error(err.message || "Booking Failed", { id: toastId });
     } finally {
       setSubmitting(false);
     }

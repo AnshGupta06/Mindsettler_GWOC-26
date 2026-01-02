@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../../../lib/firebase"; 
 import { API_URL } from "@/app/lib/api";
+import toast from "react-hot-toast"; // 🔔 IMPORT TOAST
 import { 
   Calendar, Trash2, Plus, MapPin, Wifi, Lock, ArrowLeft, LayoutGrid, ArrowUpDown, Search, X 
 } from "lucide-react";
@@ -51,6 +52,8 @@ export default function AdminSlotsPage() {
       }
     } catch (err: any) {
       setError(err.message);
+      // Optional: We don't usually toast on initial load errors, but you could:
+      // toast.error("Could not load slots");
     } finally {
       setLoading(false);
     }
@@ -104,6 +107,9 @@ export default function AdminSlotsPage() {
     e.preventDefault();
     setError("");
     setSubmitting(true);
+    
+    // 🔔 1. Show Loading Toast
+    const toastId = toast.loading("Adding slot availability...");
 
     try {
       if (!date || !startTime || !endTime) throw new Error("Please fill in all fields");
@@ -112,7 +118,7 @@ export default function AdminSlotsPage() {
       const endDateTime = new Date(`${date}T${endTime}`);
 
       if (startDateTime >= endDateTime) throw new Error("End time must be after start time");
-      if (checkConflict(startDateTime, endDateTime)) throw new Error("❌ Overlaps with existing slot!");
+      if (checkConflict(startDateTime, endDateTime)) throw new Error("Overlaps with existing slot!");
 
       const user = auth.currentUser;
       const token = await user?.getIdToken();
@@ -135,27 +141,47 @@ export default function AdminSlotsPage() {
       if (!res.ok) throw new Error(data.error || "Failed to create slot");
 
       await fetchSlots(token);
+      
+      // 🔔 2. Success Toast
+      toast.success("Slot added successfully!", { id: toastId });
+      
       setStartTime("");
       setEndTime("");
     } catch (err: any) {
       setError(err.message);
+      // 🔔 3. Error Toast
+      toast.error(err.message || "Failed to create slot", { id: toastId });
     } finally {
       setSubmitting(false);
     }
   };
 
   const handleDelete = async (id: string) => {
+    // Keep native confirm for safety (or replace with your Modal if preferred)
     if (!confirm("Delete this slot permanently?")) return;
+    
+    // 🔔 1. Loading Toast
+    const toastId = toast.loading("Deleting slot...");
+
     try {
       const user = auth.currentUser;
       const token = await user?.getIdToken();
-      await fetch(`${API_URL}/api/admin/slots/${id}`, {
+      
+      const res = await fetch(`${API_URL}/api/admin/slots/${id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
+
+      if (!res.ok) throw new Error("Failed to delete");
+
       setSlots((prev) => prev.filter((s) => s.id !== id));
+      
+      // 🔔 2. Success Toast
+      toast.success("Slot deleted", { id: toastId });
     } catch (err: any) {
-      alert(err.message);
+      console.error(err);
+      // 🔔 3. Error Toast (Replaced Alert)
+      toast.error("Could not delete slot", { id: toastId });
     }
   };
 
@@ -257,8 +283,8 @@ export default function AdminSlotsPage() {
                 </div>
               </div>
 
-              {error && error !== "Admin access only" && (
-                <div className="p-3 bg-red-50 text-red-600 text-xs font-bold rounded-lg border border-red-100">
+              {error && (
+                <div className="p-3 bg-red-50 text-red-600 text-xs font-bold rounded-lg border border-red-100 animate-pulse">
                   {error}
                 </div>
               )}

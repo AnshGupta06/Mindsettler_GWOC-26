@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
+import toast from "react-hot-toast";
 import {
   Menu,
   X,
@@ -69,17 +70,21 @@ export default function Navbar() {
 
   // 🚪 Logout Handler (UPDATED: No Redirect)
   const handleLogout = async () => {
+    // Show loading state
+    const toastId = toast.loading("Logging out...");
     try {
       await signOut(auth);
       setIsAdmin(false);
-      // We do NOT push to login anymore. 
-      // We just refresh the current page state.
+      /// ✅ Success Message
+      toast.success("Logged out successfully. See you soon!", { id: toastId });
+      
       router.refresh(); 
       setMobileMenuOpen(false);
     } catch (error) {
       console.error("Logout failed", error);
+      toast.error("Failed to log out", { id: toastId });
     }
-  };
+};
 
   // 📋 Menu Items Configuration
   const menuItems = [

@@ -10,6 +10,7 @@ import {
   AlertCircle, XCircle, ExternalLink 
 } from "lucide-react";
 import AlertModal from "../components/common/AlertModal";
+import toast from "react-hot-toast";
 
 // --- Types ---
 type Booking = {
@@ -107,10 +108,12 @@ export default function ProfilePage() {
         body: JSON.stringify({ phone: newPhone }),
       });
       if (user) await fetchProfileData(user);
+      // ✅ Toast for small success
+      toast.success("Phone number updated!");
       setNewPhone("");
     } catch (err) {
-      console.error(err);
-      alert("Failed to update phone");
+     // ❌ Toast for error
+      toast.error("Failed to update phone.");
     } finally {
       setUpdatingPhone(false);
     }
