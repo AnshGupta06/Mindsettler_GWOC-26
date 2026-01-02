@@ -111,10 +111,6 @@ export const createBooking = async (req, res) => {
   try {
     const { slotId, type, reason } = req.body;
 
-    if (!req.user?.uid) {
-      return res.status(401).json({ error: "Unauthorized" });
-    }
-
     const user = await prisma.user.findUnique({
       where: { firebaseUid: req.user.uid },
     });

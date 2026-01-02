@@ -6,11 +6,11 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 export const sendEmail = async (to, subject, html) => {
   try {
     await resend.emails.send({
-      from: "MindSettler <onboarding@resend.dev>", 
+      from: "MindSettler <parnika.bajaj@mindsettlers.com>", 
       to,
       subject,
       html,
-    });
+    }); 
 
     console.log(`📧 Email sent to ${to}`);
   } catch (err) {
