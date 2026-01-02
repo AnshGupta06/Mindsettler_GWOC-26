@@ -6,7 +6,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 export const sendEmail = async (to, subject, html) => {
   try {
     await resend.emails.send({
-      from: "MindSettler <parnika.bajaj@mindsettlers.com>", 
+      from: "MindSettler <onboarding@resend.dev>", 
       to,
       subject,
       html,

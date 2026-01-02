@@ -17,15 +17,11 @@ import {
   User as UserIcon,
   Library,
 } from "lucide-react";
-
-// ... (lines 19-71 are unchanged, but I need to make sure I don't break the file structure by replacing huge chunks inappropriately. The tool works by replacing chunks.)
-
-// I will use replace_file_content to just replace the imports and then another call/chunk for the menuItems and logic.
-// Actually, I can do it in one go with multi_replace if I am careful, or just replace the whole file? No, replace_file_content is better for contiguous blocks.
-// I will use multi_replace for imports + menuItems + Desktop Nav.
-
 import { onAuthStateChanged, User, signOut } from "firebase/auth";
 import { auth } from "../../../lib/firebase";
+
+// 🛡️ ADMIN LIST
+const ADMIN_EMAILS = ["shsheth2006@gmail.com"];
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -34,8 +30,6 @@ export default function Navbar() {
   const [isAdmin, setIsAdmin] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
-
-  const ADMIN_EMAILS = ["shsheth2006@gmail.com"];
 
   // 🔤 Helper to get Initials (e.g., "Siddharth Sheth" -> "SS")
   const getInitials = (name: string | null | undefined) => {
@@ -55,6 +49,7 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // 🔐 Auth Listener
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (u) => {
       setUser(u);
@@ -67,16 +62,26 @@ export default function Navbar() {
     return () => unsub();
   }, []);
 
+  // Prevent scrolling when mobile menu is open
   useEffect(() => {
     document.body.style.overflow = mobileMenuOpen ? "hidden" : "auto";
   }, [mobileMenuOpen]);
 
+  // 🚪 Logout Handler (UPDATED: No Redirect)
   const handleLogout = async () => {
-    await signOut(auth);
-    setIsAdmin(false);
-    router.push("/login");
+    try {
+      await signOut(auth);
+      setIsAdmin(false);
+      // We do NOT push to login anymore. 
+      // We just refresh the current page state.
+      router.refresh(); 
+      setMobileMenuOpen(false);
+    } catch (error) {
+      console.error("Logout failed", error);
+    }
   };
 
+  // 📋 Menu Items Configuration
   const menuItems = [
     { href: "/", label: "Home", icon: <Home size={24} /> },
     { href: "/about", label: "About", icon: <Info size={24} /> },
@@ -85,6 +90,8 @@ export default function Navbar() {
     { href: "/resource", label: "Resources", icon: <Library size={24} /> },
     { href: "/contact", label: "Contact", icon: <Mail size={24} /> },
   ];
+
+  // Add Admin Dashboard if eligible
   if (isAdmin) {
     menuItems.push({
       href: "/admin",
@@ -96,10 +103,11 @@ export default function Navbar() {
   return (
     <>
       <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled || mobileMenuOpen
-          ? "bg-white/90 backdrop-blur-md shadow-sm py-4"
-          : "bg-transparent py-4 md:py-6"
-          }`}
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+          scrolled || mobileMenuOpen
+            ? "bg-white/90 backdrop-blur-md shadow-sm py-4"
+            : "bg-transparent py-4 md:py-6"
+        }`}
       >
         <nav className="max-w-[1440px] mx-auto px-6 md:px-8 flex items-center justify-between">
           {/* LOGO */}
@@ -142,6 +150,7 @@ export default function Navbar() {
               </>
             ) : (
               <>
+                {/* Admin Button */}
                 {isAdmin && (
                   <Link href="/admin">
                     <button className="px-5 py-2 rounded-full bg-[#3F2965] text-white text-sm font-bold hover:bg-[#513681] transition flex items-center gap-2">
@@ -151,7 +160,7 @@ export default function Navbar() {
                   </Link>
                 )}
 
-                {/* 👤 User Initials Button */}
+                {/* Profile Button */}
                 <Link href="/profile">
                   <button className="px-4 py-2 rounded-full border border-[#3F2965]/30 text-[#3F2965] text-sm font-bold hover:bg-[#3F2965] hover:text-white transition flex items-center gap-2">
                     <UserIcon size={16} />
@@ -159,6 +168,7 @@ export default function Navbar() {
                   </button>
                 </Link>
 
+                {/* Book Session (Hidden for Admins to reduce clutter, optional) */}
                 {!isAdmin && (
                   <Link href="/book">
                     <button className="px-6 py-3 rounded-full bg-[#Dd1764] text-white text-sm font-bold tracking-wide hover:shadow-lg hover:shadow-[#3F2965]/20 transition">
@@ -189,8 +199,9 @@ export default function Navbar() {
 
       {/* MOBILE MENU */}
       <div
-        className={`fixed inset-0 z-40 bg-gradient-to-br from-[#F9F6FF] via-white to-[#F9F6FF] flex flex-col md:hidden transition-all duration-500 ${mobileMenuOpen ? "translate-x-0 opacity-100" : "translate-x-full opacity-0"
-          }`}
+        className={`fixed inset-0 z-40 bg-gradient-to-br from-[#F9F6FF] via-white to-[#F9F6FF] flex flex-col md:hidden transition-all duration-500 ${
+          mobileMenuOpen ? "translate-x-0 opacity-100" : "translate-x-full opacity-0"
+        }`}
       >
         <div className="relative z-10 flex flex-col items-center justify-center flex-1 px-6 pt-24 pb-8">
           <ul className="flex flex-col gap-3 w-full max-w-sm mb-8">
@@ -198,10 +209,11 @@ export default function Navbar() {
               <li key={item.href} onClick={() => setMobileMenuOpen(false)}>
                 <Link href={item.href}>
                   <div
-                    className={`flex items-center justify-between px-6 py-4 rounded-2xl transition ${pathname === item.href
-                      ? "bg-gradient-to-r from-[#3F2965] to-[#513681] text-white"
-                      : "bg-white text-[#3F2965]"
-                      }`}
+                    className={`flex items-center justify-between px-6 py-4 rounded-2xl transition ${
+                      pathname === item.href
+                        ? "bg-gradient-to-r from-[#3F2965] to-[#513681] text-white"
+                        : "bg-white text-[#3F2965]"
+                    }`}
                   >
                     <div className="flex items-center gap-4">
                       {item.icon}
@@ -259,6 +271,7 @@ export default function Navbar() {
   );
 }
 
+// Sub-component for Cleaner Desktop Links
 function NavLink({
   href,
   active,
@@ -272,10 +285,11 @@ function NavLink({
     <li>
       <Link
         href={href}
-        className={`block px-5 py-2 rounded-full text-sm font-bold transition ${active
-          ? "bg-white text-[#3F2965] shadow-sm"
-          : "text-[#3F2965]/70 hover:bg-white/50 hover:text-[#3F2965]"
-          }`}
+        className={`block px-5 py-2 rounded-full text-sm font-bold transition ${
+          active
+            ? "bg-white text-[#3F2965] shadow-sm"
+            : "text-[#3F2965]/70 hover:bg-white/50 hover:text-[#3F2965]"
+        }`}
       >
         {children}
       </Link>
