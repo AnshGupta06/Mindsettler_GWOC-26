@@ -5,10 +5,11 @@ import { useRouter } from "next/navigation";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../../../lib/firebase"; 
 import { API_URL } from "@/app/lib/api";
-import toast from "react-hot-toast"; // 🔔 IMPORT TOAST
+import toast from "react-hot-toast"; 
 import { 
   Calendar, Trash2, Plus, MapPin, Wifi, Lock, ArrowLeft, LayoutGrid, ArrowUpDown, Search, X 
 } from "lucide-react";
+import Loader from "../../components/common/Loader";
 
 type Slot = {
   id: string;
@@ -342,8 +343,8 @@ export default function AdminSlotsPage() {
             </div>
 
             {loading ? (
-              <div className="text-center py-20 opacity-50">Loading schedule...</div>
-            ) : filteredSlots.length === 0 ? (
+<Loader fullScreen={false} message="Loading Schedules..." />
+) : filteredSlots.length === 0 ? (
               <div className="bg-white p-12 rounded-3xl border border-dashed border-[#3F2965]/20 text-center">
                 <Calendar className="mx-auto text-[#3F2965]/20 mb-4" size={48} />
                 <p className="text-[#3F2965]/60 font-medium">

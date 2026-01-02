@@ -6,6 +6,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../../lib/firebase"; // Ensure path is correct
 import { API_URL } from "@/app/lib/api";
 import toast from "react-hot-toast"; // 🔔 IMPORT TOAST
+import Loader from "../components/common/Loader";
 import { 
   Calendar, 
   Clock, 
@@ -219,8 +220,8 @@ export default function AdminBookingsPage() {
 
         {/* BOOKINGS GRID */}
         {loading ? (
-          <div className="text-center py-20 text-[#3F2965]/50 animate-pulse">Loading dashboard data...</div>
-        ) : filteredBookings.length === 0 ? (
+          <Loader fullScreen={true} message="Loading Dashboard Data..."/>
+) : filteredBookings.length === 0 ? (
           <div className="text-center py-20 bg-white rounded-3xl border border-dashed border-[#3F2965]/20">
             <p className="text-[#3F2965]/40">No bookings found in this category.</p>
           </div>

@@ -87,10 +87,6 @@ export default function JourneySection() {
       {/* Container */}
       <div className="max-w-[1440px] mx-auto bg-[#F9F6FF] rounded-2xl sm:rounded-3xl md:rounded-[3rem] px-4 sm:px-8 md:px-12 lg:px-20 py-12 sm:py-16 md:py-20 lg:py-24 relative overflow-hidden">
         
-        {/* Background Blurs */}
-        <div className="absolute top-0 right-0 w-[400px] sm:w-[500px] md:w-[600px] h-[400px] sm:h-[500px] md:h-[600px] bg-[#3F2965]/5 blur-[100px] sm:blur-[120px] rounded-full pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-[350px] sm:w-[450px] md:w-[500px] h-[350px] sm:h-[450px] md:h-[500px] bg-[#Dd1764]/5 blur-[80px] sm:blur-[100px] rounded-full pointer-events-none" />
-
         {/* Heading */}
         <div className="max-w-3xl mx-auto text-center mb-12 sm:mb-16 md:mb-20 lg:mb-24 relative z-10 flex flex-col items-center">
           <SlideUp>

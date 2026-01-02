@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import AlertModal from "../components/common/AlertModal";
 import toast from "react-hot-toast";
+import Loader from "../components/common/Loader";
 
 // --- Types ---
 type Booking = {
@@ -57,6 +58,15 @@ export default function ProfilePage() {
   });
   
   const [actionLoading, setActionLoading] = useState(false);
+
+  // 🆕 FORCE SCROLL TO TOP
+  // This ensures that when the loader finishes and content appears, 
+  // the user is looking at the top of the profile, not the middle.
+  useEffect(() => {
+    if (!loading) {
+      window.scrollTo(0, 0);
+    }
+  }, [loading]);
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (currentUser) => {
@@ -196,14 +206,7 @@ export default function ProfilePage() {
 
   // --- LOADING VIEW ---
   if (loading) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-white gap-4">
-        <div className="animate-spin w-12 h-12 border-[5px] border-[#F9F6FF] border-t-[#Dd1764] rounded-full" />
-        <p className="text-[#3F2965] font-bold text-lg animate-pulse">
-          Loading your space...
-        </p>
-      </div>
-    );
+    return <Loader fullScreen={true} message={"Loading your space..."} />; 
   }
 
   return (
@@ -216,7 +219,6 @@ export default function ProfilePage() {
         title={modalState.title}
         message={modalState.message}
         actionLabel={modalState.actionLabel}
-        // 🚀 FIX: Only run cancel logic if in CONFIRM mode. Otherwise, just close.
         onAction={modalState.type === "CONFIRM" ? handleConfirmCancel : closeModal}
         isLoading={actionLoading}
         page="profile" 
