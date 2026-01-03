@@ -75,9 +75,9 @@ export default function BookPage() {
 
   // Helper: Group slots by Date String
   const safeSlots = Array.isArray(slots) ? slots : [];
-  const groupedSlots = safeSlots.reduce((acc, slot) => { 
-    const dateStr = new Date(slot.date).toLocaleDateString('en-US', { 
-      weekday: 'long', month: 'long', day: 'numeric' 
+  const groupedSlots = safeSlots.reduce((acc, slot) => {
+    const dateStr = new Date(slot.date).toLocaleDateString('en-US', {
+      weekday: 'long', month: 'long', day: 'numeric'
     });
     if (!acc[dateStr]) acc[dateStr] = [];
     acc[dateStr].push(slot);
@@ -87,7 +87,7 @@ export default function BookPage() {
   const handleSubmit = async () => {
     if (!selectedSlot) { setError("Please select a time slot."); return; }
     if (!agreed) { setError("You must agree to the Confidentiality Policy."); return; }
-    
+
     setSubmitting(true);
     // Use a "Loading" toast that updates automatically!
     const toastId = toast.loading("Confirming your session...");
@@ -115,7 +115,7 @@ export default function BookPage() {
           slotId: selectedSlot.id,
           type,
           reason,
-          paymentMethod, 
+          paymentMethod,
         }),
       });
 
