@@ -60,3 +60,15 @@ model Booking {
 
   createdAt DateTime @default(now())
 }
+
+model BookingDiscount {
+  id              String   @id @default(uuid())
+  isActive        Boolean  @default(true) @map("is_active")
+  bookingCountFrom Int     @map("booking_count_from")
+  bookingCountTo   Int     @map("booking_count_to")
+  discountPercent  Int     @map("discount_percent")
+  label           String?
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  @@map("booking_discounts")
+}
