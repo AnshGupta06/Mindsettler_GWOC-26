@@ -39,6 +39,13 @@ export const getApplicableDiscount = async (userId) => {
         return null; // Feature Disabled by Admin
     }
 
+    // [FIX] Valid User ID is MANDATORY
+    // Prisma ignores undefined fields in where clause, causing GLOBAL COUNTS if userId is missing.
+    if (!userId) {
+        console.error("[DiscountService] Error: userId is missing/undefined. Cannot calculate discount.");
+        return null;
+    }
+
     // 2. Count CONFIRMED bookings for the user
     // CRITICAL: Only count bookings that are officially confirmed to prevent gaming.
     const confirmedCount = await prisma.booking.count({
@@ -65,18 +72,19 @@ export const getApplicableDiscount = async (userId) => {
     }
 
     // 4. Sort rules to find the MOST SPECIFIC match (Highest Priority)
-    // Priority 1: Exact Match (Smallest Range) - e.g. "5-5" beats "1-10"
-    // Priority 2: Highest Start Count - e.g. "5-10" beats "1-10"
+    // Priority 1: Exact Match (5-5) is better than Range (1-10)
+    // Priority 2: Narrowest Range (5-6) is better than Wide Range (1-10)
+    // Priority 3: Highest Start (Tiebreaker)
     validRules.sort((a, b) => {
         const rangeA = a.bookingCountTo - a.bookingCountFrom;
         const rangeB = b.bookingCountTo - b.bookingCountFrom;
 
-        // Smaller range = More specific
+        // Rule 1 & 2: Smaller range wins (Specific > General)
         if (rangeA !== rangeB) {
             return rangeA - rangeB;
         }
 
-        // Keep existing logic: Highest start = "Higher tier" rule
+        // Rule 3: If ranges are equal, prefer the one starting higher (arbitrary but consistent)
         return b.bookingCountFrom - a.bookingCountFrom;
     });
 

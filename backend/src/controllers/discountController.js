@@ -1,9 +1,25 @@
+import prisma from "../config/prisma.js";
 import * as discountService from "../services/discountService.js";
 
 // User: Check Discount
 export const checkDiscount = async (req, res) => {
     try {
-        const userId = req.user.id; // user id from auth middleware
+        if (!req.user || !req.user.uid) {
+            console.error("[DiscountController] Error: User not authenticated or UID missing.");
+            return res.status(401).json({ error: "Unauthorized" });
+        }
+
+        // Fetch the internal Database User ID using Firebase UID
+        const user = await prisma.user.findUnique({
+            where: { firebaseUid: req.user.uid }
+        });
+
+        if (!user) {
+            console.error(`[DiscountController] Error: User not found in DB for UID ${req.user.uid}`);
+            return res.status(404).json({ error: "User profile not found. Please complete registration." });
+        }
+
+        const userId = user.id; // Correct Prisma UUID
         const discount = await discountService.getApplicableDiscount(userId);
         res.json({ discount });
     } catch (error) {
