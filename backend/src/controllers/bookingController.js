@@ -9,7 +9,7 @@ const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
 /*                                EMAIL TEMPLATES                              */
 /* -------------------------------------------------------------------------- */
 
-const newBookingAdminTemplate = ({ userName, userEmail, type, reason }) => `
+const newBookingAdminTemplate = ({ userName, userEmail, type, therapyType, reason }) => `
 <!DOCTYPE html>
 <html>
   <body style="margin:0;padding:0;background:#f4f4f7;font-family:Arial,Helvetica,sans-serif;">
@@ -29,6 +29,7 @@ const newBookingAdminTemplate = ({ userName, userEmail, type, reason }) => `
                   <tr><td><strong>User:</strong> ${userName || "N/A"}</td></tr>
                   <tr><td><strong>Email:</strong> ${userEmail}</td></tr>
                   <tr><td><strong>Session Type:</strong> ${type}</td></tr>
+                  ${therapyType ? `<tr><td><strong>Therapy Type:</strong> ${therapyType}</td></tr>` : ''}
                   <tr><td><strong>Reason:</strong> ${reason || "—"}</td></tr>
                 </table>
                 <p style="margin-top:24px;">
@@ -91,11 +92,17 @@ const refundAlertTemplate = ({ userName, userEmail, sessionDate, status }) => `
 
 export const getSlots = async (req, res) => {
   try {
+    const { therapyType } = req.query;
     const now = new Date();
+    
     const slots = await prisma.sessionSlot.findMany({
       where: {
         isBooked: false,
         startTime: { gt: now },
+        OR: [
+          { therapyType: null }, // General slots available for all therapies
+          { therapyType: therapyType || undefined }, // Slots specific to selected therapy
+        ],
       },
       orderBy: { startTime: "asc" },
     });
@@ -109,7 +116,7 @@ export const getSlots = async (req, res) => {
 
 export const createBooking = async (req, res) => {
   try {
-    const { slotId, type, reason } = req.body;
+    const { slotId, type, reason, therapyType } = req.body;
 
     if (!req.user?.uid) {
       return res.status(401).json({ error: "Unauthorized" });
@@ -128,7 +135,7 @@ export const createBooking = async (req, res) => {
       if (!slot || slot.isBooked) throw new Error("Slot unavailable");
 
       const created = await tx.booking.create({
-        data: { userId: user.id, slotId, type, reason },
+        data: { userId: user.id, slotId, type, reason, therapyType },
       });
 
       await tx.sessionSlot.update({
@@ -149,8 +156,7 @@ export const createBooking = async (req, res) => {
       newBookingAdminTemplate({
         userName: user.name,
         userEmail: user.email,
-        type,
-        reason,
+        type,        therapyType,        reason,
       })
     );
   } catch (err) {

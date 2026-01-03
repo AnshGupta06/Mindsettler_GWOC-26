@@ -3,7 +3,7 @@ import prisma from "../config/prisma.js";
 // Create a new slot
 export async function createSlot(req, res) {
   try {
-    const { date, startTime, endTime, mode } = req.body;
+    const { date, startTime, endTime, mode, therapyType } = req.body;
 
     if (!date || !startTime || !endTime || !mode) {
       return res.status(400).json({ error: "All fields are required" });
@@ -15,6 +15,7 @@ export async function createSlot(req, res) {
         startTime: new Date(startTime),
         endTime: new Date(endTime),
         mode,
+        therapyType: therapyType || null,
       },
     });
 
