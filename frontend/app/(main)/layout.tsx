@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import ToastProvider from "./components/common/ToastProvider";
 import Footer from "./components/common/Footer";
+import SessionTimeout from "../(auth)/login/components/SessionTimeout";
 import "../globals.css";
 
 const geistSans = Geist({
@@ -37,7 +38,8 @@ export default function RootLayout({
           src="https://unpkg.com/@google/model-viewer@latest/dist/model-viewer.min.js"
           strategy="beforeInteractive"
         />
-]        <ToastProvider />
+        <SessionTimeout />
+        <ToastProvider />
         {children}
         <Chatbot />
         <Footer />
