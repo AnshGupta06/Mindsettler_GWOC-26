@@ -11,7 +11,7 @@ import {
   CreditCard, Sparkles, ArrowRight, Wallet, User as UserIcon, Banknote, BrainCircuit, ChevronRight
 } from "lucide-react";
 import { motion } from "framer-motion";
-import AlertModal from "../components/common/AlertModal"; // Ensure this path matches your project structure
+import AlertModal from "../components/common/AlertModal";
 import toast from "react-hot-toast";
 
 // Import therapy approaches data
@@ -74,11 +74,14 @@ export default function BookPage() {
     }
   }, [therapyType, therapyApproaches]);
 
-  // --- 1. Combined Auth Check & Data Fetching ---
+  // --- Combined Auth Check & Initial Data Setup ---
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (user) => {
+      setUser(user);
+      setAuthChecking(false);
+      
       if (!user) {
-        router.replace("/login");
+        // Don't redirect immediately, let the AlertModal handle it
         return;
       }
 
@@ -88,39 +91,57 @@ export default function BookPage() {
       if (therapy) {
         setTherapyType(decodeURIComponent(therapy));
       }
-
-      // Fetch slots (will be called again when therapyType changes)
-      fetchSlots();
     });
+    
     return () => unsub();
   }, []);
 
-  // Separate effect to fetch slots when therapyType changes
+  // Fetch slots when therapyType changes or when user is authenticated
   useEffect(() => {
-    if (therapyType !== undefined) { // Only fetch after initial load
+    if (user) {
       fetchSlots();
     }
-  }, [therapyType]);
+  }, [therapyType, user]);
 
   const fetchSlots = async () => {
+    if (!user) return;
+    
     try {
+      setLoading(true);
       const url = therapyType 
         ? `${API_URL}/api/bookings/slots?therapyType=${encodeURIComponent(therapyType)}`
         : `${API_URL}/api/bookings/slots`;
       
-      const res = await fetch(url);
+      const token = await user.getIdToken();
+      const res = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      
+      if (!res.ok) {
+        throw new Error("Failed to fetch slots");
+      }
+      
       const data = await res.json();
       setSlots(data);
     } catch (err) {
       console.error(err);
+      toast.error("Failed to load available slots");
       setError("Failed to load slots.");
     } finally {
       setLoading(false);
     }
   };
 
+  // Filter slots based on mode filter
+  const filteredSlots = slots.filter(slot => {
+    if (slotModeFilter === "BOTH") return true;
+    return slot.mode === slotModeFilter;
+  });
+
   // Helper: Group slots by Date String
-  const safeSlots = Array.isArray(slots) ? slots : [];
+  const safeSlots = Array.isArray(filteredSlots) ? filteredSlots : [];
   const groupedSlots = safeSlots.reduce((acc, slot) => {
     const dateStr = new Date(slot.date).toLocaleDateString('en-US', {
       weekday: 'long', month: 'long', day: 'numeric'
@@ -131,17 +152,28 @@ export default function BookPage() {
   }, {} as Record<string, Slot[]>);
 
   const handleSubmit = async () => {
-    if (!selectedSlot) { setError("Please select a time slot."); return; }
-    if (!agreed) { setError("You must agree to the Confidentiality Policy."); return; }
+    if (!selectedSlot) { 
+      toast.error("Please select a time slot.");
+      setError("Please select a time slot."); 
+      return; 
+    }
+    if (!agreed) { 
+      toast.error("You must agree to the Confidentiality Policy.");
+      setError("You must agree to the Confidentiality Policy."); 
+      return; 
+    }
 
     setSubmitting(true);
-    // Use a "Loading" toast that updates automatically!
     const toastId = toast.loading("Confirming your session...");
     setError("");
 
     try {
       const currentUser = auth.currentUser;
-      if (!currentUser) return; // Should not happen due to guard, but safe check
+      if (!currentUser) {
+        toast.error("Please login to continue");
+        return;
+      }
+      
       const token = await currentUser.getIdToken();
 
       // Sync user to backend first
@@ -162,10 +194,7 @@ export default function BookPage() {
           type,
           reason,
           paymentMethod,
-<<<<<<< HEAD
           therapyType,
-=======
->>>>>>> 51f84cd81d1f3423d605c2c96619bb56eb85a746
         }),
       });
 
@@ -174,14 +203,21 @@ export default function BookPage() {
         throw new Error(errData.error || "Booking failed");
       }
 
-      // SUCCESS: Update the loading toast to success
+      // SUCCESS
       toast.success("Session Booked Successfully! 🎉", { id: toastId });
       
+      // Remove the booked slot from the list
       setSlots((prev) => prev.filter((s) => s.id !== selectedSlot.id));
-      router.push("/profile");
+      
+      // Redirect to profile after a short delay
+      setTimeout(() => {
+        router.push("/profile");
+      }, 1500);
+      
     } catch (err: any) {
       console.error(err);
       toast.error(err.message || "Booking Failed", { id: toastId });
+      setError(err.message || "Booking failed. Please try again.");
     } finally {
       setSubmitting(false);
     }
@@ -203,8 +239,8 @@ export default function BookPage() {
       {!user && (
         <AlertModal 
           isOpen={true} 
-          onClose={() => router.push("/")} // Redirect to Home if they cancel
-          page= {"book"}
+          onClose={() => router.push("/")}
+          page={"book"}
         />
       )}
 
@@ -272,11 +308,111 @@ export default function BookPage() {
                 </div>
               </section>
 
-              {/* 2. Slot Selection */}
+              {/* 2. Therapy Selection */}
               <section>
                 <div className="flex items-center gap-3 mb-6">
                   <div className="w-10 h-10 rounded-2xl bg-[#3F2965] text-white flex items-center justify-center font-bold text-lg shadow-lg shadow-[#3F2965]/20">2</div>
+                  <h2 className="text-2xl font-bold">Choose Your Therapy Approach</h2>
+                </div>
+
+                <div className="bg-white/60 rounded-3xl p-8 border border-[#3F2965]/5">
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="w-12 h-12 rounded-2xl bg-[#F9F6FF] flex items-center justify-center">
+                        <BrainCircuit className="text-[#Dd1764]" size={24} />
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-lg text-[#3F2965]">Select Therapy Type</h3>
+                        <p className="text-sm text-[#3F2965]/60">Choose the therapeutic approach that best fits your needs</p>
+                      </div>
+                    </div>
+
+                    <div className="relative">
+                      <select
+                        value={therapyType}
+                        onChange={(e) => setTherapyType(e.target.value)}
+                        className="w-full bg-white border-2 border-[#F9F6FF] hover:border-[#Dd1764]/30 focus:border-[#Dd1764] rounded-2xl p-4 pr-12 text-base focus:outline-none focus:ring-2 focus:ring-[#Dd1764]/10 transition-all duration-300 appearance-none cursor-pointer"
+                      >
+                        <option value="" className="text-[#3F2965]/60">Select a therapy approach...</option>
+                        {therapyApproaches.map((therapy) => (
+                          <option key={therapy.id} value={therapy.title} className="text-[#3F2965] py-2">
+                            {therapy.title}
+                          </option>
+                        ))}
+                      </select>
+                      <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
+                        <ChevronRight className="text-[#3F2965]/40 rotate-90" size={20} />
+                      </div>
+                    </div>
+
+                    <div className="mt-6 p-4 bg-[#F9F6FF]/50 rounded-xl">
+                      <p className="text-xs text-[#3F2965]/70 leading-relaxed">
+                        <span className="font-semibold">💡 Tip:</span> Not sure which therapy to choose? You can discuss this with your therapist during your first session, or select "Custom Therapy Plan" for a personalized approach.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              {/* 3. Slot Selection */}
+              <section>
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 rounded-2xl bg-[#3F2965] text-white flex items-center justify-center font-bold text-lg shadow-lg shadow-[#3F2965]/20">3</div>
                   <h2 className="text-2xl font-bold">Select a Time Slot</h2>
+                </div>
+
+                {/* Slot Mode Filter */}
+                <div className="bg-white/60 rounded-3xl p-6 mb-8 border border-[#3F2965]/5">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 rounded-2xl bg-[#F9F6FF] flex items-center justify-center">
+                      <MapPin className="text-[#Dd1764]" size={20} />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-lg text-[#3F2965]">Session Mode</h3>
+                      <p className="text-sm text-[#3F2965]/60">Choose how you'd like to have your session</p>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap gap-3">
+                    <button
+                      onClick={() => setSlotModeFilter("BOTH")}
+                      className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-300 ${
+                        slotModeFilter === "BOTH"
+                          ? "bg-[#3F2965] text-white shadow-lg shadow-[#3F2965]/20"
+                          : "bg-white text-[#3F2965] hover:bg-[#3F2965]/10 border border-[#3F2965]/20"
+                      }`}
+                    >
+                      All Sessions
+                    </button>
+                    <button
+                      onClick={() => setSlotModeFilter("ONLINE")}
+                      className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-300 ${
+                        slotModeFilter === "ONLINE"
+                          ? "bg-green-600 text-white shadow-lg shadow-green-600/20"
+                          : "bg-white text-green-700 hover:bg-green-50 border border-green-200"
+                      }`}
+                    >
+                      🖥️ Online Only
+                    </button>
+                    <button
+                      onClick={() => setSlotModeFilter("OFFLINE")}
+                      className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-300 ${
+                        slotModeFilter === "OFFLINE"
+                          ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20"
+                          : "bg-white text-blue-700 hover:bg-blue-50 border border-blue-200"
+                      }`}
+                    >
+                      🏢 In-Person Only
+                    </button>
+                  </div>
+
+                  {therapyType && (
+                    <div className="mt-4 p-3 bg-[#F9F6FF]/50 rounded-xl">
+                      <p className="text-xs text-[#3F2965]/70">
+                        <span className="font-semibold">{therapyType}</span> sessions are available. Use the filters above to view online or in-person options.
+                      </p>
+                    </div>
+                  )}
                 </div>
 
                 {loading && (
@@ -286,6 +422,22 @@ export default function BookPage() {
                   </div>
                 )}
                 
+                {!loading && safeSlots.length === 0 && slots.length > 0 && (
+                  <div className="bg-white p-10 rounded-3xl text-center border-2 border-dashed border-[#3F2965]/10">
+                    <MapPin className="mx-auto text-[#3F2965]/20 mb-4" size={48} />
+                    <p className="font-bold text-lg text-[#3F2965]/80">No slots match your current filter.</p>
+                    <p className="text-sm text-[#3F2965]/50 mb-4">
+                      Try changing your session mode preference or check back later for more availability.
+                    </p>
+                    <button
+                      onClick={() => setSlotModeFilter("BOTH")}
+                      className="px-4 py-2 bg-[#3F2965] text-white rounded-xl text-sm font-semibold hover:bg-[#3F2965]/90 transition-colors"
+                    >
+                      Show All Sessions
+                    </button>
+                  </div>
+                )}
+
                 {!loading && slots.length === 0 && (
                   <div className="bg-white p-10 rounded-3xl text-center border-2 border-dashed border-[#3F2965]/10">
                     <Calendar className="mx-auto text-[#3F2965]/20 mb-4" size={48} />
@@ -294,370 +446,73 @@ export default function BookPage() {
                   </div>
                 )}
 
-                <div className="space-y-10">
-                  {Object.entries(groupedSlots).map(([dateString, dateSlots]) => (
-                    <div key={dateString} className="relative">
-                      {/* Sticky Date Header */}
-                      <div className="sticky top-0 z-10 -mx-4 px-4 bg-[#F9F6FF]/90 backdrop-blur-md py-4 mb-4 flex items-center gap-3">
-                        <div className="h-px flex-1 bg-[#3F2965]/10"></div>
-                        <span className="font-bold text-[#3F2965]/80 bg-white px-5 py-2 rounded-full text-sm shadow-sm border border-[#3F2965]/5">
+                {!loading && safeSlots.length > 0 && (
+                  <div className="space-y-10">
+                    {Object.entries(groupedSlots).map(([dateString, dateSlots]) => (
+                      <div key={dateString} className="relative">
+                        {/* Sticky Date Header with Backdrop Blur */}
+                        <div className="sticky top-0 z-10 -mx-4 px-4 bg-[#F9F6FF]/90 backdrop-blur-md py-4 mb-4 flex items-center gap-3">
+                          <div className="h-px flex-1 bg-[#3F2965]/10"></div>
+                          <span className="font-bold text-[#3F2965]/80 bg-white px-5 py-2 rounded-full text-sm shadow-sm border border-[#3F2965]/5">
                             {dateString}
-                        </span>
-                        <div className="h-px flex-1 bg-[#3F2965]/10"></div>
-                      </div>
+                          </span>
+                          <div className="h-px flex-1 bg-[#3F2965]/10"></div>
+                        </div>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {dateSlots.map((slot) => {
-                          const start = new Date(slot.startTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-                          const end = new Date(slot.endTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-                          const isSelected = selectedSlot?.id === slot.id;
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                          {dateSlots.map((slot) => {
+                            const start = new Date(slot.startTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+                            const end = new Date(slot.endTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+                            const isSelected = selectedSlot?.id === slot.id;
 
-                          return (
-                            <button
-                              key={slot.id}
-                              onClick={() => setSelectedSlot(slot)}
-                              className={`relative p-5 rounded-2xl border transition-all duration-300 group ${
-                                isSelected
-                                  ? "bg-[#3F2965] text-white border-[#3F2965] shadow-lg shadow-[#3F2965]/20 scale-[1.02]"
-                                  : "bg-white border-transparent hover:border-[#Dd1764]/30 hover:shadow-md"
-                              }`}
-                            >
-                              <div className="flex justify-between items-center mb-3">
-                                <div className={`text-[10px] font-bold px-2 py-1 rounded-lg uppercase tracking-wider flex items-center gap-1.5 ${
-                                    slot.mode === 'ONLINE' 
-                                      ? (isSelected ? 'bg-white/20 text-white' : 'bg-green-50 text-green-700')
-                                      : (isSelected ? 'bg-white/20 text-white' : 'bg-blue-50 text-blue-700')
-                                  }`}>
+                            return (
+                              <button
+                                key={slot.id}
+                                onClick={() => setSelectedSlot(slot)}
+                                className={`relative p-5 rounded-2xl border transition-all duration-300 group ${
+                                  isSelected
+                                    ? "bg-[#3F2965] text-white border-[#3F2965] shadow-lg shadow-[#3F2965]/20 scale-[1.02]"
+                                    : "bg-white border-transparent hover:border-[#Dd1764]/30 hover:shadow-md"
+                                }`}
+                              >
+                                <div className="flex justify-between items-center mb-3">
+                                  <div className={`text-[10px] font-bold px-2 py-1 rounded-lg uppercase tracking-wider flex items-center gap-1.5 ${
+                                      slot.mode === 'ONLINE' 
+                                        ? (isSelected ? 'bg-white/20 text-white' : 'bg-green-50 text-green-700')
+                                        : (isSelected ? 'bg-white/20 text-white' : 'bg-blue-50 text-blue-700')
+                                    }`}>
                                     <MapPin size={10} />
                                     {slot.mode}
                                   </div>
                                   {isSelected && <CheckCircle size={16} className="text-[#Dd1764] fill-white" />}
-                              </div>
-                              
-                              <p className="font-bold text-xl mb-1">
-                                {start}
-                              </p>
-                              <p className={`text-xs ${isSelected ? "text-white/60" : "text-[#3F2965]/40"}`}>
-                                Until {end}
-                              </p>
-                            </button>
-                          );
-                        })}
+                                </div>
+                                
+                                <p className="font-bold text-xl mb-1">
+                                  {start}
+                                </p>
+                                <p className={`text-xs ${isSelected ? "text-white/60" : "text-[#3F2965]/40"}`}>
+                                  Until {end}
+                                </p>
+                              </button>
+                            );
+                          })}
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )}
               </section>
             </div>
 
-            {/* 1. Session Type Selection */}
-            <section>
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 rounded-2xl bg-[#3F2965] text-white flex items-center justify-center font-bold text-lg shadow-lg shadow-[#3F2965]/20">1</div>
-                <h2 className="text-2xl font-bold">Choose Session Type</h2>
-              </div>
-              
-              <div className="grid sm:grid-cols-2 gap-5">
-                {[
-                  { id: "FIRST", label: "First Session", desc: "For new clients. We'll explore your history and goals.", icon: Sparkles },
-                  { id: "FOLLOW_UP", label: "Follow-up", desc: "For returning clients. Continuing our progress.", icon: ArrowRight }
-                ].map((item) => (
-                  <button
-                    key={item.id}
-                    onClick={() => setType(item.id as any)}
-                    className={`relative p-6 rounded-3xl border-2 text-left transition-all duration-300 group overflow-hidden ${
-                      type === item.id
-                        ? "border-[#Dd1764] bg-white shadow-xl shadow-[#Dd1764]/10"
-                        : "border-transparent bg-white/60 hover:bg-white hover:border-[#3F2965]/10"
-                    }`}
-                  >
-                    <div className={`absolute top-0 right-0 p-4 opacity-0 transition-opacity ${type === item.id ? 'opacity-100' : ''}`}>
-                      <CheckCircle className="text-[#Dd1764] fill-[#Dd1764]/10" size={24} />
-                    </div>
-                    
-                    <div className={`w-12 h-12 rounded-2xl mb-4 flex items-center justify-center transition-colors ${
-                      type === item.id ? "bg-[#Dd1764] text-white" : "bg-[#F9F6FF] text-[#3F2965]"
-                    }`}>
-                      <item.icon size={20} />
-                    </div>
-                    
-                    <h3 className="font-bold text-lg mb-1">{item.label}</h3>
-                    <p className="text-sm text-[#3F2965]/60 leading-relaxed">
-                      {item.desc}
-                    </p>
-                  </button>
-                ))}
-              </div>
-            </section>
-
-            {/* 2. Therapy Selection */}
-            <section>
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 rounded-2xl bg-[#3F2965] text-white flex items-center justify-center font-bold text-lg shadow-lg shadow-[#3F2965]/20">2</div>
-                <h2 className="text-2xl font-bold">Choose Your Therapy Approach</h2>
-              </div>
-
-              <div className="bg-white/60 rounded-3xl p-8 border border-[#3F2965]/5">
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-12 h-12 rounded-2xl bg-[#F9F6FF] flex items-center justify-center">
-                      <BrainCircuit className="text-[#Dd1764]" size={24} />
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-lg text-[#3F2965]">Select Therapy Type</h3>
-                      <p className="text-sm text-[#3F2965]/60">Choose the therapeutic approach that best fits your needs</p>
-                    </div>
-                  </div>
-
-                  <div className="relative">
-                    <select
-                      value={therapyType}
-                      onChange={(e) => setTherapyType(e.target.value)}
-                      className="w-full bg-white border-2 border-[#F9F6FF] hover:border-[#Dd1764]/30 focus:border-[#Dd1764] rounded-2xl p-4 pr-12 text-base focus:outline-none focus:ring-2 focus:ring-[#Dd1764]/10 transition-all duration-300 appearance-none cursor-pointer"
-                    >
-                      <option value="" className="text-[#3F2965]/60">Select a therapy approach...</option>
-                      {therapyApproaches.map((therapy) => (
-                        <option key={therapy.id} value={therapy.title} className="text-[#3F2965] py-2">
-                          {therapy.title}
-                        </option>
-                      ))}
-                    </select>
-                    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
-                      <ChevronRight className="text-[#3F2965]/40 rotate-90" size={20} />
-                    </div>
-                  </div>
-
-                  <div className="mt-6 p-4 bg-[#F9F6FF]/50 rounded-xl">
-                    <p className="text-xs text-[#3F2965]/70 leading-relaxed">
-                      <span className="font-semibold">💡 Tip:</span> Not sure which therapy to choose? You can discuss this with your therapist during your first session, or select "Custom Therapy Plan" for a personalized approach.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            {/* 3. Slot Selection */}
-            <section>
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 rounded-2xl bg-[#3F2965] text-white flex items-center justify-center font-bold text-lg shadow-lg shadow-[#3F2965]/20">3</div>
-                <h2 className="text-2xl font-bold">Select a Time Slot</h2>
-              </div>
-
-              {/* Slot Mode Filter */}
-              <div className="bg-white/60 rounded-3xl p-6 mb-8 border border-[#3F2965]/5">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-2xl bg-[#F9F6FF] flex items-center justify-center">
-                    <MapPin className="text-[#Dd1764]" size={20} />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-lg text-[#3F2965]">Session Mode</h3>
-                    <p className="text-sm text-[#3F2965]/60">Choose how you'd like to have your session</p>
-                  </div>
-                </div>
-
-                <div className="flex flex-wrap gap-3">
-                  <button
-                    onClick={() => setSlotModeFilter("BOTH")}
-                    className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-300 ${
-                      slotModeFilter === "BOTH"
-                        ? "bg-[#3F2965] text-white shadow-lg shadow-[#3F2965]/20"
-                        : "bg-white text-[#3F2965] hover:bg-[#3F2965]/10 border border-[#3F2965]/20"
-                    }`}
-                  >
-                    All Sessions
-                  </button>
-                  <button
-                    onClick={() => setSlotModeFilter("ONLINE")}
-                    className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-300 ${
-                      slotModeFilter === "ONLINE"
-                        ? "bg-green-600 text-white shadow-lg shadow-green-600/20"
-                        : "bg-white text-green-700 hover:bg-green-50 border border-green-200"
-                    }`}
-                  >
-                    🖥️ Online Only
-                  </button>
-                  <button
-                    onClick={() => setSlotModeFilter("OFFLINE")}
-                    className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-300 ${
-                      slotModeFilter === "OFFLINE"
-                        ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20"
-                        : "bg-white text-blue-700 hover:bg-blue-50 border border-blue-200"
-                    }`}
-                  >
-                    🏢 In-Person Only
-                  </button>
-                </div>
-
-                {therapyType && (
-                  <div className="mt-4 p-3 bg-[#F9F6FF]/50 rounded-xl">
-                    <p className="text-xs text-[#3F2965]/70">
-                      <span className="font-semibold">{therapyType}</span> sessions are available. Use the filters above to view online or in-person options.
-                    </p>
-                  </div>
-                )}
-              </div>
-
-              {loading && (
-                <div className="p-12 text-center">
-                  <div className="animate-spin w-8 h-8 border-4 border-[#Dd1764] border-t-transparent rounded-full mx-auto mb-4"/>
-                  <p className="text-[#3F2965]/50">Loading availability...</p>
-                </div>
-              )}
-              
-              {!loading && safeSlots.length === 0 && (
-                <div className="bg-white p-10 rounded-3xl text-center border-2 border-dashed border-[#3F2965]/10">
-                  <MapPin className="mx-auto text-[#3F2965]/20 mb-4" size={48} />
-                  <p className="font-bold text-lg text-[#3F2965]/80">No slots match your current filter.</p>
-                  <p className="text-sm text-[#3F2965]/50 mb-4">
-                    Try changing your session mode preference or check back later for more availability.
-                  </p>
-                  <button
-                    onClick={() => setSlotModeFilter("BOTH")}
-                    className="px-4 py-2 bg-[#3F2965] text-white rounded-xl text-sm font-semibold hover:bg-[#3F2965]/90 transition-colors"
-                  >
-                    Show All Sessions
-                  </button>
-                </div>
-              )}
-
-              {!loading && safeSlots.length === 0 && (
-                <div className="bg-white p-10 rounded-3xl text-center border-2 border-dashed border-[#3F2965]/10">
-                  <Calendar className="mx-auto text-[#3F2965]/20 mb-4" size={48} />
-                  <p className="font-bold text-lg text-[#3F2965]/80">No slots available right now.</p>
-                  <p className="text-sm text-[#3F2965]/50">Please check back later or contact us directly.</p>
-                </div>
-              )}
-
-              {!loading && safeSlots.length > 0 && (
-                <div className="space-y-10">
-                  {Object.entries(groupedSlots).map(([dateString, dateSlots]) => (
-                    <div key={dateString} className="relative">
-                      {/* Sticky Date Header with Backdrop Blur */}
-                      <div className="sticky top-0 z-10 -mx-4 px-4 bg-[#F9F6FF]/90 backdrop-blur-md py-4 mb-4 flex items-center gap-3">
-                         <div className="h-px flex-1 bg-[#3F2965]/10"></div>
-                         <span className="font-bold text-[#3F2965]/80 bg-white px-5 py-2 rounded-full text-sm shadow-sm border border-[#3F2965]/5">
-                            {dateString}
-                         </span>
-                         <div className="h-px flex-1 bg-[#3F2965]/10"></div>
-                      </div>
-
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {dateSlots.map((slot) => {
-                          const start = new Date(slot.startTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-                          const end = new Date(slot.endTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-                          const isSelected = selectedSlot?.id === slot.id;
-
-                          return (
-                            <button
-                              key={slot.id}
-                              onClick={() => setSelectedSlot(slot)}
-                              className={`relative p-5 rounded-2xl border transition-all duration-300 group ${
-                                isSelected
-                                  ? "bg-[#3F2965] text-white border-[#3F2965] shadow-lg shadow-[#3F2965]/20 scale-[1.02]"
-                                  : "bg-white border-transparent hover:border-[#Dd1764]/30 hover:shadow-md"
-                              }`}
-                            >
-                              <div className="flex justify-between items-center mb-3">
-                                 <div className={`text-[10px] font-bold px-2 py-1 rounded-lg uppercase tracking-wider flex items-center gap-1.5 ${
-                                    slot.mode === 'ONLINE' 
-                                      ? (isSelected ? 'bg-white/20 text-white' : 'bg-green-50 text-green-700')
-                                      : (isSelected ? 'bg-white/20 text-white' : 'bg-blue-50 text-blue-700')
-                                  }`}>
-                                    <MapPin size={10} />
-                                    {slot.mode}
-                                  </div>
-                                  {isSelected && <CheckCircle size={16} className="text-[#Dd1764] fill-white" />}
-                              </div>
-                              
-                              <p className="font-bold text-xl mb-1">
-                                {start}
-                              </p>
-                              <p className={`text-xs ${isSelected ? "text-white/60" : "text-[#3F2965]/40"}`}>
-                                 Until {end}
-                              </p>
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </section>
-          </div>
-
-          {/* ================= RIGHT COLUMN: SUMMARY & ACTION (Sticky) ================= */}
-          <div className="lg:col-span-4">
-            <div className="sticky top-8">
-              
-              {/* Unified Ticket Card */}
-              <div className="bg-white rounded-[2rem] shadow-2xl shadow-[#3F2965]/10 border border-[#3F2965]/5 overflow-hidden">
+            {/* ================= RIGHT COLUMN: SUMMARY & ACTION (Sticky) ================= */}
+            <div className="lg:col-span-4">
+              <div className="sticky top-8">
                 
+                {/* Unified Ticket Card */}
                 <div className="bg-white rounded-[2rem] shadow-2xl shadow-[#3F2965]/10 border border-[#3F2965]/5 overflow-hidden">
                   
-                  {/* Session Details */}
-                  {!selectedSlot ? (
-                    <div className="text-center py-6 border-2 border-dashed border-gray-100 rounded-2xl">
-                      <Clock size={32} className="mx-auto mb-3 text-gray-300" />
-                      <p className="text-sm text-gray-400">Select a time slot to continue</p>
-                    </div>
-                  ) : (
-                    <div className="space-y-4">
-                      <div className="flex justify-between items-center pb-4 border-b border-gray-100">
-                        <div>
-                          <p className="text-xs text-gray-400 font-bold uppercase tracking-wider">Date</p>
-                          <p className="font-bold text-[#3F2965]">
-                            {new Date(selectedSlot.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
-                          </p>
-                        </div>
-                        <div className="text-right">
-                           <p className="text-xs text-gray-400 font-bold uppercase tracking-wider">Time</p>
-                           <p className="font-bold text-[#3F2965]">
-                             {new Date(selectedSlot.startTime).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}
-                           </p>
-                        </div>
-                      </div>
-
-                      <div className="flex justify-between items-center">
-                         <div>
-                            <p className="text-xs text-gray-400 font-bold uppercase tracking-wider">Type</p>
-                            <p className="font-semibold text-[#Dd1764]">
-                              {type === "FIRST" ? "First Session" : "Follow-up"}
-                            </p>
-                         </div>
-                         <span className={`px-3 py-1 rounded-full text-xs font-bold ${selectedSlot.mode === 'ONLINE' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}`}>
-                            {selectedSlot.mode}
-                         </span>
-                      </div>
-
-                      {therapyType && (
-                        <div className="flex justify-between items-center">
-                          <div>
-                            <p className="text-xs text-gray-400 font-bold uppercase tracking-wider">Therapy</p>
-                            <p className="font-semibold text-[#3F2965]">
-                              {therapyType}
-                            </p>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Optional Reason Input */}
-                  <div>
-                      <label className="text-xs font-bold text-[#3F2965]/60 mb-2 block uppercase tracking-wider">
-                        Anything to share? (Optional)
-                      </label>
-                      <textarea
-                        className="w-full bg-[#F9F6FF] border border-transparent focus:bg-white focus:border-[#Dd1764]/20 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#Dd1764]/10 resize-none transition-all"
-                        rows={2}
-                        value={reason}
-                        onChange={(e) => setReason(e.target.value)}
-                        placeholder="I'm feeling anxious about..."
-                      />
-                  </div>
-
                   <div className="p-6 md:p-8 space-y-6">
+                    {/* Session Details */}
                     {!selectedSlot ? (
                       <div className="text-center py-6 border-2 border-dashed border-gray-100 rounded-2xl">
                         <Clock size={32} className="mx-auto mb-3 text-gray-300" />
@@ -682,30 +537,41 @@ export default function BookPage() {
 
                         <div className="flex justify-between items-center">
                           <div>
-                              <p className="text-xs text-gray-400 font-bold uppercase tracking-wider">Type</p>
-                              <p className="font-semibold text-[#Dd1764]">
-                                {type === "FIRST" ? "First Session" : "Follow-up"}
-                              </p>
+                            <p className="text-xs text-gray-400 font-bold uppercase tracking-wider">Type</p>
+                            <p className="font-semibold text-[#Dd1764]">
+                              {type === "FIRST" ? "First Session" : "Follow-up"}
+                            </p>
                           </div>
                           <span className={`px-3 py-1 rounded-full text-xs font-bold ${selectedSlot.mode === 'ONLINE' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}`}>
-                              {selectedSlot.mode}
+                            {selectedSlot.mode}
                           </span>
                         </div>
+
+                        {therapyType && (
+                          <div className="flex justify-between items-center">
+                            <div>
+                              <p className="text-xs text-gray-400 font-bold uppercase tracking-wider">Therapy</p>
+                              <p className="font-semibold text-[#3F2965]">
+                                {therapyType}
+                              </p>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     )}
 
                     {/* Reason Input */}
                     <div>
-                        <label className="text-xs font-bold text-[#3F2965]/60 mb-2 block uppercase tracking-wider">
-                          Anything to share? (Optional)
-                        </label>
-                        <textarea
-                          className="w-full bg-[#F9F6FF] border border-transparent focus:bg-white focus:border-[#Dd1764]/20 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#Dd1764]/10 resize-none transition-all"
-                          rows={2}
-                          value={reason}
-                          onChange={(e) => setReason(e.target.value)}
-                          placeholder="I'm feeling anxious about..."
-                        />
+                      <label className="text-xs font-bold text-[#3F2965]/60 mb-2 block uppercase tracking-wider">
+                        Anything to share? (Optional)
+                      </label>
+                      <textarea
+                        className="w-full bg-[#F9F6FF] border border-transparent focus:bg-white focus:border-[#Dd1764]/20 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#Dd1764]/10 resize-none transition-all"
+                        rows={2}
+                        value={reason}
+                        onChange={(e) => setReason(e.target.value)}
+                        placeholder="I'm feeling anxious about..."
+                      />
                     </div>
 
                     {/* Payment & Confirm */}
@@ -801,18 +667,19 @@ export default function BookPage() {
                       </motion.div>
                     )}
                   </div>
-                </div>
 
-                {/* Trust Badges */}
-                <div className="mt-6 flex justify-center gap-6 text-[#3F2965]/40 grayscale opacity-60">
-                    <div className="flex items-center gap-1.5 text-xs font-medium">
-                      <ShieldCheck size={14} /> Secure
+                  {/* Trust Badges */}
+                  <div className="p-6 border-t border-gray-100">
+                    <div className="flex justify-center gap-6 text-[#3F2965]/40 grayscale opacity-60">
+                      <div className="flex items-center gap-1.5 text-xs font-medium">
+                        <ShieldCheck size={14} /> Secure
+                      </div>
+                      <div className="flex items-center gap-1.5 text-xs font-medium">
+                        <UserIcon size={14} /> Private
+                      </div>
                     </div>
-                    <div className="flex items-center gap-1.5 text-xs font-medium">
-                      <UserIcon size={14} /> Private
-                    </div>
+                  </div>
                 </div>
-
               </div>
             </div>
           </div>

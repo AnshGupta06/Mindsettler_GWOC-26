@@ -14,6 +14,11 @@ const app = express();
 // 1. Helmet: Sets various HTTP headers for security
 app.use(helmet());
 
+const allowedOrigins = [
+  "http://localhost:3000", // Next.js Localhost
+  // "https://mindsettler.vercel.app" <--- UNCOMMENT & ADD YOUR LIVE URL HERE LATER
+];
+
 app.use(cors({
   origin: function (origin, callback) {
     // Allow requests with no origin (like mobile apps, curl, or Postman)
@@ -54,11 +59,6 @@ const limiter = rateLimit({
   legacyHeaders: false, 
 });
 app.use('/api', limiter);
-const allowedOrigins = [
-  "http://localhost:3000", // Next.js Localhost
-  // "https://mindsettler.vercel.app" <--- UNCOMMENT & ADD YOUR LIVE URL HERE LATER
-];
-
 
 app.use(express.json());
 app.use("/api/admin/", adminBookingRoutes);

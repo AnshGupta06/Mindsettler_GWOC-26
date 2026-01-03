@@ -298,7 +298,7 @@ export default function AdminSlotsPage() {
               </div>
 
               <div>
-                <label className="text-xs font-bold text-[#3F2965]/60 uppercase ml-1">Therapy Type (Optional)</label>
+                <label className="text-xs font-bold text-[#3F2965]/60 uppercase ml-1">Therapy Type</label>
                 <select
                   value={therapyType}
                   onChange={(e) => setTherapyType(e.target.value)}

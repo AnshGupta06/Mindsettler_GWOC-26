@@ -59,7 +59,7 @@ async function main() {
         startTime: slotTime(date, 10),
         endTime: slotTime(date, 11),
         mode: "ONLINE",
-        therapyType: "Cognitive Behavioral Therapy",
+        therapyType: "Cognitive Behavioural Therapy (CBT)",
         isBooked: false,
       },
       {
@@ -67,7 +67,7 @@ async function main() {
         startTime: slotTime(date, 12),
         endTime: slotTime(date, 13),
         mode: "ONLINE",
-        therapyType: "Mindfulness Meditation",
+        therapyType: "Dialectical Behavioural Therapy (DBT)",
         isBooked: false,
       },
       {
@@ -75,7 +75,7 @@ async function main() {
         startTime: slotTime(date, 16),
         endTime: slotTime(date, 17),
         mode: "OFFLINE",
-        therapyType: "Counseling Session",
+        therapyType: "Acceptance & Commitment Therapy (ACT)",
         isBooked: false,
       }
     );
@@ -86,6 +86,20 @@ async function main() {
     skipDuplicates: true,
   });
   console.log(`✅ Created ${slots.length} therapy slots`);
+
+  // Update existing slots with wrong names
+  await prisma.sessionSlot.updateMany({
+    where: { therapyType: "Cognitive Behavioral Therapy" },
+    data: { therapyType: "Cognitive Behavioural Therapy (CBT)" },
+  });
+  await prisma.sessionSlot.updateMany({
+    where: { therapyType: "Mindfulness Meditation" },
+    data: { therapyType: "Mindfulness-Based Cognitive Therapy (MBCT)" },
+  });
+  await prisma.sessionSlot.updateMany({
+    where: { therapyType: "Counseling Session" },
+    data: { therapyType: "Client-Centred Therapy" },
+  });
 
   // Create test bookings
   console.log("📌 Creating test bookings...");

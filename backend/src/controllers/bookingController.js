@@ -95,15 +95,20 @@ export const getSlots = async (req, res) => {
     const { therapyType } = req.query;
     const now = new Date();
     
+    const whereCondition = {
+      isBooked: false,
+      startTime: { gt: now },
+    };
+
+    if (therapyType) {
+      whereCondition.OR = [
+        { therapyType: null }, // General slots available for all therapies
+        { therapyType }, // Slots specific to selected therapy
+      ];
+    }
+
     const slots = await prisma.sessionSlot.findMany({
-      where: {
-        isBooked: false,
-        startTime: { gt: now },
-        OR: [
-          { therapyType: null }, // General slots available for all therapies
-          { therapyType: therapyType || undefined }, // Slots specific to selected therapy
-        ],
-      },
+      where: whereCondition,
       orderBy: { startTime: "asc" },
     });
 
