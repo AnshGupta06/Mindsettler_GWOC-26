@@ -33,78 +33,6 @@ type CorporateFormValues = z.infer<typeof corporateFormSchema>;
 // This would typically be fetched, but for static site we can import directly
 import workshopsData from '@/data/workshops.json';
 
-// Custom Input component with pink background and purple border - completely custom
-const PinkInput = ({ className, onFocus, onBlur, ...props }: React.ComponentProps<typeof Input>) => {
-  const [isFocused, setIsFocused] = useState(false);
-
-  const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
-    setIsFocused(true);
-    onFocus?.(e);
-  };
-
-  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    setIsFocused(false);
-    onBlur?.(e);
-  };
-
-  return (
-    <input
-      type={props.type || 'text'}
-      className={`
-        flex h-10 w-full rounded-md border px-3 py-2 text-base 
-        file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground 
-        placeholder:text-gray-400 
-        focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 
-        disabled:cursor-not-allowed disabled:opacity-50 md:text-sm
-        transition-all duration-200
-        ${isFocused 
-          ? 'bg-pink-50 border-purple-500 ring-2 ring-purple-500 ring-offset-0' 
-          : 'bg-white border-pink-200'
-        }
-        ${className || ''}
-      `}
-      onFocus={handleFocus}
-      onBlur={handleBlur}
-      {...props}
-    />
-  );
-};
-
-// Custom Textarea component with pink background and purple border - completely custom
-const PinkTextarea = ({ className, onFocus, onBlur, ...props }: React.ComponentProps<typeof Textarea>) => {
-  const [isFocused, setIsFocused] = useState(false);
-
-  const handleFocus = (e: React.FocusEvent<HTMLTextAreaElement>) => {
-    setIsFocused(true);
-    onFocus?.(e);
-  };
-
-  const handleBlur = (e: React.FocusEvent<HTMLTextAreaElement>) => {
-    setIsFocused(false);
-    onBlur?.(e);
-  };
-
-  return (
-    <textarea
-      className={`
-        flex min-h-[80px] w-full rounded-md border px-3 py-2 text-base 
-        placeholder:text-gray-400 
-        focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 
-        disabled:cursor-not-allowed disabled:opacity-50 md:text-sm
-        transition-all duration-200
-        ${isFocused 
-          ? 'bg-pink-50 border-purple-500 ring-2 ring-purple-500 ring-offset-0' 
-          : 'bg-white border-pink-200'
-        }
-        ${className || ''}
-      `}
-      onFocus={handleFocus}
-      onBlur={handleBlur}
-      {...props}
-    />
-  );
-};
-
 // Faster Scroll reveal animation component
 const FastScrollReveal = ({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) => {
   const ref = useRef(null);
@@ -144,7 +72,6 @@ type CarouselItem = {
   title: string;
   description: string;
   image: string;
-  overlay: string;
   stats?: Array<{ label: string; value: string }>;
   highlight?: string;
 };
@@ -159,7 +86,6 @@ const CorporateWellnessCarousel = () => {
       title: "Corporate Wellness Programs",
       description: "Invest in your team's most valuable asset: their mental well-being. We partner with organizations to build healthier, more resilient workplaces.",
       image: "https://images.unsplash.com/photo-1573164713988-8665fc963095?q=80&w=2069&auto=format&fit=crop",
-      overlay: "bg-gradient-to-br from-[#3f2965]/80 via-[#5a3d8a]/70 to-[#3f2965]/80",
       stats: [
         { label: "Employee Satisfaction", value: "89%" },
         { label: "Productivity Increase", value: "25%" },
@@ -170,35 +96,30 @@ const CorporateWellnessCarousel = () => {
       title: "Increased Productivity",
       description: "Companies with wellness programs see up to 25% increase in employee productivity and 30% reduction in healthcare costs.",
       image: "https://images.unsplash.com/photo-1551434678-e076c223a692?q=80&w=2070&auto=format&fit=crop",
-      overlay: "bg-gradient-to-br from-pink-600/80 via-purple-600/70 to-pink-600/80",
       highlight: "25% Productivity Boost"
     },
     {
       title: "Reduced Absenteeism",
       description: "Wellness initiatives can reduce absenteeism by up to 28% through better health management and preventive care.",
       image: "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=2070&auto=format&fit=crop",
-      overlay: "bg-gradient-to-br from-purple-600/80 via-pink-600/70 to-purple-600/80",
       highlight: "28% Less Absenteeism"
     },
     {
       title: "Higher Retention",
       description: "87% of employees consider health and wellness offerings when choosing an employer, leading to 40% lower turnover.",
       image: "https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=2070&auto=format&fit=crop",
-      overlay: "bg-gradient-to-br from-pink-500/80 via-purple-500/70 to-pink-500/80",
       highlight: "40% Lower Turnover"
     },
     {
       title: "Better Mental Health",
       description: "Mental wellness programs reduce stress levels by 33% and improve focus by 42%, creating healthier work environments.",
       image: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?q=80&w=2032&auto=format&fit=crop",
-      overlay: "bg-gradient-to-br from-purple-500/80 via-pink-500/70 to-purple-500/80",
       highlight: "42% Better Focus"
     },
     {
       title: "ROI on Wellness",
       description: "For every $1 invested in employee wellness, companies see an average return of $3-4 in reduced costs and increased productivity.",
       image: "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?q=80&w=2070&auto=format&fit=crop",
-      overlay: "bg-gradient-to-br from-pink-700/80 via-purple-700/70 to-pink-700/80",
       highlight: "$3-4 ROI per $1"
     }
   ];
@@ -262,16 +183,16 @@ const CorporateWellnessCarousel = () => {
               }}
             />
             
-            {/* Overlay */}
-            <div className={`absolute inset-0 z-1 ${item.overlay}`} />
+            {/* Light overlay for better text readability */}
+            <div className="absolute inset-0 bg-black/60" />
             
             {/* Content */}
             <div className="relative z-10 h-full flex items-center">
               <div className="container mx-auto px-4 py-8">
-                <div className="max-w-4xl mx-auto text-center text-white">
+                <div className="max-w-4xl mx-auto text-center">
                   {item.type === 'intro' ? (
                     <>
-                      <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
+                      <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight text-white">
                         {item.title}
                       </h1>
                       <p className="text-lg md:text-xl text-white/90 mb-10 max-w-2xl mx-auto">
@@ -283,7 +204,7 @@ const CorporateWellnessCarousel = () => {
                             key={idx}
                             className="bg-white/20 backdrop-blur-sm rounded-xl p-4 md:p-6 min-w-[140px] md:min-w-[180px]"
                           >
-                            <div className="text-2xl md:text-3xl font-bold">{stat.value}</div>
+                            <div className="text-2xl md:text-3xl font-bold text-white">{stat.value}</div>
                             <div className="text-white/80 text-sm md:text-base mt-2">{stat.label}</div>
                           </div>
                         ))}
@@ -294,7 +215,7 @@ const CorporateWellnessCarousel = () => {
                       <div className="inline-block bg-white/30 backdrop-blur-sm px-4 py-2 rounded-full mb-6">
                         <span className="text-white font-semibold text-sm md:text-base">{item.highlight}</span>
                       </div>
-                      <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-6">
+                      <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-6 text-white">
                         {item.title}
                       </h2>
                       <p className="text-lg md:text-xl text-white/90 max-w-2xl mx-auto">
@@ -566,13 +487,17 @@ export default function CorporatePage() {
         </FastScrollReveal>
         
         <FastScrollReveal delay={0.1}>
-          <Card 
-            className="p-6 shadow-lg border-pink-100"
-            style={{ backgroundColor: '#f9f6ff' }}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="bg-white p-8 rounded-3xl shadow-xl border border-softPurple/20 relative overflow-hidden"
           >
-            <CardContent className="p-0">
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-accent/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
                   {['companyName', 'contactName', 'email', 'message'].map((fieldName, index) => (
                     <FastScrollReveal key={fieldName} delay={0.15 + index * 0.05}>
                       {fieldName === 'message' ? (
@@ -580,10 +505,10 @@ export default function CorporatePage() {
                           <FormItem>
                             <FormLabel className="font-medium" style={{ color: '#3f2965' }}>Your Message</FormLabel>
                             <FormControl>
-                              <PinkTextarea 
+                              <textarea
+                                className="w-full px-4 py-3 rounded-xl bg-lightBg border border-softPurple/30 focus:border-accent focus:ring-2 focus:ring-accent/10 outline-none transition-all placeholder:text-gray-400 text-primary resize-none min-h-[120px]"
                                 placeholder="Tell us about your organizational needs and goals..." 
-                                {...field} 
-                                className="min-h-[120px]"
+                                {...field}
                               />
                             </FormControl>
                             <FormMessage className="text-pink-600" />
@@ -600,13 +525,14 @@ export default function CorporatePage() {
                                  fieldName === 'contactName' ? 'Your Name' : 'Work Email'}
                               </FormLabel>
                               <FormControl>
-                                <PinkInput 
+                                <input
+                                  type={fieldName === 'email' ? 'email' : 'text'}
+                                  className="w-full px-4 py-3 rounded-xl bg-lightBg border border-softPurple/30 focus:border-accent focus:ring-2 focus:ring-accent/10 outline-none transition-all placeholder:text-gray-400 text-primary"
                                   placeholder={
                                     fieldName === 'companyName' ? 'Your Company Inc.' : 
                                     fieldName === 'contactName' ? 'Jane Doe' : 'jane.doe@company.com'
                                   }
-                                  type={fieldName === 'email' ? 'email' : 'text'}
-                                  {...field} 
+                                  {...field}
                                 />
                               </FormControl>
                               <FormMessage className="text-pink-600" />
@@ -642,9 +568,8 @@ export default function CorporatePage() {
                   </FastScrollReveal>
                 </form>
               </Form>
-            </CardContent>
-          </Card>
-        </FastScrollReveal>
+            </motion.div>
+          </FastScrollReveal>
       </div>
     </div>
   </div>
@@ -652,3 +577,4 @@ export default function CorporatePage() {
     </div>
   );
 }
+  

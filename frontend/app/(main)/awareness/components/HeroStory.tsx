@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { CharReveal } from "../../components/common/RevealComponent";
+import {  CharReveal } from "../../components/common/RevealComponent";
 
 
 const slides = [
@@ -61,13 +61,13 @@ export default function HeroStory() {
   return (
     <section className="relative bg-[#f9f6ff] rounded-2xl">
       {/* Page Heading */}
-<div className="relative max-w-7xl mx-auto px-6 pt-8 pb-2 text-center overflow-hidden">
-
-  <CharReveal delay={0.1} className="relative text-4xl md:text-5xl font-extrabold text-primary leading-tight justify-center"> Mental Health Awareness
-</CharReveal>
-
-</div>
-
+      <div className="relative max-w-7xl mx-auto px-6 pt-8 pb-2 text-center overflow-hidden">
+        <div className="relative text-4xl md:text-5xl font-extrabold text-primary leading-tight justify-center">
+            <CharReveal delay={0.1}>
+                Mental Health Awareness
+            </CharReveal>
+        </div>
+      </div>
 
       <div className="container mx-auto px-6 py-16 md:py-10">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
@@ -144,9 +144,8 @@ export default function HeroStory() {
               key={i}
               type="button"
               onClick={() => goToSlide(i)}
-              className={`h-1.5 transition-all duration-500 rounded-full ${
-                activeIndex === i ? "w-8 bg-accent" : "w-2 bg-softPurple"
-              }`}
+              className={`h-1.5 transition-all duration-500 rounded-full ${activeIndex === i ? "w-8 bg-accent" : "w-2 bg-softPurple"
+                }`}
             />
           ))}
         </div>

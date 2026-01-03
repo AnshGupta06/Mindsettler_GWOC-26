@@ -10,7 +10,7 @@ import {
 const router = express.Router();
 
 router.post("/", requireAuth, requireAdmin, createSlot);
-router.get("/",requireAuth, requireAdmin, getAllSlots); // It's okay if viewing slots is public, but usually admin lists are protected
+router.get("/",requireAuth, requireAdmin, getAllSlots); 
 router.delete("/:id", requireAuth, requireAdmin, deleteSlot);
 
 export default router;

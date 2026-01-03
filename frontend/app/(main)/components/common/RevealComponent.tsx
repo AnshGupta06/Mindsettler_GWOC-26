@@ -7,75 +7,73 @@ interface WrapperProps {
   children: React.ReactNode;
   className?: string;
   delay?: number;
+  onMouseEnter?: () => void;
+  onMouseLeave?: () => void;
 }
 
 interface CharRevealProps {
-  children: string; // Must be a string to split
+  children: string;
   className?: string;
   delay?: number;
 }
 
-// --- 1. Character-by-Character Slide (The "Alphabet" Reveal) ---
 export const CharReveal = ({ children, className = "", delay = 0 }: CharRevealProps) => {
-  const characters = children.split("");
+  const words = children.split(" ");
 
   return (
-    <motion.h1
-      className={`flex flex-wrap w-full overflow-hidden pb-2 ${className}`}
+    <motion.span
+      className={`inline-block overflow-hidden align-bottom pb-2 ${className}`}
       initial="hidden"
       whileInView="visible"
-      viewport={{ once: true, amount: 0.4 }}
-      transition={{ staggerChildren: 0.03, delayChildren: delay }}
+      viewport={{ once: true, margin: "-5%" }}
+      transition={{ 
+        staggerChildren: 0.03, 
+        delayChildren: delay 
+      }}
     >
-      {characters.map((char, index) => (
+      {words.map((word, i) => (
         <motion.span
-          key={index}
-          variants={{
-            hidden: { x: 20, opacity: 0 },
-            visible: {
-              x: 0,
-              opacity: 1,
-              transition: { duration: 0.5, ease: "easeOut" },
-            },
-          }}
-          className="inline-block whitespace-pre"
+          key={i}
+          className="inline-block whitespace-nowrap mr-[0.25em]"
+          transition={{ staggerChildren: 0.005 }} 
         >
-          {char}
+          {word.split("").map((char, j) => (
+            <motion.span
+              key={j}
+              className="inline-block"
+              variants={{
+                hidden: { 
+                  x: 20, 
+                  opacity: 0,
+                  scale: 1.1 
+                },
+                visible: {
+                  x: 0, 
+                  opacity: 1,
+                  scale: 1,
+                  transition: { 
+                    duration: 0.2, 
+                    ease: "easeOut" 
+                  },
+                },
+              }}
+            >
+              {char}
+            </motion.span>
+          ))}
         </motion.span>
       ))}
-    </motion.h1>
-  );
-};
-  
-// --- 2. Masked Slide Up (Block Reveal) ---
-export const MaskedReveal = ({ children, className = "", delay = 0 }: WrapperProps) => {
-  return (
-    // FIX: Added 'pb-1' here as well for safety
-    <div className={`relative overflow-hidden pb-1 ${className}`}>
-      <motion.div
-        initial={{ y: "110%" }}
-        whileInView={{ y: 0 }}
-        transition={{ 
-            duration: 0.75, 
-            ease: [0.33, 1, 0.68, 1],
-            delay: delay 
-        }}
-        viewport={{ once: true }}
-      >
-        {children}
-      </motion.div>
-    </div>
+    </motion.span>
   );
 };
 
-// --- 3. Standard Slide Up ---
 export const SlideUp = ({ children, className = "", delay = 0 }: WrapperProps) => {
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, delay: delay, ease: "easeOut" }}
-      viewport={{ once: true }}
+      transition={{ duration: 0.5, delay: delay, ease: "easeOut" }}
+      viewport={{ once: true, amount: 0.1 }}
       className={className}
     >
       {children}
@@ -83,14 +81,13 @@ export const SlideUp = ({ children, className = "", delay = 0 }: WrapperProps) =
   );
 };
 
-// --- 4. Stagger Container ---
 export const StaggerContainer = ({ children, className = "", delay = 0 }: WrapperProps) => {
   return (
     <motion.div
       initial="hidden"
       whileInView="visible"
-      viewport={{ once: true, amount: 0.2 }}
-      transition={{ staggerChildren: 0.1, delayChildren: delay }}
+      viewport={{ once: true, amount: 0.1 }}
+      transition={{ staggerChildren: 0.08, delayChildren: delay }}
       className={className}
     >
       {children}
@@ -98,7 +95,6 @@ export const StaggerContainer = ({ children, className = "", delay = 0 }: Wrappe
   );
 };
 
-// --- 5. Stagger Item ---
 export const StaggerItem = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => {
   return (
     <motion.div
@@ -112,14 +108,12 @@ export const StaggerItem = ({ children, className = "" }: { children: React.Reac
     </motion.div>
   );
 };
-// --- 6. Image Wipe Reveal (Mask slides left → right) ---
+
 export const ImageWipeReveal = ({ children, className = "", delay = 0 }: WrapperProps) => {
   return (
     <div className={`relative overflow-hidden ${className}`}>
-      {/* Image stays static */}
       {children}
 
-      {/* Wipe overlay */}
       <motion.div
         initial={{ x: "0%" }}
         whileInView={{ x: "100%" }}

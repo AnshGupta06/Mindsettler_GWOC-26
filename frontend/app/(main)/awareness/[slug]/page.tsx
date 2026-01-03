@@ -107,8 +107,8 @@ export default async function AwarenessDetailPage({
 
               {/* Header */}
               <div className="relative flex items-center gap-4 mb-8">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-md">
-                  <span className="text-white text-xl font-bold">?</span>
+                <div className="w-12 h-12 rounded-xl bg-[#d9d2e0] flex items-center justify-center shadow-md">
+                  <span className="text-primary text-xl font-bold">?</span>
                 </div>
                 <h2 className="text-3xl md:text-4xl font-bold text-primary leading-tight">
                   <CharReveal delay={0.05} className="justify-center">
@@ -283,7 +283,7 @@ export default async function AwarenessDetailPage({
                       <div className="group h-full bg-white rounded-2xl p-7 md:p-8 border border-softPurple/30 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:border-primary/40">
 
                         {/* Step badge */}
-                        <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center mb-5 text-white text-xl font-bold transition-transform duration-300 group-hover:scale-110">
+                        <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mb-5 text-primary text-xl font-bold transition-transform duration-300 group-hover:scale-110">
                           {idx + 1}
                         </div>
 

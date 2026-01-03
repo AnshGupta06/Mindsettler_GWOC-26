@@ -1,18 +1,81 @@
 "use client";
 
-import React from "react";
+import React, { useState, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
-import Reveal from "../components/common/Reveal";
-import { CharReveal, SlideUp } from "../components/common/RevealComponent";
+import { ArrowRight, Play, Pause, Volume2, VolumeX, RotateCcw } from "lucide-react"; 
+import { CharReveal, SlideUp, ImageWipeReveal } from "../components/common/RevealComponent";
 
 export default function AboutPage() {
-    const videoRef = React.useRef<HTMLVideoElement>(null);
+    const videoRef = useRef<HTMLVideoElement>(null);
+    const [isPlaying, setIsPlaying] = useState(false);
+    const [isMuted, setIsMuted] = useState(false); // Default: Unmuted
+
+    // 1. Play Video
+    const handlePlay = () => {
+        if (videoRef.current) {
+            videoRef.current.muted = false; // Ensure sound is on by default
+            setIsMuted(false);
+            videoRef.current.play()
+                .then(() => setIsPlaying(true))
+                .catch((err) => console.error("Playback failed:", err));
+        }
+    };
+
+    // 2. Pause Video
+    const handlePause = () => {
+        if (videoRef.current) {
+            videoRef.current.pause();
+            setIsPlaying(false);
+        }
+    };
+
+    // 3. Toggle Play/Pause (for main container click)
+    const togglePlay = () => {
+        if (videoRef.current) {
+            if (videoRef.current.paused) {
+                handlePlay();
+            } else {
+                handlePause();
+            }
+        }
+    };
+
+    // 4. Restart Video
+    const restartVideo = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (videoRef.current) {
+            videoRef.current.currentTime = 0;
+            handlePlay();
+        }
+    };
+
+    // 5. Toggle Mute
+    const toggleMute = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (videoRef.current) {
+            const newState = !videoRef.current.muted;
+            videoRef.current.muted = newState;
+            setIsMuted(newState);
+        }
+    };
+
+    // 6. Handle Video End (Reset to initial state)
+    const handleVideoEnd = () => {
+        setIsPlaying(false);
+        if (videoRef.current) {
+            videoRef.current.currentTime = 0;
+            videoRef.current.load(); // Reloads to show the poster
+            // Reset to default settings (Unmuted)
+            videoRef.current.muted = false;
+            setIsMuted(false);
+        }
+    };
+
     return (
         <>
         <main className="bg-white">
-            {/* --- HERO SECTION: Simple & Elegant --- */}
+            {/* --- HERO SECTION --- */}
             <section className="min-h-[85vh] flex items-center pt-24 pb-12 px-4 sm:px-6 md:px-8 relative overflow-hidden bg-white">
                 <div className="max-w-7xl mx-auto w-full grid lg:grid-cols-2 gap-8 lg:gap-11 items-center">
 
@@ -26,7 +89,9 @@ export default function AboutPage() {
                         </SlideUp>
 
                         <div className="text-5xl sm:text-6xl md:text-[5.5rem] leading-[1.05] font-bold text-[#3F2965] tracking-tight mb-8">
-                            <CharReveal delay={0}>Redefining</CharReveal>
+                            <div className="inline-block">
+                                <CharReveal delay={0}>Redefining</CharReveal>
+                            </div>
                             <span className="block text-[#Dd1764] italic font-light font-serif">
                                 <CharReveal delay={0.2}>Mental Wellness</CharReveal>
                             </span>
@@ -51,44 +116,41 @@ export default function AboutPage() {
                         </SlideUp>
                     </div>
 
-                    {/* IMAGE / VISUAL: Single Elegant Image */}
+                    {/* IMAGE / VISUAL */}
                     <div className="order-1 lg:order-2 relative flex justify-center lg:justify-end">
-                        <SlideUp delay={0.2} className="w-full max-w-xl">
+                        <ImageWipeReveal delay={0.2} className="w-full max-w-xl">
                             <div className="relative aspect-[4/4] w-full rounded-tl-[100px] rounded-br-[100px] rounded-tr-3xl rounded-bl-3xl overflow-hidden shadow-2xl">
                                 <Image
                                     src="/assets/aboutus_hero.jpeg"
                                     alt="About Mindsettler"
                                     fill
                                     className="object-cover hover:scale-105 transition-transform duration-700 ease-out"
+                                    priority
                                 />
-                                {/* Subtle overlay for better integration if needed, but keeping it clean for now */}
                                 <div className="absolute inset-0 ring-1 ring-black/5 rounded-tl-[100px] rounded-br-[100px] rounded-tr-3xl rounded-bl-3xl pointer-events-none" />
                             </div>
-                            {/* Floating decorative element */}
                             <div className="absolute -bottom-8 -left-8 w-24 h-24 bg-[#f3ecff] rounded-full -z-10 blur-xl opacity-80" />
                             <div className="absolute -top-8 -right-8 w-32 h-32 bg-[#Dd1764]/5 rounded-full -z-10 blur-2xl" />
-                        </SlideUp>
+                        </ImageWipeReveal>
                     </div>
 
                 </div>
             </section>
 
-            {/* --- VISION SECTION (Redesigned) --- */}
+            {/* --- VISION SECTION --- */}
             <section className="py-26 px-4 sm:px-6 relative overflow-hidden bg-white">
-                {/* Creative Typographic Background */}
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full text-center pointer-events-none opacity-[0.03] select-none">
                     <h2 className="text-[15rem] font-black text-[#3F2965]">VISION</h2>
                 </div>
 
                 <div className="max-w-4xl mx-auto w-full text-center relative z-10">
-                    <Reveal>
-                        <div className="mb-12">
-                            <h2 className="text-3xl md:text-5xl font-bold bg-clip-text text-[#3F2965] inline-block">
+                    <div className="mb-12">
+                        <h2 className="text-3xl md:text-5xl font-bold bg-clip-text text-[#3F2965] inline-block">
+                            <CharReveal delay={0.1}>
                                 Our Vision
-                            </h2>
-                            {/* <div className="w-16 h-1.5 bg-[#Dd1764] mx-auto rounded-full mt-4" /> */}
-                        </div>
-                    </Reveal>
+                            </CharReveal>
+                        </h2>
+                    </div>
 
                     <SlideUp delay={0.2}>
                         <div className="relative">
@@ -110,9 +172,8 @@ export default function AboutPage() {
                 </div>
             </section>
 
-            {/* --- FOUNDER SECTION (Left Aligned Title) --- */}
+            {/* --- FOUNDER SECTION --- */}
             <section className="py-8 px-4 sm:px-6 bg-white relative overflow-hidden">
-                {/* Background Decoration */}
                 <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-white rounded-full blur-[100px] translate-x-1/2 -translate-y-1/2" />
 
                 <div className="max-w-6xl mx-auto w-full relative z-10">
@@ -120,15 +181,16 @@ export default function AboutPage() {
 
                         {/* Founder Info */}
                         <div className="space-y-8 relative">
-                            {/* Decorative background for text area */}
                             <div className="absolute -left-20 -top-20 w-64 h-64 bg-[#Dd1764]/5 rounded-full blur-3xl -z-10" />
 
                             <SlideUp delay={0.2}>
                                 <div className="mb-8">
-                                    <Reveal>
-                                        <h2 className="text-4xl md:text-6xl font-bold text-[#3F2965] mb-2">Meet The Founder</h2>
-                                        <div className="w-24 h-1.5 bg-[#Dd1764] rounded-full" />
-                                    </Reveal>
+                                    <h2 className="text-4xl md:text-6xl font-bold text-[#3F2965] mb-2">
+                                        <CharReveal delay={0.1}>
+                                            Meet The Founder
+                                        </CharReveal>
+                                    </h2>
+                                    <div className="w-24 h-1.5 bg-[#Dd1764] rounded-full" />
                                 </div>
 
                                 <div className="flex items-center gap-6 mb-8">
@@ -162,62 +224,85 @@ export default function AboutPage() {
                             </SlideUp>
                         </div>
 
-                        {/* VIDEO SECTION */}
-                        <SlideUp delay={0.6} className="w-full">
+                        {/* VIDEO SECTION - Minimalist Controls */}
+                        <ImageWipeReveal delay={0.6} className="w-full">
                             <div
-                                className="relative w-full max-w-sm mx-auto aspect-[9/14] bg-black rounded-3xl overflow-hidden shadow-2xl group cursor-pointer group"
-                                onMouseEnter={() => {
-                                    if (videoRef.current) {
-                                        videoRef.current.muted = false;
-                                        const playPromise = videoRef.current.play();
-                                        if (playPromise !== undefined) {
-                                            playPromise.catch((error) => {
-                                                console.error("Auto-play prevented:", error);
-                                                // Fallback: Play muted if audio is blocked
-                                                if (videoRef.current) {
-                                                    videoRef.current.muted = true;
-                                                    videoRef.current.play();
-                                                }
-                                            });
-                                        }
-                                    }
-                                }}
-                                onMouseLeave={() => {
-                                    if (videoRef.current) {
-                                        videoRef.current.pause();
-                                        videoRef.current.currentTime = 0;
-
-                                        videoRef.current.load();
-                                    }
-                                }}
+                                className="relative w-full max-w-sm mx-auto aspect-[9/14] bg-black rounded-3xl overflow-hidden shadow-2xl cursor-pointer group"
+                                onClick={togglePlay} // Toggle Play/Pause on Click
                             >
                                 <video
                                     ref={videoRef}
-                                    loop
-                                    playsInline
+                                    playsInline // Crucial for mobile
+                                    muted={false} // Default Unmuted
                                     className="w-full h-full object-cover"
                                     poster="/assets/aboutus_videointro.jpeg"
-                                    onEnded={() => {
-                                    if (videoRef.current) {
-                                        videoRef.current.currentTime = 0;
-                                        videoRef.current.load();
-                                    }
-                                }}
+                                    onEnded={handleVideoEnd} // Reset when finished
+                                    onPause={() => setIsPlaying(false)}
+                                    onPlay={() => setIsPlaying(true)}
                                 >
                                     <source src="/assets/aboutus_video.mp4" type="video/mp4" />
                                     Your browser does not support the video tag.
                                 </video>
+
+                                {/* --- STATE 1: PAUSED (Bottom-Right CTA Badge) --- */}
+                                {!isPlaying && (
+                                    <div className="absolute bottom-6 right-6 z-20 group-hover:scale-105 transition-transform duration-300">
+                                        <div className="flex items-center gap-3 bg-white/20 backdrop-blur-md border border-white/30 px-5 py-3 rounded-full shadow-lg">
+                                            <span className="text-white font-semibold text-sm tracking-wide">Watch Story</span>
+                                            <div className="w-10 h-10 bg-white text-[#3F2965] rounded-full flex items-center justify-center shadow-md">
+                                                <Play size={20} fill="currentColor" className="ml-1" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* --- STATE 2: PLAYING (Minimalist Bottom Controls) --- */}
+                                {isPlaying && (
+                                    // Gradient overlay at the bottom for contrast
+                                    <div 
+                                        className="absolute bottom-0 left-0 right-0 z-20 p-5 bg-gradient-to-t from-black/70 via-black/30 to-transparent flex items-end justify-between"
+                                        onClick={(e) => e.stopPropagation()} // Prevent clicking bar from toggling main pause
+                                    >
+                                        
+                                        {/* Left: Play/Pause */}
+                                        <button 
+                                            onClick={togglePlay}
+                                            className="text-white/90 hover:text-white hover:scale-110 transition-all p-2 rounded-full bg-black/20 backdrop-blur-sm"
+                                            title={isPlaying ? "Pause" : "Play"}
+                                        >
+                                            {isPlaying ? <Pause size={24} fill="currentColor" /> : <Play size={24} fill="currentColor" />}
+                                        </button>
+
+                                        {/* Right: Restart & Mute */}
+                                        <div className="flex items-center gap-3">
+                                            {/* Restart */}
+                                            <button 
+                                                onClick={restartVideo}
+                                                className="text-white/90 hover:text-white hover:scale-110 transition-all p-2 rounded-full bg-black/20 backdrop-blur-sm"
+                                                title="Restart"
+                                            >
+                                                <RotateCcw size={20} />
+                                            </button>
+
+                                            {/* Mute Toggle */}
+                                            <button 
+                                                onClick={toggleMute}
+                                                className="text-white/90 hover:text-white hover:scale-110 transition-all p-2 rounded-full bg-black/20 backdrop-blur-sm"
+                                                title={isMuted ? "Unmute" : "Mute"}
+                                            >
+                                                {isMuted ? <VolumeX size={22} /> : <Volume2 size={22} />}
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
-                            <p className="text-center text-sm text-[#3F2965]/60 mt-4 italic">
-                                Hover on video to play the founder&apos;s message
-                            </p>
-                        </SlideUp>
+                        </ImageWipeReveal>
 
                     </div>
                 </div>
             </section>
 
         </main >
-                </>
+        </>
     );
 }

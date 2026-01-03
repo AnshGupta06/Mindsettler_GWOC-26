@@ -1,5 +1,6 @@
 import prisma from "../config/prisma.js";
 import { sendEmail } from "../services/emailService.js";
+import "dotenv/config";
 
 export const getAllBookings = async (req, res) => {
   try {
@@ -10,7 +11,7 @@ export const getAllBookings = async (req, res) => {
         slot: true,
       },
     });
-    
+
     res.json(bookings);
   } catch (err) {
     console.error("❌ Admin fetch bookings:", err);
@@ -21,13 +22,14 @@ export const getAllBookings = async (req, res) => {
 export const updateBookingStatus = async (req, res) => {
   try {
     const { id } = req.params;
-    const { status } = req.body; // CONFIRMED | REJECTED
+    const { status } = req.body;
 
+    // Guard: only allowed statuses
     if (!["CONFIRMED", "REJECTED"].includes(status)) {
       return res.status(400).json({ error: "Invalid status" });
     }
 
-    // 1. Fetch booking with User and Slot details (needed for email)
+    // Fetch booking with relations
     const booking = await prisma.booking.findUnique({
       where: { id },
       include: {
@@ -40,7 +42,7 @@ export const updateBookingStatus = async (req, res) => {
       return res.status(404).json({ error: "Booking not found" });
     }
 
-    // 2. Handle Rejection (Free up the slot)
+    // ------------------ REJECT FLOW ------------------
     if (status === "REJECTED") {
       await prisma.$transaction([
         prisma.booking.update({
@@ -52,49 +54,111 @@ export const updateBookingStatus = async (req, res) => {
           data: { isBooked: false },
         }),
       ]);
-    } 
-    // 3. Handle Confirmation
-    else {
+    }
+
+    // ------------------ CONFIRM FLOW ------------------
+    if (status === "CONFIRMED") {
       await prisma.booking.update({
         where: { id },
         data: { status },
       });
 
-      // 📧 SEND EMAIL NOTIFICATION (Only if Confirmed)
-      if (status === "CONFIRMED") {
-         const userEmail = booking.user.email;
-         const userName = booking.user.name || "there";
-         
-         // Format date nicely (e.g., "Monday, January 12, 2025 at 10:00 AM")
-         const date = new Date(booking.slot.startTime).toLocaleString('en-IN', { 
-            weekday: 'long', 
-            year: 'numeric', 
-            month: 'long', 
-            day: 'numeric', 
-            hour: '2-digit', 
-            minute: '2-digit' 
-         });
-         
-         const emailContent = `
-           <div style="font-family: Arial, sans-serif; color: #333; line-height: 1.6;">
-             <h2 style="color: #3F2965;">✅ Booking Confirmed!</h2>
-             <p>Hi ${userName},</p>
-             <p>Your session with <strong>MindSettler</strong> has been successfully confirmed.</p>
-             
-             <div style="background: #f9f6ff; padding: 20px; border-radius: 10px; margin: 20px 0; border: 1px solid #e0d4fc;">
-               <p style="margin: 5px 0;"><strong>📅 Date & Time:</strong> ${date}</p>
-               <p style="margin: 5px 0;"><strong>📍 Mode:</strong> ${booking.slot.mode}</p>
-               <p style="margin: 5px 0;"><strong>📝 Session Type:</strong> ${booking.type === 'FIRST' ? 'First Session' : 'Follow-up'}</p>
-             </div>
+      const userEmail = booking.user.email;
 
-             <p>Please ensure you are on time. If this is an online session, a meeting link will be shared with you shortly.</p>
-             <br/>
-             <p style="color: #666; font-size: 14px;">Warm regards,<br/><strong>Team MindSettler</strong></p>
-           </div>
-         `;
-       
-         // Send email asynchronously (no await, so it doesn't block the response)
-         sendEmail(userEmail, "✅ Your MindSettler Session is Confirmed", emailContent);
+      // 🚨 CRITICAL FIX: email existence check
+      if (!userEmail) {
+        console.error("❌ Cannot send confirmation email — user email missing", {
+          bookingId: booking.id,
+          userId: booking.user.id,
+        });
+      } else {
+        const userName = booking.user.name || "there";
+
+        const date = new Date(booking.slot.startTime).toLocaleString("en-IN", {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+
+        const emailContent = `
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Booking Confirmed</title>
+  </head>
+  <body style="margin:0; padding:0; background-color:#f4f4f7; font-family: Arial, Helvetica, sans-serif;">
+    <table width="100%" cellpadding="0" cellspacing="0">
+      <tr>
+        <td align="center" style="padding: 30px 15px;">
+          <table width="100%" style="max-width:600px; background:#ffffff; border-radius:12px; overflow:hidden;">
+            <tr>
+              <td style="background:#3F2965; padding:24px 32px;">
+                <h1 style="margin:0; font-size:22px; color:#ffffff;">MindSettler</h1>
+              </td>
+            </tr>
+
+            <tr>
+              <td style="padding:32px; color:#333;">
+                <h2 style="margin-top:0; color:#3F2965;">✅ Your Session is Confirmed</h2>
+
+                <p>Hi <strong>${userName}</strong>,</p>
+
+                <p>
+                  We’re happy to let you know that your session with
+                  <strong>MindSettler</strong> has been successfully confirmed.
+                </p>
+
+                <table width="100%" style="background:#f9f6ff; border:1px solid #e5dcff; border-radius:10px; margin:24px 0;">
+                  <tr>
+                    <td style="padding:20px;">
+                      <p><strong>📅 Date & Time:</strong> ${date}</p>
+                      <p><strong>📍 Mode:</strong> ${booking.slot.mode}</p>
+                      <p>
+                        <strong>📝 Session Type:</strong>
+                        ${booking.type === "FIRST" ? "First Session" : "Follow-up Session"}
+                      </p>
+                    </td>
+                  </tr>
+                </table>
+
+                <p>
+                  Please make sure to join on time.
+                  If this is an online session, the meeting link will be shared with you shortly.
+                </p>
+
+                <p style="margin-top:32px; font-size:14px; color:#555;">
+                  Warm regards,<br />
+                  <strong>Team MindSettler</strong>
+                </p>
+              </td>
+            </tr>
+
+            <tr>
+              <td style="background:#fafafa; padding:18px 32px; text-align:center;">
+                <p style="margin:0; font-size:12px; color:#888;">
+                  © ${new Date().getFullYear()} MindSettler. All rights reserved.
+                </p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
+        `;
+
+        console.log("📧 Sending confirmation email to:", userEmail);
+
+        sendEmail(
+          userEmail,
+          "✅ Your MindSettler Session is Confirmed",
+          emailContent
+        );
       }
     }
 

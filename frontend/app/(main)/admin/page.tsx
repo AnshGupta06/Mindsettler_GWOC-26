@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../../lib/firebase";
+import { API_URL } from "@/app/lib/api";
 import { 
   Calendar, 
   Clock, 
@@ -22,6 +23,7 @@ type Booking = {
   id: string;
   status: "PENDING" | "CONFIRMED" | "REJECTED";
   type: "FIRST" | "FOLLOW_UP";
+  therapyType?: string;
   reason?: string;
   user: {
     name?: string;
@@ -45,7 +47,7 @@ export default function AdminBookingsPage() {
 
   const fetchBookings = async (token: string) => {
     try {
-      const res = await fetch("http://localhost:5000/api/admin/bookings", {
+      const res = await fetch(`${API_URL}/api/admin/bookings`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -74,7 +76,7 @@ export default function AdminBookingsPage() {
     setBookings(prev => prev.map(b => b.id === id ? { ...b, status } : b));
 
     try {
-      await fetch(`http://localhost:5000/api/admin/bookings/${id}`, {
+      await fetch(`${API_URL}/api/admin/bookings/${id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -115,92 +117,97 @@ export default function AdminBookingsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F9F6FF] px-4 md:px-8 lg:px-12 pt-20 md:pt-24 pb-12 text-[#3F2965]">
+    // 1. Outer Container: White background with top padding (Clears Navbar)
+    <div className="min-h-screen bg-white pt-20 sm:pt-24 pb-8 sm:pb-12 px-4 sm:px-6 md:px-8">
       
-      {/* 1. HEADER & ACTIONS */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold flex items-center gap-3">
-            <LayoutDashboard className="text-[#Dd1764]" />
-            Admin Dashboard
-          </h1>
-          <p className="text-[#3F2965]/60 mt-1 text-sm md:text-base">Manage appointments and schedules</p>
-        </div>
-        
-        <button
-          onClick={() => router.push("/admin/slots")}
-          className="w-full md:w-auto justify-center px-6 py-3 bg-[#3F2965] text-white rounded-full font-bold shadow-lg hover:shadow-[#3F2965]/20 hover:scale-105 transition-all flex items-center gap-2"
-        >
-          <Calendar size={18} />
-          Manage Slots
-        </button>
-      </div>
-
-      {/* 2. CIRCULAR STATS (Responsive) */}
-      <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-12 px-2 md:px-8">
-        <StatCircle 
-          label="Total Requests" 
-          value={stats.total} 
-          icon={LayoutDashboard} 
-          color="border-[#3F2965]" 
-          bg="bg-[#3F2965]/5"
-          textColor="text-[#3F2965]"
-        />
-        
-        <div className="hidden md:block h-px flex-1 bg-gradient-to-r from-[#3F2965]/5 via-[#3F2965]/20 to-[#3F2965]/5" />
-        
-        <StatCircle 
-          label="Pending Action" 
-          value={stats.pending} 
-          icon={Clock} 
-          color="border-orange-400" 
-          bg="bg-orange-50"
-          textColor="text-orange-600"
-        />
-        
-        <div className="hidden md:block h-px flex-1 bg-gradient-to-r from-[#3F2965]/5 via-[#3F2965]/20 to-[#3F2965]/5" />
-        
-        <StatCircle 
-          label="Confirmed" 
-          value={stats.confirmed} 
-          icon={CheckCircle} 
-          color="border-emerald-500" 
-          bg="bg-emerald-50"
-          textColor="text-emerald-600"
-        />
-      </div>
-
-      {/* 3. FILTERS (Scrollable on mobile) */}
-      <div className="flex overflow-x-auto pb-4 mb-4 md:mb-8 border-b border-[#3F2965]/10 gap-2 no-scrollbar">
-        {["ALL", "PENDING", "CONFIRMED", "REJECTED"].map((f) => (
+      {/* 2. Inner Container: Purple Box (Main Content) */}
+      <div className="max-w-[1440px] mx-auto bg-[#F9F6FF] rounded-[2.5rem] p-6 md:p-12 shadow-sm min-h-[80vh] text-[#3F2965]">
+      
+        {/* 1. HEADER & ACTIONS */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold flex items-center gap-3">
+              <LayoutDashboard className="text-[#Dd1764]" />
+              Admin Dashboard
+            </h1>
+            <p className="text-[#3F2965]/60 mt-1 text-sm md:text-base">Manage appointments and schedules</p>
+          </div>
+          
           <button
-            key={f}
-            onClick={() => setFilter(f as any)}
-            className={`whitespace-nowrap px-4 py-2 rounded-full text-xs md:text-sm font-bold transition-all ${
-              filter === f 
-                ? "bg-[#3F2965] text-white shadow-md" 
-                : "bg-white text-[#3F2965]/60 hover:bg-white hover:text-[#3F2965]"
-            }`}
+            onClick={() => router.push("/admin/slots")}
+            className="w-full md:w-auto justify-center px-6 py-3 bg-[#3F2965] text-white rounded-full font-bold shadow-lg hover:shadow-[#3F2965]/20 hover:scale-105 transition-all flex items-center gap-2"
           >
-            {f === "ALL" ? "All Bookings" : f.charAt(0) + f.slice(1).toLowerCase()}
+            <Calendar size={18} />
+            Manage Slots
           </button>
-        ))}
-      </div>
-
-      {/* 4. BOOKINGS GRID (Adaptive Columns) */}
-      {loading ? (
-        <div className="text-center py-20 text-[#3F2965]/50 animate-pulse">Loading dashboard data...</div>
-      ) : filteredBookings.length === 0 ? (
-        <div className="text-center py-20 bg-white rounded-3xl border border-dashed border-[#3F2965]/20">
-          <p className="text-[#3F2965]/40">No bookings found in this category.</p>
         </div>
-      ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
-          {filteredBookings.map((b) => (
-            <BookingCard key={b.id} booking={b} onUpdate={updateStatus} />
+
+        {/* 2. CIRCULAR STATS (Responsive) */}
+        <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-12 px-2 md:px-8">
+          <StatCircle 
+            label="Total Requests" 
+            value={stats.total} 
+            icon={LayoutDashboard} 
+            color="border-[#3F2965]" 
+            bg="bg-[#3F2965]/5"
+            textColor="text-[#3F2965]"
+          />
+          
+          <div className="hidden md:block h-px flex-1 bg-gradient-to-r from-[#3F2965]/5 via-[#3F2965]/20 to-[#3F2965]/5" />
+          
+          <StatCircle 
+            label="Pending Action" 
+            value={stats.pending} 
+            icon={Clock} 
+            color="border-orange-400" 
+            bg="bg-orange-50"
+            textColor="text-orange-600"
+          />
+          
+          <div className="hidden md:block h-px flex-1 bg-gradient-to-r from-[#3F2965]/5 via-[#3F2965]/20 to-[#3F2965]/5" />
+          
+          <StatCircle 
+            label="Confirmed" 
+            value={stats.confirmed} 
+            icon={CheckCircle} 
+            color="border-emerald-500" 
+            bg="bg-emerald-50"
+            textColor="text-emerald-600"
+          />
+        </div>
+
+        {/* 3. FILTERS (Scrollable on mobile) */}
+        <div className="flex overflow-x-auto pb-4 mb-4 md:mb-8 border-b border-[#3F2965]/10 gap-2 no-scrollbar">
+          {["ALL", "PENDING", "CONFIRMED", "REJECTED"].map((f) => (
+            <button
+              key={f}
+              onClick={() => setFilter(f as any)}
+              className={`whitespace-nowrap px-4 py-2 rounded-full text-xs md:text-sm font-bold transition-all ${
+                filter === f 
+                  ? "bg-[#3F2965] text-white shadow-md" 
+                  : "bg-white text-[#3F2965]/60 hover:bg-white hover:text-[#3F2965]"
+              }`}
+            >
+              {f === "ALL" ? "All Bookings" : f.charAt(0) + f.slice(1).toLowerCase()}
+            </button>
           ))}
         </div>
-      )}
+
+        {/* 4. BOOKINGS GRID (Adaptive Columns) */}
+        {loading ? (
+          <div className="text-center py-20 text-[#3F2965]/50 animate-pulse">Loading dashboard data...</div>
+        ) : filteredBookings.length === 0 ? (
+          <div className="text-center py-20 bg-white rounded-3xl border border-dashed border-[#3F2965]/20">
+            <p className="text-[#3F2965]/40">No bookings found in this category.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+            {filteredBookings.map((b) => (
+              <BookingCard key={b.id} booking={b} onUpdate={updateStatus} />
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -296,6 +303,11 @@ function BookingCard({ booking, onUpdate }: { booking: Booking, onUpdate: (id: s
               <span className="text-[10px] font-bold bg-[#3F2965] text-white px-2 py-0.5 rounded">
                 {booking.type === "FIRST" ? "First Session" : "Follow-up"}
               </span>
+              {booking.therapyType && (
+                <span className="text-[10px] font-bold bg-[#Dd1764] text-white px-2 py-0.5 rounded">
+                  {booking.therapyType}
+                </span>
+              )}
             </div>
             <p className="text-xs md:text-sm text-[#3F2965]/80 italic">
               {booking.reason ? `"${booking.reason}"` : <span className="opacity-50">No specific reason provided.</span>}

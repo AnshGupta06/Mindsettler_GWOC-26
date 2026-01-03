@@ -11,7 +11,6 @@ async function main() {
     return d;
   }
 
-  // ✅ Explicit type
   const slots: Prisma.SessionSlotCreateManyInput[] = [];
 
   for (let i = 1; i <= 7; i++) {
