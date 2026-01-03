@@ -8,10 +8,12 @@ import PersonalPathSection from "./components/home/PersonalPath";
 import WorkplaceWellnessSection from "./components/home/Workplace";
 import Footer from "./components/common/Footer";
 import FAQSection from "./components/home/FAQSection";
+import Loader from "./components/common/Loader";
 
 export default function HomePage() {
   return (
-    <main className="min-h-screen bg-gradient-to-b from-[#f3ecff] via-[#ffeaf5] to-[#f7f0ff]">
+    <>
+    <main className="min-h-screen bg-white">
       <HeroSection />
       <AboutPreview />
       <JourneySection />
@@ -20,5 +22,6 @@ export default function HomePage() {
       <WorkplaceWellnessSection />
       <FAQSection />
     </main>
+    </>
   );
 }

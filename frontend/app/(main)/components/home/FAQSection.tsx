@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Plus, Minus } from "lucide-react";
 import { CharReveal, SlideUp, StaggerContainer, StaggerItem } from "../common/RevealComponent";
-
+import Link from "next/link";
 export default function FAQSection() {
   return (
     <section className="py-8 sm:py-10 md:py-12 px-4 sm:px-6 md:px-8 bg-white">
@@ -39,6 +39,7 @@ export default function FAQSection() {
                 ))}
             </StaggerContainer>
 
+            <Link href="/faqs">
             <SlideUp delay={0.4} className="mt-10 sm:mt-12 md:mt-16 text-center">
                 <button className="w-full sm:w-auto relative px-8 sm:px-10 py-3 sm:py-4 rounded-full border-2 border-[#3F2965]/10 text-[#3F2965] font-bold text-sm sm:text-base tracking-wide overflow-hidden group transition-all duration-300 hover:border-[#3F2965] hover:-translate-y-1">
                     <span className="absolute top-0 left-[-25%] w-[80%] h-full bg-gradient-to-r from-[#3F2965] to-[#513681] -skew-x-12 -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-left" />
@@ -46,6 +47,7 @@ export default function FAQSection() {
                     <span className="relative z-10 group-hover:text-white transition-colors duration-300">View All FAQs</span>
                 </button>
             </SlideUp>
+            </Link>
         </div>
       </div>
     </section>

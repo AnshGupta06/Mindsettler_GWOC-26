@@ -3,8 +3,10 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "../../lib/firebase";
+import { auth } from "../../lib/firebase"; // Ensure path is correct
 import { API_URL } from "@/app/lib/api";
+import toast from "react-hot-toast"; // 🔔 IMPORT TOAST
+import Loader from "../components/common/Loader";
 import { 
   Calendar, 
   Clock, 
@@ -57,6 +59,7 @@ export default function AdminBookingsPage() {
       setBookings(data);
     } catch (err: any) {
       setError(err.message || "Unable to load bookings");
+      // Optional: Toast here if page load fails, but text error is usually fine for initial load
     } finally {
       setLoading(false);
     }
@@ -71,12 +74,20 @@ export default function AdminBookingsPage() {
     return () => unsub();
   }, [router]);
 
+  // 🔔 UPDATED STATUS HANDLER WITH TOASTS
   const updateStatus = async (id: string, status: "CONFIRMED" | "REJECTED") => {
     const token = await auth.currentUser?.getIdToken();
+    
+    // 1. Show Loading Toast
+    const toastId = toast.loading(
+      status === "CONFIRMED" ? "Confirming booking..." : "Rejecting booking..."
+    );
+
+    // Optimistic Update (Update UI immediately)
     setBookings(prev => prev.map(b => b.id === id ? { ...b, status } : b));
 
     try {
-      await fetch(`${API_URL}/api/admin/bookings/${id}`, {
+      const res = await fetch(`${API_URL}/api/admin/bookings/${id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -84,11 +95,28 @@ export default function AdminBookingsPage() {
         },
         body: JSON.stringify({ status }),
       });
+
+      if (!res.ok) throw new Error("Failed to update status");
+
+      // 2. Success Toast (Updates the loading toast)
+      toast.success(
+        status === "CONFIRMED" ? "Booking Confirmed!" : "Booking Rejected",
+        { id: toastId }
+      );
+
+      // Refresh data to ensure sync
       const refreshedToken = await auth.currentUser?.getIdToken();
       if(refreshedToken) await fetchBookings(refreshedToken);
+
     } catch (err) {
       console.error(err);
-      alert("Failed to update status");
+      // 3. Error Toast (Updates the loading toast)
+      toast.error("Failed to update status. Please try again.", { id: toastId });
+      
+      // Revert Optimistic Update on Error
+      // (Optional but recommended so UI matches Server state)
+      const refreshedToken = await auth.currentUser?.getIdToken();
+      if(refreshedToken) await fetchBookings(refreshedToken);
     }
   };
 
@@ -117,13 +145,11 @@ export default function AdminBookingsPage() {
   }
 
   return (
-    // 1. Outer Container: White background with top padding (Clears Navbar)
     <div className="min-h-screen bg-white pt-20 sm:pt-24 pb-8 sm:pb-12 px-4 sm:px-6 md:px-8">
       
-      {/* 2. Inner Container: Purple Box (Main Content) */}
       <div className="max-w-[1440px] mx-auto bg-[#F9F6FF] rounded-[2.5rem] p-6 md:p-12 shadow-sm min-h-[80vh] text-[#3F2965]">
       
-        {/* 1. HEADER & ACTIONS */}
+        {/* HEADER & ACTIONS */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
           <div>
             <h1 className="text-2xl md:text-3xl font-bold flex items-center gap-3">
@@ -142,7 +168,7 @@ export default function AdminBookingsPage() {
           </button>
         </div>
 
-        {/* 2. CIRCULAR STATS (Responsive) */}
+        {/* CIRCULAR STATS */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-12 px-2 md:px-8">
           <StatCircle 
             label="Total Requests" 
@@ -176,7 +202,7 @@ export default function AdminBookingsPage() {
           />
         </div>
 
-        {/* 3. FILTERS (Scrollable on mobile) */}
+        {/* FILTERS */}
         <div className="flex overflow-x-auto pb-4 mb-4 md:mb-8 border-b border-[#3F2965]/10 gap-2 no-scrollbar">
           {["ALL", "PENDING", "CONFIRMED", "REJECTED"].map((f) => (
             <button
@@ -193,10 +219,10 @@ export default function AdminBookingsPage() {
           ))}
         </div>
 
-        {/* 4. BOOKINGS GRID (Adaptive Columns) */}
+        {/* BOOKINGS GRID */}
         {loading ? (
-          <div className="text-center py-20 text-[#3F2965]/50 animate-pulse">Loading dashboard data...</div>
-        ) : filteredBookings.length === 0 ? (
+          <Loader fullScreen={true} message="Loading Dashboard Data..."/>
+) : filteredBookings.length === 0 ? (
           <div className="text-center py-20 bg-white rounded-3xl border border-dashed border-[#3F2965]/20">
             <p className="text-[#3F2965]/40">No bookings found in this category.</p>
           </div>
@@ -231,18 +257,12 @@ function StatCircle({
 }) {
   return (
     <div className={`relative w-36 h-36 md:w-48 md:h-48 rounded-full border-[4px] md:border-[6px] ${color} ${bg} flex flex-col items-center justify-center shadow-xl md:shadow-2xl shadow-[#3F2965]/10 hover:scale-105 transition-all duration-300 group`}>
-      
-      {/* Icon Badge */}
       <div className={`absolute -top-4 md:-top-5 p-2 md:p-3 rounded-full bg-white shadow-md border ${color} group-hover:-translate-y-1 transition-transform`}>
         <Icon className={`${textColor} w-5 h-5 md:w-6 md:h-6`} strokeWidth={2.5} />
       </div>
-      
-      {/* Number */}
       <p className={`text-3xl md:text-5xl font-black ${textColor} mt-2`}>
         {value}
       </p>
-      
-      {/* Label */}
       <p className="text-[9px] md:text-[11px] font-bold uppercase tracking-widest text-[#3F2965]/60 mt-1 md:mt-2">
         {label}
       </p>

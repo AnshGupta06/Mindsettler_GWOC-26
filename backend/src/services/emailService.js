@@ -10,7 +10,7 @@ export const sendEmail = async (to, subject, html) => {
       to,
       subject,
       html,
-    });
+    }); 
 
     console.log(`📧 Email sent to ${to}`);
   } catch (err) {

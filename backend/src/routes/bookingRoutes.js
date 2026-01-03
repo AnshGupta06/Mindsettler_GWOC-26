@@ -6,12 +6,13 @@ import {
   createBooking,
   cancelBooking,
 } from "../controllers/bookingController.js";
-
+import { validate } from "../middlewares/validate.js";
+import { createBookingSchema } from "../schemas/bookingSchema.js";
 const router = express.Router();
     
+router.post("/", requireAuth, validate(createBookingSchema), createBooking);
 router.get("/my", requireAuth, getMyBookings);
 router.get("/slots", getSlots);
-router.post("/", requireAuth, createBooking);
 router.delete("/:id", requireAuth, cancelBooking);
 
 export default router;

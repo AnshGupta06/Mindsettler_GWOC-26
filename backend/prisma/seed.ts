@@ -11,6 +11,42 @@ async function main() {
     return d;
   }
 
+  // Create test users
+  console.log("📝 Creating test users...");
+  const testUsers = [
+    {
+      firebaseUid: "test-user-1",
+      email: "john@example.com",
+      name: "John Doe",
+      phone: "+1234567890",
+    },
+    {
+      firebaseUid: "test-user-2",
+      email: "jane@example.com",
+      name: "Jane Smith",
+      phone: "+9876543210",
+    },
+    {
+      firebaseUid: "test-user-3",
+      email: "alice@example.com",
+      name: "Alice Johnson",
+      phone: "+5555555555",
+    },
+  ];
+
+  const users = await Promise.all(
+    testUsers.map((userData) =>
+      prisma.user.upsert({
+        where: { firebaseUid: userData.firebaseUid },
+        update: {},
+        create: userData,
+      })
+    )
+  );
+  console.log(`✅ Created ${users.length} test users`);
+
+  // Create therapy slots
+  console.log("📅 Creating therapy slots...");
   const slots: Prisma.SessionSlotCreateManyInput[] = [];
 
   for (let i = 1; i <= 7; i++) {
@@ -23,6 +59,7 @@ async function main() {
         startTime: slotTime(date, 10),
         endTime: slotTime(date, 11),
         mode: "ONLINE",
+        therapyType: "Cognitive Behavioral Therapy",
         isBooked: false,
       },
       {
@@ -30,6 +67,7 @@ async function main() {
         startTime: slotTime(date, 12),
         endTime: slotTime(date, 13),
         mode: "ONLINE",
+        therapyType: "Mindfulness Meditation",
         isBooked: false,
       },
       {
@@ -37,6 +75,7 @@ async function main() {
         startTime: slotTime(date, 16),
         endTime: slotTime(date, 17),
         mode: "OFFLINE",
+        therapyType: "Counseling Session",
         isBooked: false,
       }
     );
@@ -46,7 +85,49 @@ async function main() {
     data: slots,
     skipDuplicates: true,
   });
+  console.log(`✅ Created ${slots.length} therapy slots`);
 
+  // Create test bookings
+  console.log("📌 Creating test bookings...");
+  const allSlots = await prisma.sessionSlot.findMany({
+    take: 3,
+  });
+
+  const testBookings = [
+    {
+      userId: users[0].id,
+      slotId: allSlots[0].id,
+      status: "CONFIRMED" as const,
+      type: "FIRST" as const,
+      reason: "Anxiety management",
+      therapyType: "Cognitive Behavioral Therapy",
+    },
+    {
+      userId: users[1].id,
+      slotId: allSlots[1].id,
+      status: "PENDING" as const,
+      type: "FOLLOW_UP" as const,
+      reason: "Progress check-in",
+      therapyType: "Mindfulness Meditation",
+    },
+    {
+      userId: users[2].id,
+      slotId: allSlots[2].id,
+      status: "CONFIRMED" as const,
+      type: "FIRST" as const,
+      reason: "Initial consultation",
+      therapyType: "Counseling Session",
+    },
+  ];
+
+  const bookings = await Promise.all(
+    testBookings.map((bookingData) =>
+      prisma.booking.create({
+        data: bookingData,
+      })
+    )
+  );
+  console.log(`✅ Created ${bookings.length} test bookings`);
 }
 
 main()
