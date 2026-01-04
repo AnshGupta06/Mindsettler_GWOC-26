@@ -17,12 +17,10 @@ import {
   ShieldCheck,
   User as UserIcon,
   Library,
+  LogOut,
 } from "lucide-react";
 import { onAuthStateChanged, User, signOut } from "firebase/auth";
 import { auth } from "../../../lib/firebase";
-
-// 🛡️ ADMIN LIST
-const ADMIN_EMAILS = ["shsheth2006@gmail.com"];
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -34,13 +32,11 @@ export default function Navbar() {
 
   // 🔤 Helper to get Initials (e.g., "Siddharth Sheth" -> "SS")
   const getInitials = (name: string | null | undefined) => {
-    if (!name) return "Profile";
+    if (!name) return "User";
     const parts = name.trim().split(" ");
-    if (parts.length === 0) return "Profile";
-
+    if (parts.length === 0) return "User";
     const firstInitial = parts[0][0];
     const lastInitial = parts.length > 1 ? parts[parts.length - 1][0] : "";
-
     return (firstInitial + lastInitial).toUpperCase();
   };
 
@@ -54,8 +50,13 @@ export default function Navbar() {
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (u) => {
       setUser(u);
-      if (u && u.email && ADMIN_EMAILS.includes(u.email)) {
-        setIsAdmin(true);
+      if (u && u.email) {
+        // ✅ SECURE CHECK: Read from Environment Variable
+        const adminList = (process.env.NEXT_PUBLIC_ADMIN_EMAIL || "")
+          .split(",")
+          .map((e) => e.trim().toLowerCase());
+        
+        setIsAdmin(adminList.includes(u.email.toLowerCase()));
       } else {
         setIsAdmin(false);
       }
@@ -63,30 +64,25 @@ export default function Navbar() {
     return () => unsub();
   }, []);
 
-  // Prevent scrolling when mobile menu is open
   useEffect(() => {
     document.body.style.overflow = mobileMenuOpen ? "hidden" : "auto";
   }, [mobileMenuOpen]);
 
-  // 🚪 Logout Handler (UPDATED: No Redirect)
+  // 🚪 Logout Handler (Fixed Redirect)
   const handleLogout = async () => {
-    // Show loading state
     const toastId = toast.loading("Logging out...");
     try {
       await signOut(auth);
-      setIsAdmin(false);
-      /// ✅ Success Message
-      toast.success("Logged out successfully. See you soon!", { id: toastId });
-      
-      router.refresh(); 
+      setIsAdmin(false); // Clear admin state immediately
+      toast.success("Logged out successfully", { id: toastId });
       setMobileMenuOpen(false);
+      
     } catch (error) {
       console.error("Logout failed", error);
       toast.error("Failed to log out", { id: toastId });
     }
-};
+  };
 
-  // 📋 Menu Items Configuration
   const menuItems = [
     { href: "/", label: "Home", icon: <Home size={24} /> },
     { href: "/about", label: "About", icon: <Info size={24} /> },
@@ -96,7 +92,6 @@ export default function Navbar() {
     { href: "/contact", label: "Contact", icon: <Mail size={24} /> },
   ];
 
-  // Add Admin Dashboard if eligible
   if (isAdmin) {
     menuItems.push({
       href: "/admin",
@@ -110,7 +105,7 @@ export default function Navbar() {
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
           scrolled || mobileMenuOpen
-            ? "bg-white/90 backdrop-blur-md shadow-sm py-4"
+            ? "bg-white/90 backdrop-blur-md shadow-sm py-3 md:py-4"
             : "bg-transparent py-4 md:py-6"
         }`}
       >
@@ -129,7 +124,7 @@ export default function Navbar() {
           </Link>
 
           {/* DESKTOP NAV */}
-          <ul className="hidden md:flex items-center gap-2 bg-[#F9F6FF] p-1.5 rounded-full border border-[#3F2965]/5">
+          <ul className="hidden xl:flex items-center gap-1 bg-[#F9F6FF] p-1.5 rounded-full border border-[#3F2965]/5 shadow-sm">
             <NavLink href="/" active={pathname === "/"}>Home</NavLink>
             <NavLink href="/about" active={pathname === "/about"}>About</NavLink>
             <NavLink href="/awareness" active={pathname === "/awareness"}>Awareness</NavLink>
@@ -143,40 +138,40 @@ export default function Navbar() {
             {!user ? (
               <>
                 <Link href="/login">
-                  <button className="px-5 py-2 rounded-full border border-[#3F2965]/30 text-[#3F2965] text-sm font-bold hover:bg-[#F9F6FF] transition">
+                  <button className="px-6 py-2.5 rounded-full border border-[#3F2965]/10 text-[#3F2965] text-sm font-bold hover:bg-[#F9F6FF] transition hover:shadow-sm">
                     Login
                   </button>
                 </Link>
                 <Link href="/login/signup">
-                  <button className="px-5 py-2 rounded-full bg-[#3F2965] text-white text-sm font-bold hover:bg-[#513681] transition">
+                  <button className="px-6 py-2.5 rounded-full bg-[#3F2965] text-white text-sm font-bold hover:bg-[#513681] transition shadow-lg shadow-[#3F2965]/20 hover:-translate-y-0.5">
                     Sign Up
                   </button>
                 </Link>
               </>
             ) : (
               <>
-                {/* Admin Button */}
                 {isAdmin && (
                   <Link href="/admin">
-                    <button className="px-5 py-2 rounded-full bg-[#3F2965] text-white text-sm font-bold hover:bg-[#513681] transition flex items-center gap-2">
+                    <button className="px-5 py-2.5 rounded-full bg-[#3F2965] text-white text-sm font-bold hover:bg-[#513681] transition flex items-center gap-2 shadow-lg shadow-[#3F2965]/20">
                       <ShieldCheck size={16} />
                       Dashboard
                     </button>
                   </Link>
                 )}
 
-                {/* Profile Button */}
                 <Link href="/profile">
-                  <button className="px-4 py-2 rounded-full border border-[#3F2965]/30 text-[#3F2965] text-sm font-bold hover:bg-[#3F2965] hover:text-white transition flex items-center gap-2">
-                    <UserIcon size={16} />
+                  <button className="pl-3 pr-5 py-2 rounded-full border border-[#3F2965]/10 bg-white text-[#3F2965] text-sm font-bold hover:border-[#3F2965] transition flex items-center gap-2">
+                    <div className="w-7 h-7 bg-[#F9F6FF] rounded-full flex items-center justify-center text-[#Dd1764]">
+                      <UserIcon size={14} />
+                    </div>
+                    {/* 👇 This correctly renders "SS" for Siddharth Sheth */}
                     {getInitials(user.displayName)}
                   </button>
                 </Link>
 
-                {/* Book Session (Hidden for Admins to reduce clutter, optional) */}
                 {!isAdmin && (
                   <Link href="/book">
-                    <button className="px-6 py-3 rounded-full bg-[#Dd1764] text-white text-sm font-bold tracking-wide hover:shadow-lg hover:shadow-[#3F2965]/20 transition">
+                    <button className="px-6 py-2.5 rounded-full bg-[#Dd1764] text-white text-sm font-bold tracking-wide hover:shadow-lg hover:shadow-[#Dd1764]/30 transition hover:-translate-y-0.5">
                       Book Session
                     </button>
                   </Link>
@@ -184,9 +179,10 @@ export default function Navbar() {
 
                 <button
                   onClick={handleLogout}
-                  className="px-5 py-2 rounded-full border border-[#Dd1764]/40 text-[#Dd1764] text-sm font-bold hover:bg-[#Dd1764]/10 transition"
+                  className="p-2.5 rounded-full border border-red-100 text-red-500 hover:bg-red-50 transition"
+                  title="Logout"
                 >
-                  Logout
+                  <LogOut size={18} />
                 </button>
               </>
             )}
@@ -194,7 +190,7 @@ export default function Navbar() {
 
           {/* MOBILE TOGGLE */}
           <button
-            className="md:hidden z-50 text-[#3F2965] w-10 h-10 flex items-center justify-center rounded-full bg-[#F9F6FF] transition-colors hover:bg-[#Dd1764] hover:text-white"
+            className="xl:hidden z-50 text-[#3F2965] w-12 h-12 flex items-center justify-center rounded-full bg-[#F9F6FF] transition-colors hover:bg-[#Dd1764] hover:text-white"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
             {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -204,20 +200,20 @@ export default function Navbar() {
 
       {/* MOBILE MENU */}
       <div
-        className={`fixed inset-0 z-40 bg-gradient-to-br from-[#F9F6FF] via-white to-[#F9F6FF] flex flex-col md:hidden transition-all duration-500 ${
+        className={`fixed inset-0 z-40 bg-white flex flex-col xl:hidden transition-all duration-500 ${
           mobileMenuOpen ? "translate-x-0 opacity-100" : "translate-x-full opacity-0"
         }`}
       >
-        <div className="relative z-10 flex flex-col items-center justify-center flex-1 px-6 pt-24 pb-8">
-          <ul className="flex flex-col gap-3 w-full max-w-sm mb-8">
+        <div className="relative z-10 flex flex-col flex-1 px-6 pt-28 pb-8 overflow-y-auto">
+          <ul className="flex flex-col gap-2 mb-8">
             {menuItems.map((item) => (
               <li key={item.href} onClick={() => setMobileMenuOpen(false)}>
                 <Link href={item.href}>
                   <div
-                    className={`flex items-center justify-between px-6 py-4 rounded-2xl transition ${
+                    className={`flex items-center justify-between px-6 py-4 rounded-2xl transition border ${
                       pathname === item.href
-                        ? "bg-gradient-to-r from-[#3F2965] to-[#513681] text-white"
-                        : "bg-white text-[#3F2965]"
+                        ? "bg-[#3F2965] text-white border-[#3F2965] shadow-lg shadow-[#3F2965]/20"
+                        : "bg-white text-[#3F2965] border-gray-100"
                     }`}
                   >
                     <div className="flex items-center gap-4">
@@ -232,68 +228,61 @@ export default function Navbar() {
           </ul>
 
           {/* MOBILE CTA */}
-          {!user ? (
-            <div className="flex flex-col gap-3 w-full max-w-sm">
-              <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
-                <button className="w-full py-3 rounded-xl border border-[#3F2965]/30 text-[#3F2965] font-bold">
-                  Login
-                </button>
-              </Link>
-              <Link href="/login/signup" onClick={() => setMobileMenuOpen(false)}>
-                <button className="w-full py-3 rounded-xl bg-[#3F2965] text-white font-bold">
-                  Sign Up
-                </button>
-              </Link>
-            </div>
-          ) : (
-            <div className="flex flex-col gap-3 w-full max-w-sm">
-              <Link href="/profile" onClick={() => setMobileMenuOpen(false)}>
-                <button className="w-full py-3 rounded-xl border border-[#3F2965]/30 text-[#3F2965] font-bold flex items-center justify-center gap-2">
-                  <UserIcon size={18} />
-                  {getInitials(user.displayName)}
-                </button>
-              </Link>
-
-              {!isAdmin && (
-                <Link href="/book" onClick={() => setMobileMenuOpen(false)}>
-                  <button className="w-full py-4 rounded-2xl bg-[#Dd1764] text-white font-bold text-lg">
-                    Book Your Session
+          <div className="mt-auto space-y-3">
+            {!user ? (
+              <div className="flex flex-col gap-3">
+                <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
+                  <button className="w-full py-4 rounded-xl border border-[#3F2965]/20 text-[#3F2965] font-bold">
+                    Login
                   </button>
                 </Link>
-              )}
+                <Link href="/login/signup" onClick={() => setMobileMenuOpen(false)}>
+                  <button className="w-full py-4 rounded-xl bg-[#3F2965] text-white font-bold shadow-xl shadow-[#3F2965]/20">
+                    Sign Up Now
+                  </button>
+                </Link>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-3">
+                <Link href="/profile" onClick={() => setMobileMenuOpen(false)}>
+                  <button className="w-full py-4 rounded-xl bg-[#F9F6FF] text-[#3F2965] font-bold flex items-center justify-center gap-3">
+                    <UserIcon size={20} />
+                    My Profile
+                  </button>
+                </Link>
 
-              <button
-                onClick={handleLogout}
-                className="w-full py-3 rounded-xl border border-[#Dd1764]/40 text-[#Dd1764] font-bold"
-              >
-                Logout
-              </button>
-            </div>
-          )}
+                {!isAdmin && (
+                  <Link href="/book" onClick={() => setMobileMenuOpen(false)}>
+                    <button className="w-full py-4 rounded-xl bg-[#Dd1764] text-white font-bold text-lg shadow-xl shadow-[#Dd1764]/20">
+                      Book Your Session
+                    </button>
+                  </Link>
+                )}
+
+                <button
+                  onClick={handleLogout}
+                  className="w-full py-4 rounded-xl border border-red-100 text-red-500 font-bold bg-red-50/50"
+                >
+                  Sign Out
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </>
   );
 }
 
-// Sub-component for Cleaner Desktop Links
-function NavLink({
-  href,
-  active,
-  children,
-}: {
-  href: string;
-  active: boolean;
-  children: React.ReactNode;
-}) {
+function NavLink({ href, active, children }: { href: string; active: boolean; children: React.ReactNode }) {
   return (
     <li>
       <Link
         href={href}
-        className={`block px-5 py-2 rounded-full text-sm font-bold transition ${
+        className={`block px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-300 ${
           active
-            ? "bg-white text-[#3F2965] shadow-sm"
-            : "text-[#3F2965]/70 hover:bg-white/50 hover:text-[#3F2965]"
+            ? "bg-white text-[#3F2965] shadow-sm scale-105"
+            : "text-[#3F2965]/70 hover:bg-white hover:text-[#3F2965]"
         }`}
       >
         {children}
