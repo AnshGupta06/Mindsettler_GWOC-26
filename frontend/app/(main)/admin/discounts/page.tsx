@@ -10,6 +10,7 @@ import {
 import {
     LayoutDashboard, PlusCircle, Trash2, ToggleLeft, ToggleRight, Percent, Award, ArrowLeft
 } from "lucide-react";
+import Loader from "../../components/common/Loader";
 
 type DiscountRule = {
     id: string;
@@ -102,7 +103,7 @@ export default function DiscountAdminPage() {
         }
     };
 
-    if (loading) return <div className="min-h-screen bg-white flex items-center justify-center text-[#3F2965]">Loading...</div>;
+    if (loading) return <Loader fullScreen={true} message="Loading Discount Data..."/>
 
     return (
         <div className="min-h-screen bg-white pt-20 sm:pt-24 pb-8 sm:pb-12 px-4 sm:px-6 md:px-8">

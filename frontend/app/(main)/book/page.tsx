@@ -13,6 +13,7 @@ import {
 import { motion } from "framer-motion";
 import AlertModal from "../components/common/AlertModal"; // Ensure this path matches your project structure
 import toast from "react-hot-toast";
+import DiscountBanner from "./components/DiscountBanner";
 
 type Slot = {
   id: string;
@@ -171,7 +172,7 @@ export default function BookPage() {
             
             {/* ================= LEFT COLUMN ================= */}
             <div className="lg:col-span-8 space-y-12">
-              
+              <DiscountBanner />
               {/* Header */}
               <div className="space-y-3">
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-tight">
