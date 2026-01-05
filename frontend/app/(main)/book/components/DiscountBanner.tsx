@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../../../lib/firebase";
 import { checkDiscountEligibility } from "@/app/lib/discountApi";
-import { Sparkles } from "lucide-react";
+import { Sparkles, X, PartyPopper } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 type Discount = {
     discountPercent: number;
@@ -14,44 +15,93 @@ type Discount = {
 export default function DiscountBanner() {
     const [discount, setDiscount] = useState<Discount | null>(null);
     const [loading, setLoading] = useState(true);
+    const [isVisible, setIsVisible] = useState(true);
 
     useEffect(() => {
+        // Real-time listener for Auth State
         const unsub = onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                try {
-                    const token = await user.getIdToken();
-                    const res = await checkDiscountEligibility(token);
-                    if (res.discount) {
-                        setDiscount(res.discount);
-                    }
-                } catch (err) {
-                    console.error("Failed to check discount", err);
-                }
+            if (!user) {
+                setDiscount(null); // Reset if logged out
+                setLoading(false);
+                return;
             }
-            setLoading(false);
+
+            try {
+                // Get fresh token to ensure claims are up to date
+                const token = await user.getIdToken(); 
+                const res = await checkDiscountEligibility(token);
+                
+                if (res?.discount) {
+                    setDiscount(res.discount);
+                    setIsVisible(true); // Re-show if a new discount is found
+                } else {
+                    setDiscount(null);
+                }
+            } catch (err) {
+                console.error("Failed to check discount", err);
+            } finally {
+                setLoading(false);
+            }
         });
+
         return () => unsub();
     }, []);
 
-    if (loading || !discount) return null;
+    // Don't render anything if loading, no discount, or user dismissed it
+    if (loading || !discount || !isVisible) return null;
 
     return (
-        <div className="mb-6 bg-gradient-to-r from-[#Dd1764]/10 to-[#3F2965]/10 border border-[#Dd1764]/20 rounded-2xl p-4 flex items-center justify-center text-center animate-in fade-in slide-in-from-top-4 duration-500">
-            <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4">
-                <div className="p-2 bg-white rounded-full shadow-sm text-[#Dd1764]">
-                    <Sparkles size={20} fill="currentColor" className="animate-pulse" />
-                </div>
-                <div>
-                    <p className="text-[#3F2965] font-bold text-lg">
-                        🎉 You’re eligible for a <span className="text-[#Dd1764] text-xl">{discount.discountPercent}%</span> session benefit!
-                    </p>
-                    {discount.label && (
-                        <p className="text-[#3F2965]/60 text-xs font-bold uppercase tracking-wider mt-1">
-                            {discount.label}
-                        </p>
-                    )}
-                </div>
-            </div>
-        </div>
+        <AnimatePresence>
+            {isVisible && (
+                <motion.div
+                    initial={{ opacity: 0, y: -20, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -20, scale: 0.95 }}
+                    transition={{ duration: 0.4, type: "spring", bounce: 0.4 }}
+                    className="relative mb-8 overflow-hidden"
+                >
+                    {/* Glassmorphism Container */}
+                    <div className="relative bg-gradient-to-r from-[#Dd1764]/10 via-[#3F2965]/5 to-[#3F2965]/10 border border-[#Dd1764]/20 backdrop-blur-md rounded-2xl p-5 shadow-lg shadow-[#Dd1764]/5">
+                        
+                        {/* Shimmer Effect on Border */}
+                        <div className="absolute inset-0 rounded-2xl overflow-hidden pointer-events-none">
+                            <div className="absolute top-0 left-[-100%] w-[50%] h-full bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12 animate-[shimmer_2s_infinite]" />
+                        </div>
+
+                        <div className="relative flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-5 text-center sm:text-left pr-8">
+                            
+                            {/* Icon Badge */}
+                            <div className="shrink-0 p-3 bg-white rounded-full shadow-md text-[#Dd1764] ring-4 ring-[#Dd1764]/5">
+                                <PartyPopper size={24} className="animate-bounce" strokeWidth={2.5} />
+                            </div>
+
+                            {/* Text Content */}
+                            <div>
+                                <h3 className="text-[#3F2965] font-bold text-lg leading-tight">
+                                    You’re eligible for a <span className="text-[#Dd1764] text-xl font-extrabold">{discount.discountPercent}% OFF</span> benefit!
+                                </h3>
+                                {discount.label && (
+                                    <div className="flex items-center justify-center sm:justify-start gap-1.5 mt-1">
+                                        <Sparkles size={12} className="text-[#Dd1764]" />
+                                        <p className="text-[#3F2965]/70 text-xs font-bold uppercase tracking-widest">
+                                            {discount.label}
+                                        </p>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Close Button */}
+                            <button 
+                                onClick={() => setIsVisible(false)}
+                                className="absolute top-0 right-0 p-2 text-[#3F2965]/40 hover:text-[#Dd1764] hover:bg-[#Dd1764]/10 rounded-full transition-colors"
+                                aria-label="Dismiss discount"
+                            >
+                                <X size={18} />
+                            </button>
+                        </div>
+                    </div>
+                </motion.div>
+            )}
+        </AnimatePresence>
     );
 }

@@ -8,10 +8,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Mail, Lock, Loader2, ArrowLeft } from "lucide-react";
 import { API_URL } from "@/app/lib/api";
-import toast from "react-hot-toast"; // 🔔 IMPORT TOAST
-
-// 🛡️ ADMIN LIST
-const ADMIN_EMAILS = ["shsheth2006@gmail.com"];
+import toast from "react-hot-toast"; 
 
 export default function LoginForm() {
   const router = useRouter();
@@ -27,7 +24,6 @@ export default function LoginForm() {
     }
 
     setLoading(true);
-    // 🔔 1. Start Loading Toast
     const toastId = toast.loading("Signing you in...");
 
     try {
@@ -38,113 +34,112 @@ export default function LoginForm() {
       // Sync user to backend
       await fetch(`${API_URL}/api/auth/sync-user`, {
         method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ email: user.email }),
       });
-      
-      // 🔔 2. Success Toast
-      toast.success("Welcome back! ✨", { id: toastId });
 
-      // 🔀 REDIRECT LOGIC
-      if (user.email && ADMIN_EMAILS.includes(user.email)) {
-        router.push("/admin");   // Go to Admin Dashboard
+      toast.success("Welcome back!", { id: toastId });
+
+      // 🛡️ ADMIN CHECK (From ENV)
+      const allowedAdmins = (process.env.NEXT_PUBLIC_ADMIN_EMAIL || "")
+        .split(",")
+        .map((e) => e.trim().toLowerCase());
+
+      if (user.email && allowedAdmins.includes(user.email.toLowerCase())) {
+        router.push("/admin"); 
       } else {
-        router.push("/profile"); // Go to User Profile
+        router.push("/profile");
       }
 
     } catch (err: any) {
       console.error(err);
-      
-      // 🔔 3. Error Toast (Customized messages)
-      let msg = "Failed to login";
-      if (err.code === "auth/invalid-credential") msg = "Invalid email or password";
-      if (err.code === "auth/user-not-found") msg = "User not found";
-      if (err.code === "auth/wrong-password") msg = "Incorrect password";
-      if (err.code === "auth/too-many-requests") msg = "Too many failed attempts. Try later.";
-
-      toast.error(msg, { id: toastId });
+      toast.error(err.message || "Login failed", { id: toastId });
       setLoading(false);
     }
   };
 
   const handleForgotPassword = async () => {
     if (!email) {
-      toast.error("Please enter your email address first.");
+      toast.error("Please enter your email address first");
       return;
     }
 
     setResetLoading(true);
-    const toastId = toast.loading("Sending reset link...");
-
     try {
       await sendPasswordResetEmail(auth, email);
-      toast.success("Reset link sent! Check your inbox.", { id: toastId });
+      toast.success("Password reset email sent! Check your inbox.");
     } catch (err: any) {
-      console.error(err);
-      if (err.code === 'auth/user-not-found') {
-        toast.error("No account found with this email.", { id: toastId });
-      } else {
-        toast.error("Failed to send reset email. Try again later.", { id: toastId });
-      }
+      toast.error(err.message || "Failed to send reset email");
     } finally {
       setResetLoading(false);
     }
   };
 
   return (
-    <div className="w-full bg-white/80 backdrop-blur-lg border border-white/50 rounded-3xl shadow-2xl p-8 sm:p-10 relative">
+    <div className="bg-white/80 backdrop-blur-xl p-8 rounded-[2.5rem] shadow-2xl border border-white/50 relative overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-700">
       
-      {/* 🏠 Back to Home */}
+      {/* 🏠 Back to Home - Positioned Absolute Top Left */}
       <Link 
         href="/" 
-        className="absolute top-6 left-6 text-gray-400 hover:text-[#3F2965] transition-colors p-2 hover:bg-purple-50 rounded-full"
-        title="Back to Home"
+        className="absolute top-8 left-8 inline-flex items-center gap-2 text-sm font-bold text-[#3F2965]/40 hover:text-[#3F2965] transition-colors z-20"
       >
-        <ArrowLeft className="w-5 h-5" />
+         <ArrowLeft size={16} /> Back to Home
       </Link>
 
-      <div className="text-center mb-8 mt-4">
-        <h2 className="text-3xl font-bold text-[#3F2965]">Welcome Back</h2>
-        <p className="text-[#3F2965]/60 mt-2">
-          Continue your journey to mindfulness
-        </p>
+      {/* Header */}
+      <div className="text-center mb-8 mt-2">
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[#F9F6FF] text-[#Dd1764] mb-4 shadow-inner">
+          <Lock size={28} />
+        </div>
+        <h1 className="text-3xl font-bold text-[#3F2965]">Welcome Back</h1>
+        <p className="text-[#3F2965]/60 mt-2 text-sm">Sign in to continue your journey</p>
       </div>
 
       <div className="space-y-5">
-        <div className="relative group">
-          <Mail className="absolute left-4 top-3.5 w-5 h-5 text-[#3F2965]/40 group-focus-within:text-[#Dd1764] transition-colors" />
-          <input
-            type="email"
-            placeholder="Email Address"
-            className="w-full pl-12 pr-4 py-3.5 bg-gray-50/50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-[#Dd1764]/20 focus:border-[#Dd1764] transition-all outline-none text-[#3F2965] placeholder:text-gray-400"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
+        
+        {/* Email Input */}
+        <div className="space-y-1.5">
+          <label className="text-xs font-bold text-[#3F2965]/60 uppercase ml-1">Email</label>
+          <div className="relative group">
+            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-[#3F2965]/30 group-focus-within:text-[#Dd1764] transition-colors" size={20} />
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full pl-12 pr-4 py-4 bg-[#F9F6FF] border border-[#3F2965]/5 rounded-xl outline-none focus:bg-white focus:border-[#Dd1764]/20 focus:ring-4 focus:ring-[#Dd1764]/5 transition-all font-medium text-[#3F2965]"
+              placeholder="Enter your email"
+            />
+          </div>
         </div>
 
-        <div className="relative group">
-          <Lock className="absolute left-4 top-3.5 w-5 h-5 text-[#3F2965]/40 group-focus-within:text-[#Dd1764] transition-colors" />
-          <input
-            type="password"
-            placeholder="Password"
-            className="w-full pl-12 pr-4 py-3.5 bg-gray-50/50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-[#Dd1764]/20 focus:border-[#Dd1764] transition-all outline-none text-[#3F2965] placeholder:text-gray-400"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
+        {/* Password Input */}
+        <div className="space-y-1.5">
+          <div className="flex justify-between items-center ml-1">
+            <label className="text-xs font-bold text-[#3F2965]/60 uppercase">Password</label>
+            <button 
+              onClick={handleForgotPassword}
+              disabled={resetLoading}
+              className="text-xs font-bold text-[#Dd1764] hover:underline disabled:opacity-50"
+            >
+              {resetLoading ? "Sending..." : "Forgot Password?"}
+            </button>
+          </div>
+          <div className="relative group">
+            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-[#3F2965]/30 group-focus-within:text-[#Dd1764] transition-colors" size={20} />
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full pl-12 pr-4 py-4 bg-[#F9F6FF] border border-[#3F2965]/5 rounded-xl outline-none focus:bg-white focus:border-[#Dd1764]/20 focus:ring-4 focus:ring-[#Dd1764]/5 transition-all font-medium text-[#3F2965]"
+              placeholder="Enter your password"
+            />
+          </div>
         </div>
 
-        {/* 🔄 Forgot Password Button */}
-        <div className="flex justify-end">
-          <button 
-            type="button"
-            onClick={handleForgotPassword}
-            disabled={resetLoading}
-            className="text-sm font-medium text-[#3F2965]/60 hover:text-[#Dd1764] transition-colors flex items-center gap-2"
-          >
-            {resetLoading && <Loader2 className="w-3 h-3 animate-spin" />}
-            {resetLoading ? "Sending..." : "Forgot Password?"}
-          </button>
-        </div>
-
+        {/* Submit Button */}
         <button
           onClick={handleLogin}
           disabled={loading}
@@ -153,23 +148,18 @@ export default function LoginForm() {
           <span className="absolute top-0 left-[-25%] w-[75%] h-full bg-gradient-to-r from-[#3F2965] to-[#513681] -skew-x-12 -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-left" />
           <span className="absolute top-0 right-[-25%] w-[75%] h-full bg-gradient-to-l from-[#3F2965] to-[#513681] -skew-x-12 translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-right" />
           <span className="relative z-10 flex items-center justify-center gap-2">
-            {loading ? (
-              <>
-                <Loader2 className="w-5 h-5 animate-spin" /> Signing In...
-              </>
-            ) : (
-              "Sign In"
-            )}
+            {loading ? <><Loader2 className="w-5 h-5 animate-spin" /> Signing In...</> : "Sign In"}
           </span>
         </button>
       </div>
 
-      <div className="my-8 flex items-center gap-4">
-        <div className="flex-1 h-px bg-gray-200" />
-        <span className="text-xs font-medium text-gray-400 uppercase tracking-wider">
-          Or continue with
-        </span>
-        <div className="flex-1 h-px bg-gray-200" />
+      <div className="relative my-8">
+        <div className="absolute inset-0 flex items-center">
+          <div className="w-full border-t border-[#3F2965]/10"></div>
+        </div>
+        <div className="relative flex justify-center text-sm">
+          <span className="px-4 bg-[#Fdfcff] text-[#3F2965]/40 font-bold uppercase text-xs tracking-wider">Or continue with</span>
+        </div>
       </div>
 
       <GoogleButton />

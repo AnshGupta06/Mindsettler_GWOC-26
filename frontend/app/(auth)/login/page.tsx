@@ -1,10 +1,32 @@
+"use client";
+
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "../../lib/firebase";
 import LoginForm from "./components/LoginForm";
 import Link from "next/link";
+import { isUserAdmin } from "@/app/lib/admin";
 
 export default function LoginPage() {
+  const router = useRouter();
+
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // 🚀 Auto-redirect based on role if they visit /login
+        if (isUserAdmin(user.email)) {
+          router.replace("/admin");
+        } else {
+          router.replace("/profile");
+        }
+      }
+    });
+    return () => unsub();
+  }, [router]);
+
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-[#F9F6FF] relative overflow-hidden">
-      {/* 🎨 Background Blobs for Atmosphere */}
       <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-[#3F2965]/10 rounded-full blur-3xl" />
       <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-[#Dd1764]/10 rounded-full blur-3xl" />
 
