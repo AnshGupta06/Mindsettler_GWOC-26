@@ -72,8 +72,3 @@ model BookingDiscount {
 
   @@map("booking_discounts")
 }
-
-model TherapyType {
-  id   String @id @default(uuid())
-  name String @unique
-}
