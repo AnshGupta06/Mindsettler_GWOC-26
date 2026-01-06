@@ -60,9 +60,6 @@ export default function ProfilePage() {
   
   const [actionLoading, setActionLoading] = useState(false);
 
-  // 🆕 FORCE SCROLL TO TOP
-  // This ensures that when the loader finishes and content appears, 
-  // the user is looking at the top of the profile, not the middle.
   useEffect(() => {
     if (!loading) {
       window.scrollTo(0, 0);
@@ -77,7 +74,6 @@ export default function ProfilePage() {
         await fetchProfileData(currentUser);
       } else {
         setLoading(false);
-        // Trigger Auth Modal immediately if not logged in
         setModalState({ isOpen: true, type: "AUTH" });
       }
     });
@@ -119,28 +115,22 @@ export default function ProfilePage() {
         body: JSON.stringify({ phone: newPhone }),
       });
       if (user) await fetchProfileData(user);
-      // ✅ Toast for small success
       toast.success("Phone number updated!");
       setNewPhone("");
     } catch (err) {
-     // ❌ Toast for error
       toast.error("Failed to update phone.");
     } finally {
       setUpdatingPhone(false);
     }
   };
 
-  // --- MODAL HANDLERS ---
-
-  // 1. Handle Closing (Redirects if it was an Auth check)
   const closeModal = () => {
     if (modalState.type === "AUTH") {
-      router.push("/"); // 🚀 Redirect unlogged users to Home
+      router.push("/"); 
     }
     setModalState(prev => ({ ...prev, isOpen: false }));
   };
 
-  // 2. Trigger Confirmation
   const initiateCancel = (booking: Booking) => {
     const isConfirmed = booking.status === "CONFIRMED";
     
@@ -156,7 +146,6 @@ export default function ProfilePage() {
     });
   };
 
-  // 3. Perform Cancellation
   const handleConfirmCancel = async () => {
     if (!modalState.bookingId) return;
     
@@ -172,7 +161,6 @@ export default function ProfilePage() {
 
       setBookings((prev) => prev.filter((b) => b.id !== modalState.bookingId));
       
-      // Show Success Modal
       setModalState({
         isOpen: true,
         type: "SUCCESS",
@@ -193,19 +181,21 @@ export default function ProfilePage() {
     }
   };
 
+  // ✅ ROBUST GOOGLE CALENDAR LINK GENERATOR
   const getGoogleCalendarUrl = (booking: Booking) => {
     const formatTime = (dateString: string) => {
       return new Date(dateString).toISOString().replace(/-|:|\.\d+/g, "");
     };
+    
     const start = formatTime(booking.slot.startTime);
     const end = formatTime(booking.slot.endTime);
     const title = "MindSettler Therapy Session";
-    const details = `Type: ${booking.type} | Reason: ${booking.reason || "N/A"}`;
+    const details = `Type: ${booking.type} | Mode: ${booking.slot.mode} | Reason: ${booking.reason || "N/A"}`;
     const location = booking.slot.mode === "ONLINE" ? "Online (Link will be shared)" : "MindSettler Studio";
+    
     return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${start}/${end}&details=${encodeURIComponent(details)}&location=${encodeURIComponent(location)}`;
   };
 
-  // --- LOADING VIEW ---
   if (loading) {
     return <Loader fullScreen={true} message={"Loading your space..."} />; 
   }
@@ -228,7 +218,7 @@ export default function ProfilePage() {
       <div className={`transition-all duration-500 ${!user ? 'blur-md pointer-events-none opacity-50 select-none grayscale-[0.5]' : ''}`}>
         
         {/* Inner Container */}
-        <div className="max-w-7xl mx-auto bg-[#F9F6FF] rounded-[2.5rem] p-6 md:p-12 shadow-sm min-h-[80vh] flex flex-col md:flex-row gap-8 text-[#3F2965]">
+        <div className="max-w-[1440px] mx-auto bg-[#F9F6FF] rounded-[2.5rem] p-6 md:p-12 shadow-sm min-h-[80vh] flex flex-col md:flex-row gap-8 text-[#3F2965]">
         
           {/* LEFT SIDEBAR */}
           <div className="w-full md:w-1/3 lg:w-1/4 flex flex-col gap-6">
@@ -282,128 +272,135 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          {/* RIGHT CONTENT - BOOKINGS */}
-          <div className="flex-1">
-            <div className="mb-8">
-              <h2 className="text-2xl font-bold text-[#3F2965] mb-2">Your Sessions</h2>
-              <p className="text-[#3F2965]/60">Manage your upcoming and past therapy sessions</p>
-            </div>
+          {/* RIGHT CONTENT: Bookings */}
+          <div className="w-full md:w-2/3 lg:w-3/4">
+            <div className="bg-white rounded-3xl shadow-sm border border-[#3F2965]/5 p-8 min-h-[500px]">
+              <h2 className="text-xl font-bold text-[#3F2965] mb-6 flex items-center gap-3">
+                <Calendar className="text-[#Dd1764]" />
+                Your Sessions
+              </h2>
 
-            {bookings.length === 0 ? (
-              <div className="bg-white rounded-3xl p-12 text-center border border-[#3F2965]/10">
-                <div className="w-16 h-16 bg-[#3F2965]/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Calendar size={28} className="text-[#3F2965]" />
-                </div>
-                <h3 className="text-xl font-semibold text-[#3F2965] mb-2">No sessions yet</h3>
-                <p className="text-[#3F2965]/60 mb-6 max-w-md mx-auto">
-                  You haven't booked any therapy sessions yet. Book your first session to get started on your mental wellness journey.
-                </p>
-                <button 
-                  onClick={() => router.push("/booking")}
-                  className="bg-[#3F2965] text-white px-6 py-3 rounded-xl font-medium hover:bg-[#3F2965]/90 transition-colors"
-                >
-                  Book Your First Session
-                </button>
-              </div>
-            ) : (
-              <div className="grid gap-6">
-                {bookings.map((booking) => (
-                  <div 
-                    key={booking.id}
-                    className="bg-white rounded-3xl p-6 border border-[#3F2965]/10 hover:shadow-md transition-shadow"
-                  >
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                      {/* Booking Info */}
-                      <div className="space-y-4 flex-1">
-                        <div className="flex flex-wrap items-center gap-3">
-                          <span className={`px-3 py-1 rounded-full text-xs font-bold ${
-                            booking.status === "CONFIRMED" 
-                              ? "bg-green-100 text-green-800" 
-                              : booking.status === "PENDING"
-                              ? "bg-yellow-100 text-yellow-800"
-                              : "bg-red-100 text-red-800"
-                          }`}>
-                            {booking.status}
-                          </span>
-                          <span className="px-3 py-1 bg-[#3F2965]/10 text-[#3F2965] rounded-full text-xs font-bold">
-                            {booking.type === "FIRST" ? "First Session" : "Follow Up"}
-                          </span>
-                          {booking.therapyType && (
-                            <span className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-xs font-bold">
-                              {booking.therapyType}
-                            </span>
-                          )}
-                        </div>
-
-                        <div className="space-y-3">
-                          <div className="flex items-center gap-3">
-                            <Calendar size={18} className="text-[#3F2965]/60" />
-                            <span className="font-medium">
-                              {new Date(booking.slot.date).toLocaleDateString('en-US', {
-                                weekday: 'long',
-                                year: 'numeric',
-                                month: 'long',
-                                day: 'numeric'
-                              })}
-                            </span>
-                          </div>
-                          
-                          <div className="flex items-center gap-3">
-                            <Clock size={18} className="text-[#3F2965]/60" />
-                            <span className="font-medium">
-                              {new Date(booking.slot.startTime).toLocaleTimeString('en-US', {
-                                hour: '2-digit',
-                                minute: '2-digit'
-                              })} - {new Date(booking.slot.endTime).toLocaleTimeString('en-US', {
-                                hour: '2-digit',
-                                minute: '2-digit'
-                              })}
-                            </span>
-                          </div>
-                          
-                          <div className="flex items-center gap-3">
-                            <MapPin size={18} className="text-[#3F2965]/60" />
-                            <span className="font-medium">
-                              {booking.slot.mode === "ONLINE" ? "Online Session" : "In-person at MindSettler Studio"}
-                            </span>
-                          </div>
-                        </div>
-
-                        {booking.reason && (
-                          <div className="pt-3 border-t border-[#3F2965]/10">
-                            <p className="text-sm text-[#3F2965]/60 mb-1">Reason for session:</p>
-                            <p className="text-[#3F2965]">{booking.reason}</p>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Actions */}
-                      <div className="flex flex-col gap-3 md:w-auto">
-                        <a
-                          href={getGoogleCalendarUrl(booking)}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center justify-center gap-2 px-4 py-2.5 bg-[#3F2965] text-white rounded-xl hover:bg-[#3F2965]/90 transition-colors font-medium text-sm"
-                        >
-                          <ExternalLink size={16} />
-                          Add to Calendar
-                        </a>
-                        
-                        {booking.status !== "REJECTED" && (
-                          <button
-                            onClick={() => initiateCancel(booking)}
-                            className="flex items-center justify-center gap-2 px-4 py-2.5 bg-red-50 text-red-600 rounded-xl hover:bg-red-100 transition-colors font-medium text-sm"
-                          >
-                            <XCircle size={16} />
-                            Cancel Session
-                          </button>
-                        )}
-                      </div>
-                    </div>
+              {bookings.length === 0 ? (
+                <div className="bg-white rounded-3xl p-12 text-center border-2 border-dashed border-[#3F2965]/10 flex flex-col items-center justify-center h-64">
+                  <div className="w-16 h-16 bg-[#3F2965]/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Calendar size={28} className="text-[#3F2965]" />
                   </div>
-                ))}
-              </div>
-            )}
+                  <h3 className="text-xl font-semibold text-[#3F2965] mb-2">No sessions yet</h3>
+                  <p className="text-[#3F2965]/60 mb-6 max-w-md mx-auto">
+                    You haven't booked any therapy sessions yet. Book your first session to get started.
+                  </p>
+                  <button 
+                    onClick={() => router.push("/book")}
+                    className="bg-[#3F2965] text-white px-6 py-3 rounded-xl font-medium hover:bg-[#3F2965]/90 transition-colors"
+                  >
+                    Book Your First Session
+                  </button>
+                </div>
+              ) : (
+                <div className="grid gap-6">
+                  {bookings.map((booking) => {
+                    const isPast = new Date(booking.slot.startTime) < new Date();
+                    return (
+                      <div 
+                        key={booking.id}
+                        className="bg-white rounded-3xl p-6 border border-[#3F2965]/10 hover:shadow-md transition-shadow"
+                      >
+                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                          {/* Booking Info */}
+                          <div className="space-y-4 flex-1">
+                            <div className="flex flex-wrap items-center gap-3">
+                              <span className={`px-3 py-1 rounded-full text-xs font-bold ${
+                                booking.status === "CONFIRMED" 
+                                  ? "bg-green-100 text-green-800" 
+                                  : booking.status === "PENDING"
+                                  ? "bg-yellow-100 text-yellow-800"
+                                  : "bg-red-100 text-red-800"
+                              }`}>
+                                {booking.status}
+                              </span>
+                              <span className="px-3 py-1 bg-[#3F2965]/10 text-[#3F2965] rounded-full text-xs font-bold">
+                                {booking.type === "FIRST" ? "First Session" : "Follow Up"}
+                              </span>
+                              {booking.therapyType && (
+                                <span className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-xs font-bold">
+                                  {booking.therapyType}
+                                </span>
+                              )}
+                            </div>
+
+                            <div className="space-y-3">
+                              <div className="flex items-center gap-3">
+                                <Calendar size={18} className="text-[#3F2965]/60" />
+                                <span className="font-medium">
+                                  {new Date(booking.slot.date).toLocaleDateString('en-US', {
+                                    weekday: 'long',
+                                    year: 'numeric',
+                                    month: 'long',
+                                    day: 'numeric'
+                                  })}
+                                </span>
+                              </div>
+                              
+                              <div className="flex items-center gap-3">
+                                <Clock size={18} className="text-[#3F2965]/60" />
+                                <span className="font-medium">
+                                  {new Date(booking.slot.startTime).toLocaleTimeString('en-US', {
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                  })} - {new Date(booking.slot.endTime).toLocaleTimeString('en-US', {
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                  })}
+                                </span>
+                              </div>
+                              
+                              <div className="flex items-center gap-3">
+                                <MapPin size={18} className="text-[#3F2965]/60" />
+                                <span className="font-medium">
+                                  {booking.slot.mode === "ONLINE" ? "Online Session" : "In-person at MindSettler Studio"}
+                                </span>
+                              </div>
+                            </div>
+
+                            {booking.reason && (
+                              <div className="pt-3 border-t border-[#3F2965]/10">
+                                <p className="text-sm text-[#3F2965]/60 mb-1">Reason for session:</p>
+                                <p className="text-[#3F2965]">{booking.reason}</p>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Actions */}
+                          <div className="flex flex-col gap-3 md:w-auto">
+                            {!isPast && booking.status === "CONFIRMED" && (
+                              <a
+                                href={getGoogleCalendarUrl(booking)}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center justify-center gap-2 px-4 py-2.5 bg-[#3F2965] text-white rounded-xl hover:bg-[#3F2965]/90 transition-colors font-medium text-sm"
+                              >
+                                <ExternalLink size={16} />
+                                Add to Calendar
+                              </a>
+                            )}
+                            
+                            {!isPast && (
+                              <button
+                                onClick={() => initiateCancel(booking)}
+                                className="flex items-center justify-center gap-2 px-4 py-2.5 bg-red-50 text-red-600 rounded-xl hover:bg-red-100 transition-colors font-medium text-sm"
+                              >
+                                <XCircle size={16} />
+                                Cancel Session
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
