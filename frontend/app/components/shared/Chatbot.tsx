@@ -46,59 +46,59 @@ export function Chatbot() {
   }, [messages]);
 
   const handleSendMessage = async (e: React.FormEvent) => {
-  e.preventDefault();
-  if (!input.trim()) return;
+    e.preventDefault();
+    if (!input.trim()) return;
 
-  const userMessage: Message = { role: 'user', content: input };
-  setMessages(prev => [...prev, userMessage]);
-  setInput('');
-  setIsLoading(true);
+    const userMessage: Message = { role: 'user', content: input };
+    setMessages(prev => [...prev, userMessage]);
+    setInput('');
+    setIsLoading(true);
 
-  try {
-    const result = await chatbotAssistsBooking({
-  message: input,
-  history: messages
-    .filter(m => !m.content.startsWith('__'))
-    .slice(-10),
-});
+    try {
+      const result = await chatbotAssistsBooking({
+        message: input,
+        history: messages
+          .filter(m => !m.content.startsWith('__'))
+          .slice(-10),
+      });
 
 
-    setMessages(prev => [
-      ...prev,
-      { role: 'bot', content: result.response },
-    ]);
+      setMessages(prev => [
+        ...prev,
+        { role: 'bot', content: result.response },
+      ]);
 
-    // DIRECT REDIRECT
-    if (result.action === 'redirect_booking') {
-      setTimeout(() => {
-        router.push('/book');
-        setIsOpen(false);
-      }, 700);
-    }
+      // DIRECT REDIRECT
+      if (result.action === 'redirect_booking') {
+        setTimeout(() => {
+          router.push('/book');
+          setIsOpen(false);
+        }, 700);
+      }
 
-    // SOFT SUGGESTION (BUTTON)
-    if (result.action === 'suggest_booking') {
+      // SOFT SUGGESTION (BUTTON)
+      if (result.action === 'suggest_booking') {
+        setMessages(prev => [
+          ...prev,
+          {
+            role: 'bot',
+            content: '__BOOK_SESSION_BUTTON__',
+          },
+        ]);
+      }
+    } catch (err) {
       setMessages(prev => [
         ...prev,
         {
           role: 'bot',
-          content: '__BOOK_SESSION_BUTTON__',
+          content:
+            "I’m having a little trouble right now. Please try again in a moment.",
         },
       ]);
+    } finally {
+      setIsLoading(false);
     }
-  } catch (err) {
-    setMessages(prev => [
-      ...prev,
-      {
-        role: 'bot',
-        content:
-          "I’m having a little trouble right now. Please try again in a moment.",
-      },
-    ]);
-  } finally {
-    setIsLoading(false);
-  }
-};
+  };
 
 
   return (
@@ -113,7 +113,7 @@ export function Chatbot() {
       </Button>
 
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
-        <SheetContent className="ms-chatbot-sheet flex h-full flex-col sm:max-w-md">
+        <SheetContent className="ms-chatbot-sheet flex flex-col !w-[380px] !max-w-[380px] !h-[600px] !top-auto !bottom-24 !right-6 rounded-[2.5rem] border-none shadow-2xl origin-bottom-right transition-all data-[state=open]:duration-[30000ms] data-[state=open]:ease-[cubic-bezier(0.22,1,0.36,1)] data-[state=open]:animate-in data-[state=open]:zoom-in-0 data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-bottom-20 data-[state=open]:slide-in-from-right-20">
           <SheetHeader className="ms-chatbot-header pr-8">
             <SheetTitle className="text-2xl">
               MindSettler Assistant
@@ -121,7 +121,7 @@ export function Chatbot() {
             <SheetDescription>
               A calm space to understand our services and take the next step.
             </SheetDescription>
-          </SheetHeader>
+          </SheetHeader >
 
           <div className="flex-1 overflow-hidden">
             <ScrollArea className="h-full" ref={scrollAreaRef}>
@@ -154,45 +154,45 @@ export function Chatbot() {
                           : 'ms-chatbot-bot'
                       )}
                     >
-                     {message.content === '__BOOK_SESSION_BUTTON__' ? (
-  <Button
-    className="mt-2 w-fit bg-[#b8aaf3] text-white hover:bg-[#a79bf0]"
-    onClick={() => {
-      router.push('/book');
-      setIsOpen(false);
-    }}
-  >
-    Book a session with MindSettler
-  </Button>
-) : (
-  message.content
-)}
+                      {message.content === '__BOOK_SESSION_BUTTON__' ? (
+                        <Button
+                          className="mt-2 w-fit bg-[#b8aaf3] text-white hover:bg-[#a79bf0]"
+                          onClick={() => {
+                            router.push('/book');
+                            setIsOpen(false);
+                          }}
+                        >
+                          Book a session with MindSettler
+                        </Button>
+                      ) : (
+                        message.content
+                      )}
 
                     </div>
                   </div>
                 ))}
 
                 {isLoading && (
-  <div className="flex flex-col gap-1 pl-12">
-    {/* Typing text */}
-    <div className="text-xs text-muted-foreground italic">
-      MindSettler Assistant is typing…
-    </div>
+                  <div className="flex flex-col gap-1 pl-12">
+                    {/* Typing text */}
+                    <div className="text-xs text-muted-foreground italic">
+                      MindSettler Assistant is typing…
+                    </div>
 
-    {/* Loader bubble */}
-    <div className="flex items-start gap-3">
-      <Avatar>
-        <AvatarFallback>
-          <Bot className="h-5 w-5" />
-        </AvatarFallback>
-      </Avatar>
+                    {/* Loader bubble */}
+                    <div className="flex items-start gap-3">
+                      <Avatar>
+                        <AvatarFallback>
+                          <Bot className="h-5 w-5" />
+                        </AvatarFallback>
+                      </Avatar>
 
-      <div className="ms-chatbot-bot rounded-lg p-3">
-        <Loader className="ms-chatbot-loader h-5 w-5 animate-spin" />
-      </div>
-    </div>
-  </div>
-)}
+                      <div className="ms-chatbot-bot rounded-lg p-3">
+                        <Loader className="ms-chatbot-loader h-5 w-5 animate-spin" />
+                      </div>
+                    </div>
+                  </div>
+                )}
 
               </div>
             </ScrollArea>
@@ -217,8 +217,8 @@ export function Chatbot() {
               <Send className="h-4 w-4" />
             </Button>
           </form>
-        </SheetContent>
-      </Sheet>
+        </SheetContent >
+      </Sheet >
     </>
   );
 }
