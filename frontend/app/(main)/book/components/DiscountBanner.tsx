@@ -61,7 +61,7 @@ export default function DiscountBanner() {
                     className="relative mb-8 overflow-hidden"
                 >
                     {/* Glassmorphism Container */}
-                    <div className="relative bg-gradient-to-r from-[#Dd1764]/10 via-[#3F2965]/5 to-[#3F2965]/10 border border-[#Dd1764]/20 backdrop-blur-md rounded-2xl p-5 shadow-lg shadow-[#Dd1764]/5">
+                    <div className="relative bg-white border border-[#Dd1764] backdrop-blur-md rounded-2xl p-5 shadow-lg shadow-[#Dd1764]/5">
                         
                         {/* Shimmer Effect on Border */}
                         <div className="absolute inset-0 rounded-2xl overflow-hidden pointer-events-none">
