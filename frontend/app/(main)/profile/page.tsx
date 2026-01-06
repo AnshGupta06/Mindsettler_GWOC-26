@@ -59,9 +59,6 @@ export default function ProfilePage() {
   
   const [actionLoading, setActionLoading] = useState(false);
 
-  // 🆕 FORCE SCROLL TO TOP
-  // This ensures that when the loader finishes and content appears, 
-  // the user is looking at the top of the profile, not the middle.
   useEffect(() => {
     if (!loading) {
       window.scrollTo(0, 0);
@@ -76,7 +73,6 @@ export default function ProfilePage() {
         await fetchProfileData(currentUser);
       } else {
         setLoading(false);
-        // Trigger Auth Modal immediately if not logged in
         setModalState({ isOpen: true, type: "AUTH" });
       }
     });
@@ -118,28 +114,22 @@ export default function ProfilePage() {
         body: JSON.stringify({ phone: newPhone }),
       });
       if (user) await fetchProfileData(user);
-      // ✅ Toast for small success
       toast.success("Phone number updated!");
       setNewPhone("");
     } catch (err) {
-     // ❌ Toast for error
       toast.error("Failed to update phone.");
     } finally {
       setUpdatingPhone(false);
     }
   };
 
-  // --- MODAL HANDLERS ---
-
-  // 1. Handle Closing (Redirects if it was an Auth check)
   const closeModal = () => {
     if (modalState.type === "AUTH") {
-      router.push("/"); // 🚀 Redirect unlogged users to Home
+      router.push("/"); 
     }
     setModalState(prev => ({ ...prev, isOpen: false }));
   };
 
-  // 2. Trigger Confirmation
   const initiateCancel = (booking: Booking) => {
     const isConfirmed = booking.status === "CONFIRMED";
     
@@ -155,7 +145,6 @@ export default function ProfilePage() {
     });
   };
 
-  // 3. Perform Cancellation
   const handleConfirmCancel = async () => {
     if (!modalState.bookingId) return;
     
@@ -171,7 +160,6 @@ export default function ProfilePage() {
 
       setBookings((prev) => prev.filter((b) => b.id !== modalState.bookingId));
       
-      // Show Success Modal
       setModalState({
         isOpen: true,
         type: "SUCCESS",
@@ -192,19 +180,21 @@ export default function ProfilePage() {
     }
   };
 
+  // ✅ ROBUST GOOGLE CALENDAR LINK GENERATOR
   const getGoogleCalendarUrl = (booking: Booking) => {
     const formatTime = (dateString: string) => {
       return new Date(dateString).toISOString().replace(/-|:|\.\d+/g, "");
     };
+    
     const start = formatTime(booking.slot.startTime);
     const end = formatTime(booking.slot.endTime);
     const title = "MindSettler Therapy Session";
-    const details = `Type: ${booking.type} | Reason: ${booking.reason || "N/A"}`;
+    const details = `Type: ${booking.type} | Mode: ${booking.slot.mode} | Reason: ${booking.reason || "N/A"}`;
     const location = booking.slot.mode === "ONLINE" ? "Online (Link will be shared)" : "MindSettler Studio";
+    
     return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${start}/${end}&details=${encodeURIComponent(details)}&location=${encodeURIComponent(location)}`;
   };
 
-  // --- LOADING VIEW ---
   if (loading) {
     return <Loader fullScreen={true} message={"Loading your space..."} />; 
   }
@@ -342,12 +332,14 @@ export default function ProfilePage() {
                             </span>
 
                             <div className="flex items-center gap-3">
+                              {/* 📅 ADD TO CALENDAR - Only if CONFIRMED and NOT PAST */}
                               {!isPast && b.status === "CONFIRMED" && (
                                 <a
                                   href={getGoogleCalendarUrl(b)}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   className="px-3 py-1.5 bg-blue-50 text-blue-600 border border-blue-100 rounded-lg text-xs font-bold hover:bg-blue-100 transition-colors flex items-center gap-1.5"
+                                  title="Add to Google Calendar"
                                 >
                                   <ExternalLink size={12} /> Google Cal
                                 </a>
