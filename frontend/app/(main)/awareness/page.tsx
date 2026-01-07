@@ -1,9 +1,12 @@
 "use client";
+
+import { motion } from 'framer-motion';
 import Link from "next/link";
 import HeroCarousel from "./components/HeroCarousel";
 import Image from "next/image";
 import { awarenessAreas } from "./awarenessCardsData";
 import { CharReveal, SlideUp, StaggerContainer, StaggerItem } from "../components/common/RevealComponent";
+import { ArrowRight, BrainCircuit, Sparkles } from "lucide-react";
 
 export default function AwarenessPage() {
   return (
@@ -11,29 +14,33 @@ export default function AwarenessPage() {
       <HeroCarousel />
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-white"></div>
+      <section className="relative overflow-hidden py-12 lg:py-20"> 
 
         {/* Content */}
-        <div className="relative max-w-6xl mx-auto px-6 py-8 text-center">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6">
           <SlideUp>
-            <div className="bg-[#f9f6ff] rounded-3xl shadow-xl p-12 md:p-16 border border-gray-100">
-              <h1 className="text-4xl md:text-5xl font-bold text-primary leading-tight">
-                {/* Updated to use the new CharReveal for character-level animation */}
-                <div className="mb-2">
+            <div className="bg-[#F9F6FF] rounded-[2.5rem] p-8 md:p-14 lg:p-16 border border-[#3F2965]/5 text-center relative overflow-hidden">
+              
+              {/* Decorative Icon */}
+              <div className="absolute top-6 left-6 opacity-10 rotate-12 hidden md:block">
+                <BrainCircuit size={100} className="text-[#3F2965]" />
+              </div>
+
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-[#3F2965] leading-tight tracking-tight">
+                <div className="mb-1">
                     <CharReveal delay={0.1}>
-                    Understanding Your Mind
+                      Understanding Your Mind
                     </CharReveal>
                 </div>
-                <div>
+                <div className="text-[#Dd1764]">
                     <CharReveal delay={0.2}>
-                    Is the First Step Toward Healing
+                      Is the First Step Toward Healing
                     </CharReveal>
                 </div>
               </h1>
 
               <SlideUp delay={0.3}>
-                <p className="mt-6 text-lg text-gray-700 max-w-3xl mx-auto">
+                <p className="mt-6 text-base sm:text-lg md:text-xl text-[#3F2965]/70 max-w-3xl mx-auto leading-relaxed">
                   MindSettler is a psycho-education and mental well-being platform
                   that helps individuals understand their mental health and navigate
                   life’s challenges through awareness, guidance, and personalized
@@ -41,28 +48,23 @@ export default function AwarenessPage() {
                 </p>
               </SlideUp>
 
-              <div className="mt-10 flex flex-col sm:flex-row justify-center gap-6">
+              <div className="mt-10 flex flex-col sm:flex-row justify-center gap-4 sm:gap-6 relative z-10">
                 <SlideUp delay={0.4}>
-                  <Link href="/resource">
-                    <button className="w-full sm:w-auto relative px-6 sm:px-8 md:px-10 py-3 sm:py-3.5 md:py-4 rounded-full bg-[#Dd1764] text-white font-bold text-sm sm:text-base tracking-wide overflow-hidden group transition-all duration-300 hover:shadow-2xl hover:shadow-[#3F2965]/20 hover:-translate-y-1">
-                      <span className="absolute top-0 left-[-25%] w-[80%] h-full bg-gradient-to-r from-[#3F2965] to-[#513681] -skew-x-12 -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-left" />
-                      <span className="absolute top-0 right-[-25%] w-[80%] h-full bg-gradient-to-l from-[#3F2965] to-[#513681] -skew-x-12 translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-right" />
-                      <span className="relative z-10">Explore Resources</span>
+                  <Link href="/resource" className="w-full sm:w-auto">
+                    <button className="w-full sm:w-auto relative px-8 py-4 rounded-2xl bg-[#Dd1764] text-white font-bold text-sm sm:text-base tracking-wide overflow-hidden group transition-all duration-300 hover:shadow-lg hover:shadow-[#Dd1764]/30 hover:-translate-y-1 flex items-center justify-center gap-2">
+                      <span className="absolute top-0 left-[-25%] w-[80%] h-full bg-white/20 -skew-x-12 -translate-x-full group-hover:translate-x-[200%] transition-transform duration-700 ease-in-out" />
+                      Explore Resources <ArrowRight size={18} />
                     </button>
                   </Link>
                 </SlideUp>
 
-                <Link href="/services">
-                  <SlideUp delay={0.5}>
-                    <button className="w-full sm:w-auto relative px-6 sm:px-8 md:px-10 py-3 sm:py-3.5 md:py-4 rounded-full border-2 border-[#3F2965]/10 text-[#3F2965] font-bold text-sm sm:text-base tracking-wide overflow-hidden group transition-all duration-300 hover:border-[#3F2965] hover:-translate-y-1">
-                      <span className="absolute top-0 left-[-25%] w-[80%] h-full bg-gradient-to-r from-[#3F2965] to-[#513681] -skew-x-12 -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-left" />
-                      <span className="absolute top-0 right-[-25%] w-[80%] h-full bg-gradient-to-l from-[#3F2965] to-[#513681] -skew-x-12 translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-right" />
-                      <span className="relative z-10 group-hover:text-white transition-colors duration-300">
-                        Our Programs
-                      </span>
+                <SlideUp delay={0.5}>
+                  <Link href="/services" className="w-full sm:w-auto">
+                    <button className="w-full sm:w-auto relative px-8 py-4 rounded-2xl border-2 border-[#3F2965]/10 bg-white text-[#3F2965] font-bold text-sm sm:text-base tracking-wide overflow-hidden group transition-all duration-300 hover:border-[#3F2965] hover:text-[#3F2965] hover:-translate-y-1">
+                      Our Programs
                     </button>
-                  </SlideUp>
-                </Link>
+                  </Link>
+                </SlideUp>
               </div>
             </div>
           </SlideUp>
@@ -70,57 +72,72 @@ export default function AwarenessPage() {
       </section>
 
       {/* Awareness Categories */}
-      <section className="max-w-7xl mx-auto px-6 py-10">
-        <div className="text-center mb-14">
-          <h2 className="text-3xl md:text-4xl font-bold text-primary">
-            {/* Updated to use CharReveal */}
-            <CharReveal delay={0.2}>
-              Areas of Awareness
-            </CharReveal>
-          </h2>
-          <SlideUp delay={0.3}>
-            <p className="mt-4 text-gray-600 max-w-2xl mx-auto">
-              Understanding what you’re experiencing is the first step toward clarity
-              and healing. Explore common mental health concerns we support at
-              MindSettler.
-            </p>
-          </SlideUp>
-        </div>
-
-        <StaggerContainer delay={0.4}>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
-            {awarenessAreas.map((item) => (
-              <StaggerItem key={item.slug}>
-                <Link href={`/awareness/${item.slug}`}>
-                  <div className="group bg-[#f9f6ff] rounded-3xl overflow-hidden border border-gray-100 shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer h-full">
-                    {/* Image */}
-                    <div className="relative h-48 overflow-hidden">
-                      <Image
-                        src={item.image}
-                        alt={item.title}
-                        fill
-                        className="object-cover transition-transform duration-500 group-hover:scale-110"
-                      />
-
-                      {/* Hover Overlay */}
-                      <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition" />
-                    </div>
-
-                    {/* Content */}
-                    <div className="p-6">
-                      <h3 className="text-xl font-semibold text-primary mb-2">
-                        {item.title}
-                      </h3>
-                      <p className="text-gray-700 text-sm leading-relaxed">
-                        {item.description}
-                      </p>
-                    </div>
-                  </div>
-                </Link>
-              </StaggerItem>
-            ))}
+      <section className="relative py-12 lg:py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          
+          <div className="text-center mb-12 md:mb-16">
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#F9F6FF] border border-[#3F2965]/10 text-[#Dd1764] font-bold text-xs uppercase tracking-widest mb-4"
+            >
+              <Sparkles size={12} /> Key Topics
+            </motion.div>
+            
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#3F2965]">
+              <CharReveal delay={0.2}>
+                Areas of Awareness
+              </CharReveal>
+            </h2>
+            <SlideUp delay={0.3}>
+              <p className="mt-4 text-[#3F2965]/60 max-w-2xl mx-auto text-lg">
+                Explore common mental health concerns and find the clarity you need to move forward.
+              </p>
+            </SlideUp>
           </div>
-        </StaggerContainer>
+
+          <StaggerContainer delay={0.4}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+              {awarenessAreas.map((item) => (
+                <StaggerItem key={item.slug}>
+                  <Link href={`/awareness/${item.slug}`} className="block h-full">
+                    <div className="group h-full bg-white rounded-[2rem] overflow-hidden border border-[#3F2965]/5 shadow-sm hover:shadow-xl hover:shadow-[#3F2965]/10 transition-all duration-500 cursor-pointer flex flex-col">
+                      
+                      {/* Image Container */}
+                      <div className="relative h-56 sm:h-64 overflow-hidden">
+                        <Image
+                          src={item.image}
+                          alt={item.title}
+                          fill
+                          className="object-cover transition-transform duration-700 group-hover:scale-110"
+                        />
+                        
+                        {/* Hover Action */}
+                        <div className="absolute bottom-4 right-4 translate-y-10 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500 bg-white text-[#3F2965] p-3 rounded-full shadow-lg border border-[#3F2965]/10">
+                          <ArrowRight size={20} />
+                        </div>
+                      </div>
+
+                      {/* Content */}
+                      <div className="p-6 md:p-8 flex-1 flex flex-col relative">
+                        <h3 className="text-xl md:text-2xl font-bold text-[#3F2965] mb-3 group-hover:text-[#Dd1764] transition-colors">
+                          {item.title}
+                        </h3>
+                        <p className="text-[#3F2965]/60 text-sm leading-relaxed line-clamp-3">
+                          {item.description}
+                        </p>
+                        
+                        {/* Decorative Line */}
+                        <div className="mt-6 w-12 h-1 bg-[#F9F6FF] group-hover:bg-[#Dd1764] transition-colors rounded-full" />
+                      </div>
+                    </div>
+                  </Link>
+                </StaggerItem>
+              ))}
+            </div>
+          </StaggerContainer>
+        </div>
       </section>
     </main>
   );

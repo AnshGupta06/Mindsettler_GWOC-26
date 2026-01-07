@@ -48,15 +48,9 @@ export default function HowItWorks() {
   };
 
   return (
-    <section className="py-24 relative overflow-hidden bg-[#F9F6FF]" id="howitworks">
-      
-      {/* Background Decor (Matching your Book Page) */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-[#3F2965]/5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
-        <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-[#Dd1764]/5 rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
-      </div>
+    <section className="py-24 relative overflow-hidden bg-white" id="howitworks">
 
-      <div className="max-w-7xl mx-auto px-6 relative z-10">
+      <div className="max-w-[1440px] mx-auto bg-[#F9F6FF] rounded-2xl sm:rounded-3xl md:rounded-[3rem] px-4 sm:px-8 md:px-12 lg:px-20 py-12 sm:py-16 md:py-20 lg:py-24 overflow-hidden relative">
         
         {/* Header */}
         <div className="text-center mb-16 md:mb-20">
