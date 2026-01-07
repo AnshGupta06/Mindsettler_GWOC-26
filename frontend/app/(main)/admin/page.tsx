@@ -150,34 +150,41 @@ export default function AdminBookingsPage() {
       
       <div className="max-w-[1440px] mx-auto bg-[#F9F6FF] rounded-[2.5rem] p-6 md:p-12 shadow-sm min-h-[80vh] text-[#3F2965]">
       
-        {/* HEADER & ACTIONS */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold flex items-center gap-3">
-              <LayoutDashboard className="text-[#Dd1764]" />
-              Admin Dashboard
-            </h1>
-            <p className="text-[#3F2965]/60 mt-1 text-sm md:text-base">Manage appointments and schedules</p>
-          </div>
+{/* HEADER & ACTIONS */}
+<div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+  <div>
+    <h1 className="text-2xl md:text-3xl font-bold flex items-center gap-3">
+      <LayoutDashboard className="text-[#Dd1764]" />
+      Admin Dashboard
+    </h1>
+    <p className="text-[#3F2965]/60 mt-1 text-sm md:text-base">Manage appointments and schedules</p>
+  </div>
 
-          <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-            <button
-              onClick={() => router.push("/admin/discounts")}
-              className="justify-center px-6 py-3 bg-white text-[#3F2965] border border-[#3F2965]/10 rounded-full font-bold shadow-sm hover:bg-[#F9F6FF] transition-all flex items-center gap-2"
-            >
-              <Award size={18} className="text-[#Dd1764]" />
-              Discounts
-            </button>
-            <button
-              onClick={() => router.push("/admin/slots")}
-              className="justify-center px-6 py-3 bg-[#3F2965] text-white rounded-full font-bold shadow-lg hover:shadow-[#3F2965]/20 hover:scale-105 transition-all flex items-center gap-2"
-            >
-              <Calendar size={18} />
-              Manage Slots
-            </button>
-          </div>
-        </div>
+  <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+    <button
+      onClick={() => router.push("/admin/clients")} // 👈 NEW BUTTON
+      className="justify-center px-6 py-3 bg-white text-[#3F2965] border border-[#3F2965]/10 rounded-full font-bold shadow-sm hover:bg-[#F9F6FF] transition-all flex items-center gap-2"
+    >
+      <User size={18} className="text-[#Dd1764]" />
+      Clients
+    </button>
 
+    <button
+      onClick={() => router.push("/admin/discounts")}
+      className="justify-center px-6 py-3 bg-white text-[#3F2965] border border-[#3F2965]/10 rounded-full font-bold shadow-sm hover:bg-[#F9F6FF] transition-all flex items-center gap-2"
+    >
+      <Award size={18} className="text-[#Dd1764]" />
+      Discounts
+    </button>
+    <button
+      onClick={() => router.push("/admin/slots")}
+      className="justify-center px-6 py-3 bg-[#3F2965] text-white rounded-full font-bold shadow-lg hover:shadow-[#3F2965]/20 hover:scale-105 transition-all flex items-center gap-2"
+    >
+      <Calendar size={18} />
+      Manage Slots
+    </button>
+  </div>
+</div>
         {/* CIRCULAR STATS */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-12 px-2 md:px-8">
           <StatCircle
