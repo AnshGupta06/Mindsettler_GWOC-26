@@ -32,34 +32,82 @@ export default function JourneySection() {
   const riverRef = useRef<SVGPathElement>(null);
   const [pathd, setPathd] = useState("");
 
-  // Function to generate the wavy river path
-  const generateRiverPath = (width: number, height: number) => {
-    const points = [];
-    const amplitude = 30; // How wide the river swings
-    const frequency = 0.015; // How frequent the curves are
-    const centerX = width / 2;
+  // Function to generate the wavy river path connecting card centers
+  const updateRiverPath = () => {
+    if (!containerRef.current || cardsFloatRef.current.length === 0) return;
 
-    for (let y = 0; y <= height; y += 10) {
-      const x = centerX + Math.sin(y * frequency) * amplitude;
-      points.push(`${x},${y}`);
+    const containerRect = containerRef.current.getBoundingClientRect();
+    const points: { x: number; y: number }[] = [];
+
+    // 1. Start Point (Top Center)
+    points.push({ x: containerRect.width / 2, y: 0 });
+
+    // 2. Card Centers
+    cardsFloatRef.current.forEach((card) => {
+      if (card) {
+        const cardRect = card.getBoundingClientRect();
+        // Calculate center relative to container
+        const x = cardRect.left + cardRect.width / 2 - containerRect.left;
+        const y = cardRect.top + cardRect.height / 2 - containerRect.top;
+        points.push({ x, y });
+      }
+    });
+
+    // 3. End Point (Bottom Center)
+    points.push({ x: containerRect.width / 2, y: containerRect.height });
+
+    // Generate Smooth Path (Cubic Bezier)
+    if (points.length < 2) return;
+
+    let d = `M ${points[0].x} ${points[0].y}`;
+
+    for (let i = 0; i < points.length - 1; i++) {
+      const p1 = points[i];
+      const p2 = points[i + 1];
+
+      // Vertical control point distance (adjust for curvature)
+      // If it's the start or end, we might want a straighter entry/exit
+      const distY = (p2.y - p1.y) * 0.5;
+
+      // Control Points
+      // CP1: Below p1
+      const cp1x = p1.x;
+      const cp1y = p1.y + distY;
+
+      // CP2: Above p2
+      const cp2x = p2.x;
+      const cp2y = p2.y - distY;
+
+      d += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${p2.x} ${p2.y}`;
     }
 
-    if (points.length === 0) return "";
-    return `M ${points[0]} L ` + points.slice(1).join(" ");
+    setPathd(d);
   };
 
   useEffect(() => {
-    // Resize Observer to regenerate path on window resize
-    const updatePath = () => {
-      if (containerRef.current) {
-        const { offsetWidth, offsetHeight } = containerRef.current;
-        setPathd(generateRiverPath(offsetWidth, offsetHeight));
-      }
-    };
+    // Initial calculation
+    // Slight delay to ensure layout is settled (though ResizeObserver usually handles it)
+    setTimeout(updateRiverPath, 100);
 
-    updatePath();
-    window.addEventListener('resize', updatePath);
-    return () => window.removeEventListener('resize', updatePath);
+    const resizeObserver = new ResizeObserver(() => {
+      updateRiverPath();
+    });
+
+    if (containerRef.current) {
+      resizeObserver.observe(containerRef.current);
+    }
+
+    // Also observe the cards themselves in case they shift
+    cardsFloatRef.current.forEach(card => {
+      if (card) resizeObserver.observe(card);
+    })
+
+    window.addEventListener('resize', updateRiverPath);
+
+    return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener('resize', updateRiverPath);
+    };
   }, []);
 
   useEffect(() => {
@@ -265,9 +313,6 @@ export default function JourneySection() {
                       </p>
                     </div>
                   </div>
-
-                  {/* CENTER DOT */}
-                  <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center justify-center w-4 h-4 rounded-full bg-[#Dd1764] shadow-[0_0_15px_#Dd1764] z-20" />
 
                   {/* EMPTY SIDE (Decor Placement) */}
                   <div className={`w-full md:w-1/2 hidden md:flex ${isLeft ? "justify-end pr-8 lg:pr-12" : "justify-start pl-8 lg:pl-12"}`}>
