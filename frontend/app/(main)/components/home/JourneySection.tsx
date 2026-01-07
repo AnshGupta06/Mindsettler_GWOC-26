@@ -21,8 +21,14 @@ gsap.registerPlugin(ScrollTrigger);
 
 export default function JourneySection() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const cardsRef = useRef<HTMLDivElement[]>([]);
-  const decorRef = useRef<HTMLDivElement[]>([]);
+
+  // Ref pointers for animations
+  const cardsEntranceRef = useRef<HTMLDivElement[]>([]); // For Scroll Entrance (Opacity/Slide)
+  const cardsFloatRef = useRef<HTMLDivElement[]>([]);    // For Continuous Floating
+
+  const decorParallaxRef = useRef<HTMLDivElement[]>([]); // For Scroll Parallax
+  const decorFloatRef = useRef<HTMLDivElement[]>([]);    // For Continuous Floating
+
   const riverRef = useRef<SVGPathElement>(null);
   const [pathd, setPathd] = useState("");
 
@@ -38,9 +44,6 @@ export default function JourneySection() {
       points.push(`${x},${y}`);
     }
 
-    // Construct SVG path "M x0,y0 L x1,y1 ..." 
-    // Using simple line segments is often enough for high resolution, 
-    // but we can smooth it if needed. With 10px steps, L is fine.
     if (points.length === 0) return "";
     return `M ${points[0]} L ` + points.slice(1).join(" ");
   };
@@ -50,7 +53,6 @@ export default function JourneySection() {
     const updatePath = () => {
       if (containerRef.current) {
         const { offsetWidth, offsetHeight } = containerRef.current;
-        // Adjust height to cover the full potential scroll area
         setPathd(generateRiverPath(offsetWidth, offsetHeight));
       }
     };
@@ -78,16 +80,15 @@ export default function JourneySection() {
           ease: "none",
           scrollTrigger: {
             trigger: containerRef.current,
-            start: "top center", // Start drawing when container hits center
-            end: "bottom bottom", // Finish drawing when container bottom hits viewport bottom
+            start: "top center",
+            end: "bottom bottom",
             scrub: 1,
-            // markers: true, // Uncomment for debugging
           },
         }
       );
 
-      // 2. Cards Animation
-      cardsRef.current.forEach((card) => {
+      // 2. Cards Entrance Animation (Scroll-linked)
+      cardsEntranceRef.current.forEach((card) => {
         gsap.fromTo(
           card,
           { opacity: 0, y: 50 },
@@ -98,15 +99,15 @@ export default function JourneySection() {
             ease: "power3.out",
             scrollTrigger: {
               trigger: card,
-              start: "top 85%", // Slightly later start to ensure visibility
+              start: "top 85%",
               toggleActions: "play none none reverse",
             },
           }
         );
       });
 
-      // 3. Floating Decor Parallax
-      decorRef.current.forEach((el, i) => {
+      // 3. Decor Parallax (Scroll-linked)
+      decorParallaxRef.current.forEach((el, i) => {
         gsap.to(el, {
           y: -40,
           rotation: i % 2 === 0 ? 10 : -10,
@@ -119,11 +120,39 @@ export default function JourneySection() {
           }
         })
       });
-    }, containerRef); // Scope to container
 
-    return () => ctx.revert(); // Cleanup on unmount/update
+      // 4. ✨ NEW: Continuous "Floating in Water" Animation
+      // Applied to the inner elements so it doesn't conflict with scroll transforms
 
-  }, [pathd]); // Re-run effect when path changes
+      // Floating Cards
+      cardsFloatRef.current.forEach((el, i) => {
+        gsap.to(el, {
+          y: -25, // Increased from -15 to -25
+          duration: 3 + Math.random() * 1.5, // Slower, deeper float
+          repeat: -1,
+          yoyo: true,
+          ease: "sine.inOut",
+          delay: Math.random() * 2
+        });
+      });
+
+      // Floating Decor
+      decorFloatRef.current.forEach((el, i) => {
+        gsap.to(el, {
+          y: -20, // Increased from -10 to -20
+          duration: 3.5 + Math.random() * 1.5,
+          repeat: -1,
+          yoyo: true,
+          ease: "sine.inOut",
+          delay: Math.random() * 2
+        });
+      });
+
+    }, containerRef);
+
+    return () => ctx.revert();
+
+  }, [pathd]);
 
   return (
     <section className="py-8 sm:py-10 md:py-12 px-4 sm:px-6 md:px-8 bg-white" id="journey">
@@ -155,20 +184,18 @@ export default function JourneySection() {
         {/* Timeline Container */}
         <div ref={containerRef} className="relative max-w-5xl mx-auto z-10">
 
-          {/* RIVER SVG BACKGROUND (Replaces straight line) */}
+          {/* RIVER SVG BACKGROUND */}
           <div className="absolute inset-0 pointer-events-none z-0 hidden md:block">
             <svg className="w-full h-full overflow-visible">
               <defs>
-                {/* Gradient 1: The 'Main' Drawing River */}
                 <linearGradient id="riverGradient" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor="#3F2965" stopOpacity="0" />
                   <stop offset="10%" stopColor="#Dd1764" />
-                  <stop offset="50%" stopColor="#9333ea" /> {/* Purple-ish middle */}
+                  <stop offset="50%" stopColor="#9333ea" />
                   <stop offset="90%" stopColor="#3F2965" />
                   <stop offset="100%" stopColor="#3F2965" stopOpacity="0" />
                 </linearGradient>
 
-                {/* Gradient 2: A faint 'bed' for the river (optional backing) */}
                 <linearGradient id="riverBedGradient" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor="#3F2965" stopOpacity="0" />
                   <stop offset="50%" stopColor="#3F2965" stopOpacity="0.05" />
@@ -176,7 +203,6 @@ export default function JourneySection() {
                 </linearGradient>
               </defs>
 
-              {/* River Bed (Backing) - Static */}
               <path
                 d={pathd}
                 stroke="url(#riverBedGradient)"
@@ -186,7 +212,6 @@ export default function JourneySection() {
                 className="opacity-50"
               />
 
-              {/* The Flowing River - Animated */}
               <path
                 ref={riverRef}
                 d={pathd}
@@ -214,10 +239,15 @@ export default function JourneySection() {
                 >
 
                   {/* TEXT SIDE (Card) */}
-                  <div className={`w-full md:w-1/2 ${isLeft ? "md:pr-10 lg:pr-20" : "md:pl-10 lg:pl-20"} z-10`}>
+                  {/* WRAPPER: Handles Scroll Entrance (Opacity/Slide) */}
+                  <div
+                    ref={(el) => { if (el) cardsEntranceRef.current[index] = el; }}
+                    className={`w-full md:w-1/2 ${isLeft ? "md:pr-10 lg:pr-20" : "md:pl-10 lg:pl-20"} z-10`}
+                  >
+                    {/* INNER: Handles Floating Animation */}
                     <div
-                      ref={(el) => { if (el) cardsRef.current[index] = el; }}
-                      className="group relative bg-white p-6 sm:p-8 md:p-10 rounded-xl sm:rounded-2xl md:rounded-[2rem] shadow-xl shadow-[#3F2965]/5 border border-[#3F2965]/5 hover:border-[#Dd1764]/20 hover:shadow-2xl hover:shadow-[#3F2965]/10 transition-all duration-500 hover:-translate-y-2 cursor-default"
+                      ref={(el) => { if (el) cardsFloatRef.current[index] = el; }}
+                      className="group relative bg-white p-6 sm:p-8 md:p-10 rounded-xl sm:rounded-2xl md:rounded-[2rem] shadow-xl shadow-[#3F2965]/5 border border-[#3F2965]/5 hover:border-[#Dd1764]/20 hover:shadow-2xl hover:shadow-[#3F2965]/10 transition-all duration-300 cursor-default"
                     >
                       {/* Step Number Watermark */}
                       <span className="absolute top-4 right-6 text-6xl font-black text-[#3F2965]/5 pointer-events-none group-hover:text-[#Dd1764]/5 transition-colors">
@@ -236,23 +266,25 @@ export default function JourneySection() {
                     </div>
                   </div>
 
-                  {/* CENTER DOT - now integrated with the river visual slightly better? 
-                      Actually, let's keep it simple. The dot sits ON the river. 
-                  */}
+                  {/* CENTER DOT */}
                   <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center justify-center w-4 h-4 rounded-full bg-[#Dd1764] shadow-[0_0_15px_#Dd1764] z-20" />
 
-                  {/* EMPTY SIDE (Decor Placement) - Hidden on mobile */}
+                  {/* EMPTY SIDE (Decor Placement) */}
                   <div className={`w-full md:w-1/2 hidden md:flex ${isLeft ? "justify-end pr-8 lg:pr-12" : "justify-start pl-8 lg:pl-12"}`}>
+                    {/* WRAPPER: Handles Parallax */}
                     <div
-                      ref={(el) => { if (el) decorRef.current[index] = el; }}
+                      ref={(el) => { if (el) decorParallaxRef.current[index] = el; }}
                       className={`flex flex-col items-center gap-3 sm:gap-4 ${step.colorClass}`}
                     >
-                      <div className="opacity-10 scale-75 sm:scale-90 lg:scale-100">
-                        {step.decor}
+                      {/* INNER: Handles Floating */}
+                      <div ref={(el) => { if (el) decorFloatRef.current[index] = el; }}>
+                        <div className="opacity-10 scale-75 sm:scale-90 lg:scale-100">
+                          {step.decor}
+                        </div>
+                        <span className="text-xs sm:text-sm font-bold uppercase tracking-widest opacity-30 block text-center mt-2">
+                          {step.decorLabel}
+                        </span>
                       </div>
-                      <span className="text-xs sm:text-sm font-bold uppercase tracking-widest opacity-30">
-                        {step.decorLabel}
-                      </span>
                     </div>
                   </div>
                 </div>
