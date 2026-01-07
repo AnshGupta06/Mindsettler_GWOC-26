@@ -73,3 +73,12 @@ model BookingDiscount {
 
   @@map("booking_discounts")
 }
+
+model CorporateInquiry {
+  id          String   @id @default(uuid())
+  companyName String
+  contactName String
+  email       String
+  message     String
+  createdAt   DateTime @default(now())
+}

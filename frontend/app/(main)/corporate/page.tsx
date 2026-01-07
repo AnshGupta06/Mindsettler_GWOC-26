@@ -20,6 +20,7 @@ import { Input } from '../../components/ui/input';
 import { Textarea } from '../../components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
 import { useToast } from '@/hooks/use-toast';
+import workshopsData from '@/data/workshops.json';
 
 const corporateFormSchema = z.object({
   companyName: z.string().min(2, 'Company name must be at least 2 characters.'),
@@ -29,9 +30,6 @@ const corporateFormSchema = z.object({
 });
 
 type CorporateFormValues = z.infer<typeof corporateFormSchema>;
-
-// This would typically be fetched, but for static site we can import directly
-import workshopsData from '@/data/workshops.json';
 
 // Faster Scroll reveal animation component
 const FastScrollReveal = ({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) => {
@@ -75,7 +73,8 @@ type CarouselItem = {
   stats?: Array<{ label: string; value: string }>;
   highlight?: string;
 };
-// Full-width Carousel component with smooth transitions - NO WHITE FLASH
+
+// Full-width Carousel component with smooth transitions and rounded borders
 const CorporateWellnessCarousel = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
@@ -156,114 +155,113 @@ const CorporateWellnessCarousel = () => {
     return () => clearInterval(interval);
   }, [isAnimating]);
 
-  const currentItem = carouselItems[currentSlide];
-
   return (
-    <div className="relative w-full h-[500px] md:h-[600px] overflow-hidden">
-      {/* Changed from mt-16 to no top margin */}
-      
-      {/* Simple fade transition without complex animations */}
-      <div className="relative w-full h-full">
-        {/* All slides stacked, only current one visible */}
-        {carouselItems.map((item, index) => (
-          <div
-            key={index}
-            className={`absolute inset-0 transition-opacity duration-500 ${
-              index === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'
-            }`}
-          >
-            {/* Background Image with smooth loading */}
-            <div 
-              className="absolute inset-0 z-0"
-              style={{
-                backgroundImage: `url('${item.image}')`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                backgroundRepeat: 'no-repeat'
-              }}
-            />
-            
-            {/* Light overlay for better text readability */}
-            <div className="absolute inset-0 bg-black/60" />
-            
-            {/* Content */}
-            <div className="relative z-10 h-full flex items-center">
-              <div className="container mx-auto px-4 py-8">
-                <div className="max-w-4xl mx-auto text-center">
-                  {item.type === 'intro' ? (
-                    <>
-                      <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight text-white">
-                        {item.title}
-                      </h1>
-                      <p className="text-lg md:text-xl text-white/90 mb-10 max-w-2xl mx-auto">
-                        {item.description}
-                      </p>
-                      <div className="flex flex-wrap justify-center gap-4 md:gap-6">
-                        {item.stats?.map((stat, idx) => (
-                          <div
-                            key={idx}
-                            className="bg-white/20 backdrop-blur-sm rounded-xl p-4 md:p-6 min-w-[140px] md:min-w-[180px]"
-                          >
-                            <div className="text-2xl md:text-3xl font-bold text-white">{stat.value}</div>
-                            <div className="text-white/80 text-sm md:text-base mt-2">{stat.label}</div>
-                          </div>
-                        ))}
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <div className="inline-block bg-white/30 backdrop-blur-sm px-4 py-2 rounded-full mb-6">
-                        <span className="text-white font-semibold text-sm md:text-base">{item.highlight}</span>
-                      </div>
-                      <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-6 text-white">
-                        {item.title}
-                      </h2>
-                      <p className="text-lg md:text-xl text-white/90 max-w-2xl mx-auto">
-                        {item.description}
-                      </p>
-                    </>
-                  )}
+    <div className="w-full px-4 sm:px-6 md:px-8 max-w-[1600px] mx-auto">
+      <div className="relative w-full h-[500px] md:h-[600px] overflow-hidden rounded-2xl sm:rounded-3xl md:rounded-[3rem] shadow-xl">
+        
+        {/* Simple fade transition without complex animations */}
+        <div className="relative w-full h-full">
+          {/* All slides stacked, only current one visible */}
+          {carouselItems.map((item, index) => (
+            <div
+              key={index}
+              className={`absolute inset-0 transition-opacity duration-500 ${
+                index === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'
+              }`}
+            >
+              {/* Background Image with smooth loading */}
+              <div 
+                className="absolute inset-0 z-0"
+                style={{
+                  backgroundImage: `url('${item.image}')`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  backgroundRepeat: 'no-repeat'
+                }}
+              />
+              
+              {/* Light overlay for better text readability */}
+              <div className="absolute inset-0 bg-black/60" />
+              
+              {/* Content */}
+              <div className="relative z-10 h-full flex items-center">
+                <div className="container mx-auto px-4 py-8">
+                  <div className="max-w-4xl mx-auto text-center">
+                    {item.type === 'intro' ? (
+                      <>
+                        <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight text-white">
+                          {item.title}
+                        </h1>
+                        <p className="text-lg md:text-xl text-white/90 mb-10 max-w-2xl mx-auto">
+                          {item.description}
+                        </p>
+                        <div className="flex flex-wrap justify-center gap-4 md:gap-6">
+                          {item.stats?.map((stat, idx) => (
+                            <div
+                              key={idx}
+                              className="bg-white/20 backdrop-blur-sm rounded-xl p-4 md:p-6 min-w-[140px] md:min-w-[180px]"
+                            >
+                              <div className="text-2xl md:text-3xl font-bold text-white">{stat.value}</div>
+                              <div className="text-white/80 text-sm md:text-base mt-2">{stat.label}</div>
+                            </div>
+                          ))}
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="inline-block bg-white/30 backdrop-blur-sm px-4 py-2 rounded-full mb-6">
+                          <span className="text-white font-semibold text-sm md:text-base">{item.highlight}</span>
+                        </div>
+                        <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-6 text-white">
+                          {item.title}
+                        </h2>
+                        <p className="text-lg md:text-xl text-white/90 max-w-2xl mx-auto">
+                          {item.description}
+                        </p>
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
 
-      {/* Dots indicator - bottom center */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex space-x-3 z-30">
-        {carouselItems.map((_, index) => (
-          <button
-            key={index}
-            onClick={() => goToSlide(index)}
-            disabled={isAnimating}
-            className={`transition-all duration-300 ${
-              index === currentSlide 
-                ? 'w-8 h-2 bg-white rounded-full' 
-                : 'w-2 h-2 bg-white/50 rounded-full hover:bg-white/70'
-            } ${isAnimating ? 'cursor-not-allowed' : 'cursor-pointer'}`}
-            aria-label={`Go to slide ${index + 1}`}
-          />
-        ))}
-      </div>
+        {/* Dots indicator - bottom center */}
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex space-x-3 z-30">
+          {carouselItems.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => goToSlide(index)}
+              disabled={isAnimating}
+              className={`transition-all duration-300 ${
+                index === currentSlide 
+                  ? 'w-8 h-2 bg-white rounded-full' 
+                  : 'w-2 h-2 bg-white/50 rounded-full hover:bg-white/70'
+              } ${isAnimating ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+              aria-label={`Go to slide ${index + 1}`}
+            />
+          ))}
+        </div>
 
-      {/* Navigation buttons */}
-      <button
-        onClick={prevSlide}
-        disabled={isAnimating}
-        className="absolute left-4 top-1/2 -translate-y-1/2 z-30 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/90 shadow-2xl flex items-center justify-center hover:bg-white transition-all duration-300 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
-        aria-label="Previous slide"
-      >
-        <ChevronLeft className="h-5 w-5 md:h-6 md:w-6 text-purple-700" />
-      </button>
-      <button
-        onClick={nextSlide}
-        disabled={isAnimating}
-        className="absolute right-4 top-1/2 -translate-y-1/2 z-30 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/90 shadow-2xl flex items-center justify-center hover:bg-white transition-all duration-300 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
-        aria-label="Next slide"
-      >
-        <ChevronRight className="h-5 w-5 md:h-6 md:w-6 text-purple-700" />
-      </button>
+        {/* Navigation buttons */}
+        <button
+          onClick={prevSlide}
+          disabled={isAnimating}
+          className="absolute left-4 top-1/2 -translate-y-1/2 z-30 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/90 shadow-2xl flex items-center justify-center hover:bg-white transition-all duration-300 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
+          aria-label="Previous slide"
+        >
+          <ChevronLeft className="h-5 w-5 md:h-6 md:w-6 text-purple-700" />
+        </button>
+        <button
+          onClick={nextSlide}
+          disabled={isAnimating}
+          className="absolute right-4 top-1/2 -translate-y-1/2 z-30 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/90 shadow-2xl flex items-center justify-center hover:bg-white transition-all duration-300 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
+          aria-label="Next slide"
+        >
+          <ChevronRight className="h-5 w-5 md:h-6 md:w-6 text-purple-700" />
+        </button>
+      </div>
     </div>
   );
 };
@@ -305,43 +303,9 @@ export default function CorporatePage() {
   // Use the data from JSON file
   const workshopCategories = workshopsData.workshops;
 
-  // Faster animation variants
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.05
-      }
-    }
-  };
-
-  const fastItemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: {
-        duration: 0.3,
-        ease: "easeOut" as const
-      }
-    }
-  };
-
-  const cardHoverVariants = {
-    initial: { scale: 1 },
-    hover: { 
-      scale: 1.02,
-      transition: {
-        duration: 0.2,
-        ease: "easeOut" as const
-      }
-    }
-  };
-
   return (
     <div className="min-h-screen bg-white pt-20 sm:pt-24">
-      {/* Full-width Carousel Section with space for navbar */}
+      {/* Full-width Carousel Section */}
       <CorporateWellnessCarousel />
 
       {/* What We Offer section */}
@@ -457,124 +421,123 @@ export default function CorporatePage() {
       </div>
 
       {/* Form section with background image */}
-<div className="py-16 sm:py-24 relative overflow-hidden">
-  {/* Background image with overlay - very light */}
-  <div className="absolute inset-0 z-0">
-    <div 
-      className="absolute inset-0"
-      style={{
-        backgroundImage: 'url("https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=2070&auto=format&fit=crop")',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat'
-      }}
-    />
-    <div className="absolute inset-0 bg-gradient-to-br from-white/95 via-white/90 to-white/95"></div>
-  </div>
-  
-  <div className="container mx-auto px-4 relative z-10">
-    <div className="flex justify-center">
-      <div className="w-full max-w-2xl">
-        <FastScrollReveal>
-          <div className="text-center mb-10">
-            <h2 className="font-headline text-3xl font-bold" style={{ color: '#3f2965' }}>
-              <span style={{ color: '#de206a' }}>Partner</span> With <span style={{ color: '#de206a' }}>Us</span>
-            </h2>
-            <p className="mt-3 text-lg max-w-xl mx-auto" style={{ color: '#766693' }}>
-              Ready to foster a culture of wellness in your organization?
-            </p>
-          </div>
-        </FastScrollReveal>
+      <div className="py-16 sm:py-24 relative overflow-hidden">
+        {/* Background image with overlay - very light */}
+        <div className="absolute inset-0 z-0">
+          <div 
+            className="absolute inset-0"
+            style={{
+              backgroundImage: 'url("https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=2070&auto=format&fit=crop")',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat'
+            }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-br from-white/95 via-white/90 to-white/95"></div>
+        </div>
         
-        <FastScrollReveal delay={0.1}>
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="bg-white p-8 rounded-3xl shadow-xl border border-softPurple/20 relative overflow-hidden"
-          >
-            <div className="absolute top-0 right-0 w-32 h-32 bg-accent/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="flex justify-center">
+            <div className="w-full max-w-2xl">
+              <FastScrollReveal>
+                <div className="text-center mb-10">
+                  <h2 className="font-headline text-3xl font-bold" style={{ color: '#3f2965' }}>
+                    <span style={{ color: '#de206a' }}>Partner</span> With <span style={{ color: '#de206a' }}>Us</span>
+                  </h2>
+                  <p className="mt-3 text-lg max-w-xl mx-auto" style={{ color: '#766693' }}>
+                    Ready to foster a culture of wellness in your organization?
+                  </p>
+                </div>
+              </FastScrollReveal>
+              
+              <FastScrollReveal delay={0.1}>
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: 0.2 }}
+                  className="bg-white p-8 rounded-3xl shadow-xl border border-softPurple/20 relative overflow-hidden"
+                >
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-accent/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
 
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
-                  {['companyName', 'contactName', 'email', 'message'].map((fieldName, index) => (
-                    <FastScrollReveal key={fieldName} delay={0.15 + index * 0.05}>
-                      {fieldName === 'message' ? (
-                        <FormField control={form.control} name="message" render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="font-medium" style={{ color: '#3f2965' }}>Your Message</FormLabel>
-                            <FormControl>
-                              <textarea
-                                className="w-full px-4 py-3 rounded-xl bg-lightBg border border-softPurple/30 focus:border-accent focus:ring-2 focus:ring-accent/10 outline-none transition-all placeholder:text-gray-400 text-primary resize-none min-h-[120px]"
-                                placeholder="Tell us about your organizational needs and goals..." 
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormMessage className="text-pink-600" />
-                          </FormItem>
-                        )} />
-                      ) : (
-                        <FormField 
-                          control={form.control} 
-                          name={fieldName as keyof CorporateFormValues} 
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel className="font-medium" style={{ color: '#3f2965' }}>
-                                {fieldName === 'companyName' ? 'Company Name' : 
-                                 fieldName === 'contactName' ? 'Your Name' : 'Work Email'}
-                              </FormLabel>
-                              <FormControl>
-                                <input
-                                  type={fieldName === 'email' ? 'email' : 'text'}
-                                  className="w-full px-4 py-3 rounded-xl bg-lightBg border border-softPurple/30 focus:border-accent focus:ring-2 focus:ring-accent/10 outline-none transition-all placeholder:text-gray-400 text-primary"
-                                  placeholder={
-                                    fieldName === 'companyName' ? 'Your Company Inc.' : 
-                                    fieldName === 'contactName' ? 'Jane Doe' : 'jane.doe@company.com'
-                                  }
-                                  {...field}
-                                />
-                              </FormControl>
-                              <FormMessage className="text-pink-600" />
-                            </FormItem>
-                          )} 
-                        />
-                      )}
-                    </FastScrollReveal>
-                  ))}
-                  <FastScrollReveal delay={0.35}>
-                    <motion.div
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                    >
-                      <button 
-                        type="submit" 
-                        className="relative w-full px-6 py-3 rounded-full bg-[#Dd1764] text-white text-sm font-bold tracking-wide overflow-hidden group transition-all duration-300 hover:shadow-lg hover:shadow-[#3F2965]/20 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
-                        disabled={form.formState.isSubmitting}
-                      >
-                        {/* Left Curtain */}
-                        <span className="absolute top-0 left-[-25%] w-[75%] h-full bg-gradient-to-r from-[#3F2965] to-[#513681] -skew-x-12 -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-left" />
-                        
-                        {/* Right Curtain */}
-                        <span className="absolute top-0 right-[-25%] w-[75%] h-full bg-gradient-to-l from-[#3F2965] to-[#513681] -skew-x-12 translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-right" />
-                        
-                        {/* Text */}
-                        <span className="relative z-10 flex items-center justify-center gap-2">
-                          {form.formState.isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
-                          Submit Inquiry
-                        </span>
-                      </button>
-                    </motion.div>
-                  </FastScrollReveal>
-                </form>
-              </Form>
-            </motion.div>
-          </FastScrollReveal>
+                  <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+                      {['companyName', 'contactName', 'email', 'message'].map((fieldName, index) => (
+                        <FastScrollReveal key={fieldName} delay={0.15 + index * 0.05}>
+                          {fieldName === 'message' ? (
+                            <FormField control={form.control} name="message" render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="font-medium" style={{ color: '#3f2965' }}>Your Message</FormLabel>
+                                <FormControl>
+                                  <textarea
+                                    className="w-full px-4 py-3 rounded-xl bg-lightBg border border-softPurple/30 focus:border-accent focus:ring-2 focus:ring-accent/10 outline-none transition-all placeholder:text-gray-400 text-primary resize-none min-h-[120px]"
+                                    placeholder="Tell us about your organizational needs and goals..." 
+                                    {...field}
+                                  />
+                                </FormControl>
+                                <FormMessage className="text-pink-600" />
+                              </FormItem>
+                            )} />
+                          ) : (
+                            <FormField 
+                              control={form.control} 
+                              name={fieldName as keyof CorporateFormValues} 
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="font-medium" style={{ color: '#3f2965' }}>
+                                    {fieldName === 'companyName' ? 'Company Name' : 
+                                     fieldName === 'contactName' ? 'Your Name' : 'Work Email'}
+                                  </FormLabel>
+                                  <FormControl>
+                                    <input
+                                      type={fieldName === 'email' ? 'email' : 'text'}
+                                      className="w-full px-4 py-3 rounded-xl bg-lightBg border border-softPurple/30 focus:border-accent focus:ring-2 focus:ring-accent/10 outline-none transition-all placeholder:text-gray-400 text-primary"
+                                      placeholder={
+                                        fieldName === 'companyName' ? 'Your Company Inc.' : 
+                                        fieldName === 'contactName' ? 'Jane Doe' : 'jane.doe@company.com'
+                                      }
+                                      {...field}
+                                    />
+                                  </FormControl>
+                                  <FormMessage className="text-pink-600" />
+                                </FormItem>
+                              )} 
+                            />
+                          )}
+                        </FastScrollReveal>
+                      ))}
+                      <FastScrollReveal delay={0.35}>
+                        <motion.div
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                        >
+                          <button 
+                            type="submit" 
+                            className="relative w-full px-6 py-3 rounded-full bg-[#Dd1764] text-white text-sm font-bold tracking-wide overflow-hidden group transition-all duration-300 hover:shadow-lg hover:shadow-[#3F2965]/20 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled={form.formState.isSubmitting}
+                          >
+                            {/* Left Curtain */}
+                            <span className="absolute top-0 left-[-25%] w-[75%] h-full bg-gradient-to-r from-[#3F2965] to-[#513681] -skew-x-12 -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-left" />
+                            
+                            {/* Right Curtain */}
+                            <span className="absolute top-0 right-[-25%] w-[75%] h-full bg-gradient-to-l from-[#3F2965] to-[#513681] -skew-x-12 translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-right" />
+                            
+                            {/* Text */}
+                            <span className="relative z-10 flex items-center justify-center gap-2">
+                              {form.formState.isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
+                              Submit Inquiry
+                            </span>
+                          </button>
+                        </motion.div>
+                      </FastScrollReveal>
+                    </form>
+                  </Form>
+                </motion.div>
+              </FastScrollReveal>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
-</div>
     </div>
   );
 }
-  
