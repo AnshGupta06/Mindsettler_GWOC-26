@@ -92,9 +92,10 @@
   }
 }
 .ms-chatbot-trigger {
-  background: linear-gradient(135deg, #6d5bd0, #ec407a);
+  background: #dd1764 !important;
   color: white;
-  box-shadow: 0 12px 30px rgba(109, 91, 208, 0.35);
+  border: 2px solid white;
+  box-shadow: 0 12px 30px rgba(221, 23, 100, 0.35);
 }
 
 .ms-chatbot-sheet {

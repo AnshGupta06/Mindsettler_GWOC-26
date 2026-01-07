@@ -103,7 +103,7 @@ export function Chatbot() {
         className="fixed bottom-6 right-6 z-50"
       >
         <Button
-          className="ms-chatbot-trigger h-16 w-16 rounded-full shadow-lg bg-primary"
+          className="ms-chatbot-trigger h-16 w-16 rounded-full shadow-lg bg-[#dd1764] hover:bg-[#c21458] border-2 border-white"
           onClick={() => setIsOpen(true)}
           aria-label="Open chatbot"
         >
@@ -126,30 +126,30 @@ export function Chatbot() {
             {/* Chatbot Window */}
             <motion.div
               initial={{ opacity: 0, scale: 0.5, y: 100, x: 100, originX: 1, originY: 1 }}
-              animate={{ 
-                opacity: 1, 
-                scale: 1, 
-                y: 0, 
+              animate={{
+                opacity: 1,
+                scale: 1,
+                y: 0,
                 x: 0,
-                transition: { 
-                    type: "spring", 
-                    stiffness: 100, 
-                    damping: 20, 
-                    duration: 0.8 
-                } 
+                transition: {
+                  type: "spring",
+                  stiffness: 100,
+                  damping: 20,
+                  duration: 0.8
+                }
               }}
-              exit={{ 
-                opacity: 0, 
-                scale: 0.8, 
-                transition: { duration: 0.3, ease: "easeInOut" } 
+              exit={{
+                opacity: 0,
+                scale: 0.8,
+                transition: { duration: 0.3, ease: "easeInOut" }
               }}
               className="ms-chatbot-sheet fixed bottom-6 right-6 z-[52] flex flex-col w-[380px] max-w-[calc(100vw-3rem)] h-[600px] max-h-[calc(100vh-6rem)] bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border border-none"
             >
               {/* Header - Restored Title & Description */}
               <div className="ms-chatbot-header p-6 pb-4 relative pr-12">
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
+                <Button
+                  variant="ghost"
+                  size="icon"
                   className="absolute right-6 top-6 rounded-full h-8 w-8 hover:bg-muted"
                   onClick={() => setIsOpen(false)}
                 >
