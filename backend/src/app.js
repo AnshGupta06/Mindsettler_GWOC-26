@@ -17,6 +17,7 @@ app.use(helmet());
 const allowedOrigins = [
   "http://localhost:3000", // Next.js Localhost
   // "https://mindsettler.vercel.app" <--- UNCOMMENT & ADD YOUR LIVE URL HERE LATER
+  "https://mindsettler-bypb.vercel.app"
 ];
 
 app.use(cors({
