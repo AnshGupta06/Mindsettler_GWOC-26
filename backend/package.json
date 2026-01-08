@@ -13,7 +13,6 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@emailjs/browser": "^4.4.1",
     "@prisma/client": "^6.19.1",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
