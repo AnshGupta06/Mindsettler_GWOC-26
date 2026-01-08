@@ -1,8 +1,9 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import React from "react";
+
 
 const FloatingInput = React.memo(
   ({
@@ -40,10 +41,10 @@ const FloatingInput = React.memo(
         )}
 
         <label
-          className="absolute left-5 top-4 text-gray-400 text-sm font-medium transition-all duration-300 
+          className="pointer-events-none absolute left-5 top-4 text-gray-400 text-sm font-medium transition-all duration-300 
           peer-placeholder-shown:translate-y-0 peer-placeholder-shown:text-base
-          peer-focus:-translate-y-7 peer-focus:text-xs peer-focus:text-[#Dd1764] peer-focus:font-bold
-          peer-[&:not(:placeholder-shown)]:-translate-y-7
+          peer-focus:-translate-y-9 peer-focus:text-xs peer-focus:text-[#Dd1764] peer-focus:font-bold
+          peer-[&:not(:placeholder-shown)]:-translate-y-9
           peer-[&:not(:placeholder-shown)]:text-xs
           peer-[&:not(:placeholder-shown)]:text-[#Dd1764]
           peer-[&:not(:placeholder-shown)]:font-bold"
@@ -65,6 +66,8 @@ export default function ContactForm() {
     subject: "",
     message: "",
   });
+
+  
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -91,8 +94,19 @@ export default function ContactForm() {
         }
       );
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message);
+      const text = await res.text();
+
+      let data;
+      try {
+        data = text ? JSON.parse(text) : {};
+      } catch {
+        data = {};
+      }
+
+      if (!res.ok) {
+        throw new Error(data.message || "Failed to send message");
+      }
+
 
       setIsSubmitted(true);
       setFormData({ name: "", email: "", subject: "", message: "" });
@@ -103,6 +117,17 @@ export default function ContactForm() {
     }
   };
 
+  useEffect(() => {
+  if (!isSubmitted) return;
+
+  const timer = setTimeout(() => {
+    setIsSubmitted(false);
+  }, 10000); // 10 seconds
+
+  return () => clearTimeout(timer);
+}, [isSubmitted]);
+
+
   return (
     <motion.div
       initial={{ opacity: 0, x: 30 }}
@@ -111,8 +136,6 @@ export default function ContactForm() {
       transition={{ duration: 0.8, ease: "circOut" }}
       className="relative perspective-[1200px]"
     >
-      {/* Glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[110%] h-[110%] bg-gradient-to-r from-[#3F2965]/10 to-[#Dd1764]/10 blur-[80px] rounded-full -z-10" />
 
       <motion.div
         animate={{ rotateY: isSubmitted ? 180 : 0 }}
