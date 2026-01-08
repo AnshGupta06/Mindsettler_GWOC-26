@@ -10,7 +10,12 @@ import rateLimit from 'express-rate-limit';
 import hpp from 'hpp';
 import xss from 'xss-clean';
 
+import contactRoutes from "./routes/contactRoutes.js";
+
+
+
 const app = express();
+
 // 1. Helmet: Sets various HTTP headers for security
 app.use(helmet());
 
@@ -70,5 +75,7 @@ app.use("/api/admin/slots", adminSlotRoutes);
 app.get("/", (req, res) => {
   res.json({ message: "MindSettler backend running" });
 });
+
+app.use("/api/contact", contactRoutes);
 
 export default app;

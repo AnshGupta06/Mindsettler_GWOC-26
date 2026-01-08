@@ -6,6 +6,7 @@ import { z } from 'zod';
 import { Loader2, Zap, Users, Shield, Check, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion, useInView } from 'framer-motion';
 import { useState, useRef, useEffect } from 'react';
+import emailjs from '@emailjs/browser'; // Import EmailJS
 
 import { Button } from '../../components/ui/button';
 import {
@@ -21,8 +22,6 @@ import { Textarea } from '../../components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import workshopsData from '@/data/workshops.json';
-// Ensure this imports your actual API URL variable
-import { API_URL } from '@/lib/api'; 
 
 const corporateFormSchema = z.object({
   companyName: z.string().min(2, 'Company name must be at least 2 characters.'),
@@ -278,32 +277,47 @@ export default function CorporatePage() {
 
   const onSubmit = async (data: CorporateFormValues) => {
     try {
-      const response = await fetch(`${API_URL}/api/corporate/inquiry`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
+      // ---------------------------------------------------------
+      // 🔑 EMAILJS CONFIGURATION
+      // ---------------------------------------------------------
+      const SERVICE_ID = "service_gzgkxh2"; // ✅ Your actual ID
+      const TEMPLATE_ID = "template_sm66qga";   // ✅ Your actual ID
+      const PUBLIC_KEY = "7e6j40DjQi2KVHRGL";   
 
-      const result = await response.json();
+      const templateParams = {
+        company_name: data.companyName,
+        contact_name: data.contactName,
+        from_email: data.email,
+        message: data.message,
+      };
 
-      if (!response.ok) {
-        throw new Error(result.error || 'Failed to submit inquiry');
-      }
+      await emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams, PUBLIC_KEY);
 
       toast({
         title: 'Inquiry Sent Successfully! 🚀',
-        description: `Thanks ${data.contactName}! We've sent a confirmation to ${data.email}.`,
+        description: `Thanks ${data.contactName}! We have received your inquiry.`,
         className: "bg-[#3F2965] text-white border-none",
       });
       
       form.reset();
     } catch (error: any) {
-      console.error('Corporate form error:', error);
+      // 🔍 Log the exact error type
+      console.error('❌ EMAILJS ERROR:', error);
+
+      // Determine the error message
+      let errorMessage = "Failed to send. Please check your internet connection.";
+      
+      if (error?.text) {
+        errorMessage = error.text; 
+      } else if (error?.message) {
+        errorMessage = error.message; 
+      } else if (Object.keys(error).length === 0) {
+        errorMessage = "Request blocked by AdBlocker. Please disable it and retry.";
+      }
+
       toast({
         title: 'Submission Failed',
-        description: error.message || "Please check your connection and try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     }
