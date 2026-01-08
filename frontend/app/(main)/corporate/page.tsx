@@ -21,6 +21,8 @@ import { Textarea } from '../../components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import workshopsData from '@/data/workshops.json';
+// Ensure this imports your actual API URL variable
+import { API_URL } from '@/lib/api'; 
 
 const corporateFormSchema = z.object({
   companyName: z.string().min(2, 'Company name must be at least 2 characters.'),
@@ -157,6 +159,7 @@ const CorporateWellnessCarousel = () => {
 
   return (
     <div className="w-full px-4 sm:px-6 md:px-8 max-w-[1600px] mx-auto">
+      {/* ROUNDED BORDERS APPLIED HERE */}
       <div className="relative w-full h-[500px] md:h-[600px] overflow-hidden rounded-2xl sm:rounded-3xl md:rounded-[3rem] shadow-xl">
         
         {/* Simple fade transition without complex animations */}
@@ -273,13 +276,37 @@ export default function CorporatePage() {
     defaultValues: { companyName: '', contactName: '', email: '', message: '' },
   });
 
-  const onSubmit = (data: CorporateFormValues) => {
-    console.log('Corporate form submitted:', data);
-    toast({
-      title: 'Inquiry Sent!',
-      description: "Thank you for your interest. We'll be in touch with you soon.",
-    });
-    form.reset();
+  const onSubmit = async (data: CorporateFormValues) => {
+    try {
+      const response = await fetch(`${API_URL}/api/corporate/inquiry`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to submit inquiry');
+      }
+
+      toast({
+        title: 'Inquiry Sent Successfully! 🚀',
+        description: `Thanks ${data.contactName}! We've sent a confirmation to ${data.email}.`,
+        className: "bg-[#3F2965] text-white border-none",
+      });
+      
+      form.reset();
+    } catch (error: any) {
+      console.error('Corporate form error:', error);
+      toast({
+        title: 'Submission Failed',
+        description: error.message || "Please check your connection and try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const offerings = [
