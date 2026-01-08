@@ -1,106 +1,109 @@
 "use client";
 
 import Reveal from "../common/Reveal";
-import { CharReveal, SlideUp, StaggerContainer, StaggerItem, ImageWipeReveal } from "../common/RevealComponent";
-import { CheckCircle2 } from "lucide-react";
+import { SlideUp, StaggerContainer, StaggerItem } from "../common/RevealComponent";
 import Image from "next/image";
+import Link from "next/link";
 
-export default function AboutSection() {
+export default function AboutPreview() {
   return (
-    <section className="py-12 sm:py-16 md:py-20 lg:py-24 px-4 sm:px-6 md:px-8 bg-white">
-      <div className="max-w-[1440px] mx-auto grid lg:grid-cols-2 gap-10 sm:gap-12 md:gap-16 lg:gap-20 items-center">
-        
-        {/* LEFT: TEXT */}
-        <div className="max-w-xl mx-auto lg:mx-0">
-            
-            {/* Heading Construction */}
-            <div className="mb-6">
-                <SlideUp>
-                    <span className="block text-[#Dd1764] font-bold text-xs sm:text-sm tracking-wide mb-2 sm:mb-3 uppercase">
-                        About MindSettler
-                    </span>
-                </SlideUp>
-                <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#3F2965] leading-tight space-y-1">
-                    <div>
-                        <CharReveal delay={0.1}>
-                            Bridging mental health
-                        </CharReveal>
-                    </div>
-                    <div>
-                        <CharReveal delay={0.1}>
-                            awareness with
-                        </CharReveal>
-                    </div>
-                    <div className="text-[#Dd1764]">
-                        <CharReveal delay={0.1}>
-                            professional care
-                        </CharReveal>
-                    </div>
-                </div>
-            </div>
-            
-            <SlideUp delay={0.2} className="mb-6 sm:mb-8">
-                <p className="text-base sm:text-lg md:text-xl text-[#3F2965]/70 leading-relaxed font-medium">
-                MindSettler was created to bridge the gap between mental health awareness and professional care. We believe that understanding your mind is the first step toward healing.
-                </p>
-            </SlideUp>
+    <section className="py-2 px-4 sm:px-6 md:px-8 bg-white">
 
-            {/* Checklist Stagger */}
-            <StaggerContainer className="space-y-3 sm:space-y-4 mb-8 sm:mb-10">
+      <div className="max-w-[1440px] mx-auto w-full bg-[#F9F6FF] rounded-2xl sm:rounded-3xl md:rounded-[3rem] px-4 sm:px-8 md:px-12 lg:px-20 py-12 sm:py-16 md:py-20 relative overflow-visible flex flex-col items-center text-center">
+
+        {/* Background Decor - Subtle & Premium */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-full pointer-events-none overflow-hidden rounded-[3rem]">
+          <div className="absolute top-[10%] left-[-10%] w-[500px] h-[500px] bg-white rounded-full blur-[100px] opacity-60" />
+          <div className="absolute bottom-[10%] right-[-5%] w-[400px] h-[400px] bg-white rounded-full blur-[80px] opacity-60" />
+        </div>
+
+        <div className="relative z-10 w-full flex flex-col items-center">
+          {/* Label */}
+
+
+          {/* Heading - Masterpiece Typography */}
+          <div className="mb-6 md:mb-10">
+            <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-[4.5rem] font-extrabold text-[#3F2965] leading-[1.1] tracking-tight">
+              <span className="block">Bridging mental health</span>
+              <span className="block text-[#3F2965]">awareness with</span>
+              <span className="block text-[#Dd1764] italic font-serif mt-2">professional care</span>
+            </h2>
+          </div>
+
+          {/* The Quote - Stylized */}
+          <div className="mb-8 md:mb-12">
+            <Reveal delay={0.2}>
+              <div className="relative inline-block">
+                <div className="text-xl sm:text-2xl md:text-3xl font-medium text-[#3F2965]/90 italic max-w-2xl leading-relaxed relative z-10">
+                  "Compassion is the heart of <span className="text-[#Dd1764] font-bold">Healing</span>."
+                </div>
+              </div>
+            </Reveal>
+          </div>
+
+          {/* Description */}
+          <SlideUp delay={0.3} className="max-w-2xl mb-10 md:mb-14">
+            <p className="text-lg sm:text-xl text-[#3F2965]/70 leading-relaxed font-medium">
+              MindSettler was created to bridge the gap between mental health awareness and professional care. We believe that understanding your mind is the first step toward healing.
+            </p>
+          </SlideUp>
+
+          {/* FLIPPY CIRCLE TILES GRID */}
+          <div className="w-full mb-10 md:mb-14">
+            <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-10 justify-items-center">
               {[
-                "Recognize emotional patterns",
-                "Understand mental health conditions",
-                "Develop healthier coping mechanisms",
-                "Experience safe & confidential care"
+                { title: "Patterns", text: "Recognize emotional patterns" },
+                { title: "Conditions", text: "Understand mental health conditions" },
+                { title: "Mechanisms", text: "Develop healthier coping mechanisms" },
+                { title: "Safe Care", text: "Experience safe & confidential care" }
               ].map((item, i) => (
-                <StaggerItem key={i} className="flex items-start sm:items-center gap-2 sm:gap-3">
-                  <CheckCircle2 className="text-[#Dd1764] flex-shrink-0 mt-0.5 sm:mt-0" size={20} />
-                  <span className="text-sm sm:text-base md:text-lg text-[#3F2965] font-semibold">{item}</span>
+                <StaggerItem key={i}>
+                  <div className="group w-48 h-48 sm:w-56 sm:h-56 perspective-1000 cursor-pointer">
+                    <div className="relative w-full h-full duration-500 transform-style-3d group-hover:rotate-y-180">
+
+                      {/* FRONT FACE (Logo) - White Circle on Light Background */}
+                      <div className="absolute w-full h-full backface-hidden bg-white hover:bg-white/80 rounded-full shadow-xl shadow-[#3F2965]/10 border border-[#3F2965]/5 flex flex-col items-center justify-center p-6 transition-colors duration-300">
+                        <div className="relative w-20 h-20 sm:w-24 sm:h-24 mb-4">
+                          <Image
+                            src="/assets/heart-brain-icon.png"
+                            alt="MindSettler Icon"
+                            fill
+                            className="object-contain"
+                          />
+                        </div>
+                        <span className="text-[#3F2965] font-bold uppercase tracking-wider text-xs sm:text-sm">{item.title}</span>
+                      </div>
+
+                      {/* BACK FACE (Content) - Theme Purple */}
+                      <div className="absolute w-full h-full backface-hidden rotate-y-180 bg-[#3F2965] rounded-full shadow-2xl flex items-center justify-center text-center p-6 border border-[#3F2965]">
+                        <p className="text-white font-medium text-sm sm:text-base leading-snug">
+                          {item.text}
+                        </p>
+                      </div>
+
+                    </div>
+                  </div>
                 </StaggerItem>
               ))}
             </StaggerContainer>
+          </div>
 
-            <SlideUp delay={0.4}>
-                <button className="w-full sm:w-auto relative px-6 sm:px-8 py-3 sm:py-3.5 rounded-full border-2 border-[#3F2965]/10 text-[#3F2965] font-bold text-sm sm:text-base tracking-wide overflow-hidden group transition-all duration-300 hover:border-[#3F2965] hover:-translate-y-1">
-                    <span className="absolute top-0 left-[-25%] w-[75%] h-full bg-gradient-to-r from-[#3F2965] to-[#513681] -skew-x-12 -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-left" />
-                    <span className="absolute top-0 right-[-25%] w-[75%] h-full bg-gradient-to-l from-[#3F2965] to-[#513681] -skew-x-12 translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-right" />
-                    <span className="relative z-10 group-hover:text-white transition-colors duration-300">More About Us</span>
-                </button>
-            </SlideUp>
+          {/* CTA Button */}
+          <SlideUp delay={0.5}>
+            <Link href="/about">
+              <button className="relative px-8 md:px-10 py-3.5 md:py-4 rounded-full bg-[#3F2965] text-white font-bold text-base tracking-wide overflow-hidden group transition-all duration-300 hover:shadow-xl hover:shadow-[#3F2965]/20 hover:-translate-y-1">
+                <span className="absolute top-0 left-[-25%] w-[75%] h-full bg-white/20 -skew-x-12 -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-left" />
+                <span className="relative z-10 flex items-center gap-2">
+                  More About Us
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="group-hover:translate-x-1 transition-transform">
+                    <path d="M5 12h14" />
+                    <path d="m12 5 7 7-7 7" />
+                  </svg>
+                </span>
+              </button>
+            </Link>
+          </SlideUp>
         </div>
-
-        {/* RIGHT: IMAGE */}
-      <Reveal delay={0.2}>
-  <div className="relative px-4 sm:px-0">
-    {/* Decorative Background Shape */}
-    <div className="absolute inset-0 bg-[#F9F6FF] rounded-2xl sm:rounded-3xl md:rounded-[3rem] rotate-3 scale-95" />
-
-    {/* Main Card Container */}
-    <ImageWipeReveal delay={0.1}>
-      <div className="relative bg-[#3F2965] rounded-2xl sm:rounded-3xl md:rounded-[3rem] overflow-hidden shadow-2xl h-[350px] sm:h-[400px] md:h-[450px] lg:h-[500px] flex items-center justify-center group">
-
-        {/* 1. THE IMAGE */}
-        <Image 
-          src="/assets/new_homepage-1.jpg"
-          alt="Compassionate therapy session"
-          fill
-          className="object-cover transition-transform duration-700 group-hover:scale-105"
-        />
-
-        {/* 2. OVERLAY */}
-        <div className="absolute inset-0 bg-[#3F2965]/60 mix-blend-multiply" />
-
-        {/* 3. TEXT */}
-        <h3 className="relative z-10 text-white text-xl sm:text-2xl md:text-3xl font-bold text-center px-6 sm:px-8 leading-snug">
-          "Compassion is the heart of <br className="hidden sm:block" /> 
-          <span className="text-[#Dd1764]">Healing.</span>"
-        </h3>
-
-      </div>
-    </ImageWipeReveal>
-  </div>
-</Reveal>
-
 
       </div>
     </section>

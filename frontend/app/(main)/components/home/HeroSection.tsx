@@ -1,19 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import Reveal from "../common/Reveal"; 
+import Reveal from "../common/Reveal";
 import { CharReveal, SlideUp } from "../common/RevealComponent";
 
 export default function HeroSection() {
   const ModelViewer: any = "model-viewer";
 
   return (
-    <section className="min-h-screen flex items-center pt-20 sm:pt-24 pb-8 sm:pb-12 px-4 sm:px-6 md:px-8 bg-white">
-      
+    <section className="min-h-screen flex items-center pt-20 sm:pt-24 pb-2 px-4 sm:px-6 md:px-8 bg-white">
+
       <div className="max-w-[1440px] mx-auto w-full bg-[#F9F6FF] rounded-2xl sm:rounded-3xl md:rounded-[3rem] px-4 sm:px-8 md:px-12 lg:px-20 py-12 sm:py-16 md:py-20 relative overflow-visible grid md:grid-cols-[1.6fr_0.6fr] gap-8 sm:gap-10 md:gap-12 items-center">
-        
+
         {/* LEFT: Text Content */}
-        <div className="max-w-3xl relative z-10 min-w-0 flex flex-col justify-center items-center text-center md:items-start md:text-left">  
+        <div className="max-w-3xl relative z-10 min-w-0 flex flex-col justify-center items-center text-center md:items-start md:text-left">
           <Reveal>
             <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-white shadow-sm text-[#Dd1764] font-bold text-xs sm:text-sm tracking-wide mb-4 sm:mb-6">
               <span className="w-2 h-2 rounded-full bg-[#Dd1764]" />
