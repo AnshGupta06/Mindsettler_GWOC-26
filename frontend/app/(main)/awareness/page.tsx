@@ -128,8 +128,6 @@ export default function AwarenessPage() {
                           {item.description}
                         </p>
                         
-                        {/* Decorative Line */}
-                        <div className="mt-6 w-12 h-1 bg-[#F9F6FF] group-hover:bg-[#Dd1764] transition-colors rounded-full" />
                       </div>
                     </div>
                   </Link>
