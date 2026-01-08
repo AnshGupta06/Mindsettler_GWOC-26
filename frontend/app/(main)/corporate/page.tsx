@@ -6,7 +6,7 @@ import { z } from 'zod';
 import { Loader2, Zap, Users, Shield, Check, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion, useInView } from 'framer-motion';
 import { useState, useRef, useEffect } from 'react';
-import emailjs from '@emailjs/browser'; // Import EmailJS
+import emailjs from '@emailjs/browser'; 
 
 import { Button } from '../../components/ui/button';
 import {
@@ -229,13 +229,14 @@ const CorporateWellnessCarousel = () => {
           ))}
         </div>
 
-        {/* Dots indicator - bottom center */}
+        {/* Dots indicator - Suppress Hydration Warning Added */}
         <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex space-x-3 z-30">
           {carouselItems.map((_, index) => (
             <button
               key={index}
               onClick={() => goToSlide(index)}
               disabled={isAnimating}
+              suppressHydrationWarning
               className={`transition-all duration-300 ${
                 index === currentSlide 
                   ? 'w-8 h-2 bg-white rounded-full' 
@@ -246,10 +247,11 @@ const CorporateWellnessCarousel = () => {
           ))}
         </div>
 
-        {/* Navigation buttons */}
+        {/* Navigation buttons - Suppress Hydration Warning Added */}
         <button
           onClick={prevSlide}
           disabled={isAnimating}
+          suppressHydrationWarning
           className="absolute left-4 top-1/2 -translate-y-1/2 z-30 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/90 shadow-2xl flex items-center justify-center hover:bg-white transition-all duration-300 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
           aria-label="Previous slide"
         >
@@ -258,6 +260,7 @@ const CorporateWellnessCarousel = () => {
         <button
           onClick={nextSlide}
           disabled={isAnimating}
+          suppressHydrationWarning
           className="absolute right-4 top-1/2 -translate-y-1/2 z-30 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/90 shadow-2xl flex items-center justify-center hover:bg-white transition-all duration-300 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
           aria-label="Next slide"
         >
@@ -278,11 +281,17 @@ export default function CorporatePage() {
   const onSubmit = async (data: CorporateFormValues) => {
     try {
       // ---------------------------------------------------------
-      // 🔑 EMAILJS CONFIGURATION
+      // 🔑 EMAILJS CONFIGURATION (ENV VARS)
       // ---------------------------------------------------------
-      const SERVICE_ID = "service_gzgkxh2"; // ✅ Your actual ID
-      const TEMPLATE_ID = "template_sm66qga";   // ✅ Your actual ID
-      const PUBLIC_KEY = "7e6j40DjQi2KVHRGL";   
+      // We use the non-null assertion (!) because we assume these are set.
+      // If not, it's better to fail fast in development.
+      const SERVICE_ID = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID_2!; 
+      const TEMPLATE_ID = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID_2!; 
+      const PUBLIC_KEY = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY_2!; 
+
+      if (!SERVICE_ID || !TEMPLATE_ID || !PUBLIC_KEY) {
+        throw new Error("EmailJS environment variables are missing.");
+      }
 
       const templateParams = {
         company_name: data.companyName,
@@ -301,10 +310,8 @@ export default function CorporatePage() {
       
       form.reset();
     } catch (error: any) {
-      // 🔍 Log the exact error type
       console.error('❌ EMAILJS ERROR:', error);
 
-      // Determine the error message
       let errorMessage = "Failed to send. Please check your internet connection.";
       
       if (error?.text) {
@@ -513,6 +520,7 @@ export default function CorporatePage() {
                                   <textarea
                                     className="w-full px-4 py-3 rounded-xl bg-lightBg border border-softPurple/30 focus:border-accent focus:ring-2 focus:ring-accent/10 outline-none transition-all placeholder:text-gray-400 text-primary resize-none min-h-[120px]"
                                     placeholder="Tell us about your organizational needs and goals..." 
+                                    suppressHydrationWarning // Added for safety against extensions
                                     {...field}
                                   />
                                 </FormControl>
@@ -537,6 +545,7 @@ export default function CorporatePage() {
                                         fieldName === 'companyName' ? 'Your Company Inc.' : 
                                         fieldName === 'contactName' ? 'Jane Doe' : 'jane.doe@company.com'
                                       }
+                                      suppressHydrationWarning // Added for safety against extensions
                                       {...field}
                                     />
                                   </FormControl>
@@ -556,6 +565,7 @@ export default function CorporatePage() {
                             type="submit" 
                             className="relative w-full px-6 py-3 rounded-full bg-[#Dd1764] text-white text-sm font-bold tracking-wide overflow-hidden group transition-all duration-300 hover:shadow-lg hover:shadow-[#3F2965]/20 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
                             disabled={form.formState.isSubmitting}
+                            suppressHydrationWarning // Added for safety against extensions
                           >
                             {/* Left Curtain */}
                             <span className="absolute top-0 left-[-25%] w-[75%] h-full bg-gradient-to-r from-[#3F2965] to-[#513681] -skew-x-12 -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-left" />
