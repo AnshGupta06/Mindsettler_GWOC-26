@@ -2,61 +2,16 @@
 
 import { motion } from "framer-motion";
 import { useState } from "react";
+import React from "react";
 
-export default function ContactForm() {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    subject: "",
-    message: "",
-  });
-
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState("");
-  const [error, setError] = useState("");
-  const [isSubmitted, setIsSubmitted] = useState(false);
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
-    setSuccess("");
-
-    try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/contact`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
-        }
-      );
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message);
-
-      setSuccess("Message sent successfully");
-      setIsSubmitted(true);
-      setFormData({ name: "", email: "", subject: "", message: "" });
-    } catch (err: any) {
-      setError(err.message || "Something went wrong");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Floating Label Input Component (UNCHANGED)
-  const FloatingInput = ({
+const FloatingInput = React.memo(
+  ({
     label,
     name,
     type = "text",
     rows,
+    value,
+    onChange,
   }: any) => {
     const isTextarea = !!rows;
 
@@ -66,8 +21,8 @@ export default function ContactForm() {
           <textarea
             name={name}
             rows={rows}
-            value={(formData as any)[name]}
-            onChange={handleChange}
+            value={value}
+            onChange={onChange}
             placeholder=" "
             required
             className="peer w-full px-5 py-4 rounded-xl bg-white/50 border border-[#3F2965]/10 outline-none focus:border-[#Dd1764] focus:ring-4 focus:ring-[#Dd1764]/5 transition-all duration-300 resize-none font-medium text-[#3F2965] placeholder-transparent"
@@ -76,8 +31,8 @@ export default function ContactForm() {
           <input
             type={type}
             name={name}
-            value={(formData as any)[name]}
-            onChange={handleChange}
+            value={value}
+            onChange={onChange}
             placeholder=" "
             required
             className="peer w-full px-5 py-4 rounded-xl bg-white/50 border border-[#3F2965]/10 outline-none focus:border-[#Dd1764] focus:ring-4 focus:ring-[#Dd1764]/5 transition-all duration-300 font-medium text-[#3F2965] placeholder-transparent"
@@ -97,6 +52,55 @@ export default function ContactForm() {
         </label>
       </div>
     );
+  }
+);
+
+FloatingInput.displayName = "FloatingInput";
+
+
+export default function ContactForm() {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    subject: "",
+    message: "",
+  });
+
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [isSubmitted, setIsSubmitted] = useState(false);
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/contact`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+        }
+      );
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+
+      setIsSubmitted(true);
+      setFormData({ name: "", email: "", subject: "", message: "" });
+    } catch (err: any) {
+      setError(err.message || "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -107,7 +111,7 @@ export default function ContactForm() {
       transition={{ duration: 0.8, ease: "circOut" }}
       className="relative perspective-[1200px]"
     >
-      {/* Glow Effect */}
+      {/* Glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[110%] h-[110%] bg-gradient-to-r from-[#3F2965]/10 to-[#Dd1764]/10 blur-[80px] rounded-full -z-10" />
 
       <motion.div
@@ -116,7 +120,7 @@ export default function ContactForm() {
         className="relative w-full h-full"
         style={{ transformStyle: "preserve-3d" }}
       >
-        {/* FRONT – FORM */}
+        {/* FRONT */}
         <div
           className="bg-white/70 backdrop-blur-2xl p-8 md:p-10 rounded-[2.5rem] shadow-2xl shadow-[#3F2965]/10 border border-white"
           style={{ backfaceVisibility: "hidden" }}
@@ -130,20 +134,34 @@ export default function ContactForm() {
 
           <form className="space-y-5" onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              <FloatingInput label="Full Name" name="name" />
+              <FloatingInput
+                label="Full Name"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+              />
               <FloatingInput
                 label="Email Address"
                 name="email"
                 type="email"
+                value={formData.email}
+                onChange={handleChange}
               />
             </div>
 
-            <FloatingInput label="Subject" name="subject" />
+            <FloatingInput
+              label="Subject"
+              name="subject"
+              value={formData.subject}
+              onChange={handleChange}
+            />
 
             <FloatingInput
               label="Tell us more about what's on your mind..."
               name="message"
               rows={5}
+              value={formData.message}
+              onChange={handleChange}
             />
 
             <motion.button
@@ -153,11 +171,7 @@ export default function ContactForm() {
               disabled={loading}
               className="w-full relative overflow-hidden group bg-[#3F2965] text-white font-bold py-5 rounded-xl shadow-xl shadow-[#3F2965]/20 hover:shadow-[#3F2965]/40 transition-all duration-300 disabled:opacity-60"
             >
-              <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-[#3F2965] to-[#513681] group-hover:opacity-0 transition-opacity duration-300" />
-              <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-[#Dd1764] to-[#ff4785] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              <span className="relative z-10">
-                {loading ? "Sending..." : "Send Message"}
-              </span>
+              {loading ? "Sending..." : "Send Message"}
             </motion.button>
 
             {error && (
@@ -168,7 +182,7 @@ export default function ContactForm() {
           </form>
         </div>
 
-        {/* BACK – THANK YOU */}
+        {/* BACK */}
         <div
           className="absolute inset-0 bg-white/70 backdrop-blur-2xl p-10 rounded-[2.5rem] shadow-2xl shadow-[#3F2965]/10 border border-white flex flex-col items-center justify-center text-center"
           style={{
@@ -177,11 +191,11 @@ export default function ContactForm() {
           }}
         >
           <h3 className="text-4xl font-bold text-[#3F2965] mb-7">
-            Thank You For Message !
+            Thank You For Message!
           </h3>
           <p className="text-gray-600 max-w-sm">
-            Your message has been sent successfully.  
-            We truly appreciate you reaching out and will get back to you soon.
+            Your message has been sent successfully. We truly appreciate you
+            reaching out and will get back to you soon.
           </p>
         </div>
       </motion.div>
