@@ -48,10 +48,10 @@ export default function HowItWorks() {
   };
 
   return (
-    <section className="py-24 relative overflow-hidden bg-white" id="howitworks">
+    <section className="pt-2 pb-24 relative overflow-hidden bg-white" id="howitworks">
 
       <div className="max-w-[1440px] mx-auto bg-[#F9F6FF] rounded-2xl sm:rounded-3xl md:rounded-[3rem] px-4 sm:px-8 md:px-12 lg:px-20 py-12 sm:py-16 md:py-20 lg:py-24 overflow-hidden relative">
-        
+
         {/* Header */}
         <div className="text-center mb-16 md:mb-20">
           <motion.div
@@ -62,8 +62,8 @@ export default function HowItWorks() {
           >
             <Sparkles size={14} /> Simple Process
           </motion.div>
-          
-          <motion.h2 
+
+          <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -84,7 +84,7 @@ export default function HowItWorks() {
         </div>
 
         {/* Steps Grid */}
-        <motion.div 
+        <motion.div
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
@@ -101,7 +101,7 @@ export default function HowItWorks() {
               className="relative group"
             >
               <div className="bg-white rounded-[2rem] p-8 border border-[#3F2965]/5 shadow-lg shadow-[#3F2965]/5 hover:shadow-xl hover:shadow-[#3F2965]/10 hover:-translate-y-2 transition-all duration-300 h-full flex flex-col items-center text-center">
-                
+
                 {/* Step Number Badge */}
                 <div className="absolute top-6 right-6 text-4xl font-black text-[#F9F6FF] group-hover:text-[#3F2965]/5 transition-colors select-none">
                   {step.step}
@@ -125,15 +125,15 @@ export default function HowItWorks() {
         </motion.div>
 
         {/* CTA */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ delay: 0.6 }}
           className="mt-16 text-center"
         >
-          <Link 
-            href="/book" 
+          <Link
+            href="/book"
             className="inline-flex items-center gap-2 bg-[#Dd1764] text-white px-8 py-4 rounded-xl font-bold text-lg shadow-lg shadow-[#Dd1764]/20 hover:bg-[#c01255] hover:-translate-y-1 transition-all"
           >
             Book Your Session Now <ArrowRight size={20} />
