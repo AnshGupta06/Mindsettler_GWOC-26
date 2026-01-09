@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { CharReveal } from "../../components/common/RevealComponent";
-import { ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const slides = [
   {
@@ -38,7 +38,6 @@ export default function HeroStory() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [direction, setDirection] = useState(0);
 
-  // Auto-play
   useEffect(() => {
     const interval = setInterval(() => {
       goNext();
@@ -80,20 +79,20 @@ export default function HeroStory() {
     <section className="relative bg-[#F9F6FF] rounded-[2.5rem] overflow-hidden border border-[#3F2965]/5 shadow-sm">
     
       {/* Page Heading */}
-      <div className="relative z-10 pt-10 pb-4 text-center">
-        
-        <div className="text-3xl md:text-5xl font-extrabold text-[#3F2965] tracking-tight">
+      <div className="relative z-10 pt-8 pb-2 md:pt-8 md:pb-2 text-center">
+        <div className="text-2xl md:text-5xl font-extrabold text-[#3F2965] tracking-tight px-4">
             <CharReveal delay={0.1}>
                 Mental Health Awareness
             </CharReveal>
         </div>
       </div>
 
-      <div className="container mx-auto px-6 py-10 md:py-16 relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+      <div className="container mx-auto px-4 md:px-6 py-6 md:py-6 lg:py-6 relative z-10">
+        {/* CHANGED: Reduced gap-6 to gap-2 for mobile to pull items closer */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10 lg:gap-10 items-center">
           
           {/* IMAGE AREA */}
-          <div className="relative h-[350px] md:h-[500px] w-full flex items-center justify-center order-2 md:order-1">
+          <div className="relative h-[300px] md:h-[500px] lg:h-[500px] w-full flex items-center justify-center order-1">
             <div className="relative w-full h-full max-w-[500px] aspect-[4/5] md:aspect-square">
                <AnimatePresence mode="popLayout" custom={direction}>
                  <motion.div
@@ -118,8 +117,8 @@ export default function HeroStory() {
                </AnimatePresence>
             </div>
 
-            {/* Navigation Buttons (Absolute on Mobile, Relative on Desktop) */}
-            <div className="absolute md:hidden inset-0 flex items-center justify-between pointer-events-none px-2">
+            {/* Mobile Nav Buttons */}
+            <div className="absolute md:hidden inset-0 flex items-center justify-between pointer-events-none px-2 z-20">
                <button
                   onClick={goPrev}
                   className="pointer-events-auto w-10 h-10 rounded-full bg-white/90 shadow-lg text-[#3F2965] flex items-center justify-center backdrop-blur-sm active:scale-90 transition-all"
@@ -136,8 +135,9 @@ export default function HeroStory() {
           </div>
 
           {/* TEXT AREA */}
-          <div className="order-1 md:order-2 flex flex-col items-center md:items-start text-center md:text-left">
-            <div className="relative h-[160px] md:h-[200px] w-full flex items-center">
+          <div className="order-2 flex flex-col items-center md:items-start text-center md:text-left">
+            {/* CHANGED: switched 'items-center' to 'items-start' on mobile to remove top gap */}
+            <div className="relative h-[120px] md:h-[200px] w-full flex items-start md:items-center justify-center md:justify-start pt-2 md:pt-0">
                <AnimatePresence mode="wait" custom={direction}>
                  <motion.div
                    key={activeIndex}
@@ -147,22 +147,22 @@ export default function HeroStory() {
                    animate="center"
                    exit="exit"
                    transition={{ duration: 0.4, ease: "easeOut" }}
-                   className="absolute w-full"
+                   className="absolute w-full px-2 md:px-0"
                  >
-                   <h2 className="text-3xl md:text-5xl lg:text-6xl font-bold text-[#3F2965] leading-[1.1]">
+                   <h2 className="text-2xl md:text-5xl lg:text-6xl font-bold text-[#3F2965] leading-[1.2] md:leading-[1.1]">
                      {slides[activeIndex].title}
                    </h2>
-                   <p className="mt-4 text-2xl md:text-4xl font-serif italic text-[#Dd1764]">
+                   <p className="mt-3 md:mt-4 text-xl md:text-4xl font-serif italic text-[#Dd1764]">
                      {slides[activeIndex].highlight}
                    </p>
                  </motion.div>
                </AnimatePresence>
             </div>
 
-            {/* Desktop Controls & Indicators */}
-            <div className="mt-8 flex flex-col md:flex-row items-center gap-8">
-              {/* Dots */}
-              <div className="flex gap-2 bg-white p-2 rounded-full border border-[#3F2965]/5">
+            {/* Controls */}
+            {/* CHANGED: Reduced mt-4 to mt-0 on mobile if you want dots closer to text */}
+            <div className="mt-2 md:mt-8 flex flex-col md:flex-row items-center gap-8">
+              <div className="flex gap-2 bg-white p-2 rounded-full border border-[#3F2965]/5 shadow-sm">
                 {slides.map((_, i) => (
                   <button
                     key={i}
@@ -177,7 +177,6 @@ export default function HeroStory() {
                 ))}
               </div>
 
-              {/* Desktop Arrows */}
               <div className="hidden md:flex gap-3">
                  <button
                     onClick={goPrev}

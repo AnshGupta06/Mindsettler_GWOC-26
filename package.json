@@ -1,11 +1,8 @@
 {
   "dependencies": {
     "nodemailer": "^7.0.12"
-<<<<<<< HEAD
   },
   "devDependencies": {
     "@types/nodemailer": "^7.0.4"
-=======
->>>>>>> ea16658dd11e5097e6d327379bb322a8075dba92
   }
 }

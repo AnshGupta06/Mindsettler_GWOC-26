@@ -10,11 +10,11 @@ import { ArrowRight, BrainCircuit, Sparkles, Video } from "lucide-react";
 
 export default function AwarenessPage() {
   return (
-    <main className="min-h-screen bg-white">
+    <main className="min-h-screen bg-[#F9F6FF]">
       <HeroCarousel />
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden py-12 lg:py-20"> 
+      <section className="relative overflow-hidden py-12 lg:py-12"> 
 
         {/* Content */}
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6">
