@@ -16,7 +16,7 @@ export default function ResourcesPage() {
 
                 <div className="relative max-w-6xl mx-auto px-4 md:px-6 pt-28 md:pt-39 pb-4 text-center">
                     <SlideUp delay={0.1}>
-                        <div className="bg-white/80 backdrop-blur-sm rounded-[2rem] md:rounded-3xl p-8 md:p-16 border border-white/60 shadow-xl shadow-purple-900/5 ring-1 ring-slate-100/50">
+                        <div className="bg-gradient-to-br from-white via-[#f9f7fc] to-[#f0eaff]/80 backdrop-blur-sm rounded-[2rem] md:rounded-3xl p-8 md:p-16 border border-white/60 shadow-xl shadow-purple-900/5 ring-1 ring-slate-100/50">
 
                             {/* Updated Main Heading */}
                             <h1 className="text-4xl md:text-6xl font-bold text-primary leading-tight md:leading-tight mb-6">
