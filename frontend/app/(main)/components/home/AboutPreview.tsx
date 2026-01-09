@@ -8,7 +8,7 @@ import Link from "next/link";
 export default function AboutPreview() {
   return (
     // UPDATED: Full width White background
-    <section className="py-20 md:py-28 px-4 sm:px-6 md:px-8 bg-white overflow-hidden relative">
+    <section className="py-20 md:py-28 px-4 sm:px-6 md:px-8 bg-[#F9F6FF] overflow-hidden relative">
 
       {/* Background Decor - Adjusted for White BG */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-full pointer-events-none">

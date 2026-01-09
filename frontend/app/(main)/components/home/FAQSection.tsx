@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Minus, HelpCircle } from "lucide-react";
+import { Plus, Minus, HelpCircle, ArrowRight } from "lucide-react";
 import { CharReveal, SlideUp } from "../common/RevealComponent";
 
 export default function FAQSection() {
@@ -26,8 +27,7 @@ export default function FAQSection() {
   ];
 
   return (
-    // UPDATED: Full width White background, No inner box
-    <section className="py-20 md:py-28 px-4 sm:px-6 md:px-8 bg-white relative overflow-hidden">
+    <section className="py-20 md:py-28 px-4 sm:px-6 md:px-8 bg-[#F9F6FF] relative overflow-hidden">
       
       <div className="max-w-[1440px] mx-auto px-4 sm:px-8 md:px-12 lg:px-20 relative z-10">
 
@@ -47,7 +47,6 @@ export default function FAQSection() {
                   Clarity Before
                 </CharReveal>
               </div>
-              {/* UPDATED: Italic Pink Serif Style */}
               <div className="text-[#Dd1764] italic font-serif mt-1">
                 <CharReveal delay={0.2}>
                   Commitment
@@ -62,13 +61,23 @@ export default function FAQSection() {
             </SlideUp>
           </div>
 
-          {/* RIGHT: Accordion */}
+          {/* RIGHT: Accordion & Button */}
           <div className="lg:col-span-8">
-            <div className="space-y-4">
+            <div className="space-y-4 mb-8">
               {faqs.map((faq, index) => (
                 <FAQItem key={index} faq={faq} index={index} />
               ))}
             </div>
+
+            {/* View All Button */}
+            <SlideUp delay={0.5} className="flex justify-center lg:justify-start">
+              <Link href="/faqs">
+                <button className="group flex items-center gap-2 px-6 py-3 rounded-full border-2 border-[#3F2965]/10 text-[#3F2965] font-bold text-sm hover:bg-[#3F2965] hover:text-white hover:border-[#3F2965] transition-all duration-300">
+                  View All FAQs
+                  <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                </button>
+              </Link>
+            </SlideUp>
           </div>
 
         </div>
@@ -85,9 +94,8 @@ function FAQItem({ faq, index }: { faq: { question: string; answer: string }; in
       <div 
         onClick={() => setIsOpen(!isOpen)}
         className={`group cursor-pointer rounded-2xl border transition-all duration-300 overflow-hidden ${
-          // Adjusted styling for White background context
           isOpen 
-            ? "bg-[#F9F6FF] border-[#Dd1764]/30 shadow-lg shadow-[#3F2965]/5" 
+            ? "bg-white border-[#Dd1764]/30 shadow-lg shadow-[#3F2965]/5" 
             : "bg-white border-[#3F2965]/10 hover:border-[#3F2965]/30 hover:shadow-md"
         }`}
       >

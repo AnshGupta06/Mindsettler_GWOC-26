@@ -3,102 +3,150 @@
 import Link from "next/link";
 import Reveal from "../common/Reveal";
 import { CharReveal, SlideUp } from "../common/RevealComponent";
+import { Users, Star, ShieldCheck } from "lucide-react";
 
 export default function HeroSection() {
-  // Use a simple string for the custom element to avoid TS errors
   const ModelViewer: any = "model-viewer";
 
   return (
-    // UPDATED: Full width background #F9F6FF, no inner rounded box
-    <section className="min-h-screen flex items-center pt-32 pb-16 px-4 sm:px-6 md:px-8 bg-[#F9F6FF] overflow-hidden relative">
+    <section className="min-h-[100dvh] flex flex-col justify-center pt-24 lg:pt-32 pb-12 px-4 sm:px-6 md:px-8 bg-[#F9F6FF] relative overflow-hidden">
+      
+      <div className="max-w-[1440px] mx-auto w-full relative z-10 grid lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-20 items-center">
 
-      <div className="max-w-[1440px] mx-auto w-full relative grid md:grid-cols-[1.6fr_0.6fr] gap-8 sm:gap-10 md:gap-12 items-center">
+        {/* LEFT COLUMN: 3D Model (Swapped to Left) */}
+        {/* Mobile: order-2 (Bottom), Desktop: order-1 (Left) */}
+        <div className="order-2 lg:order-1 relative w-full flex items-center justify-center lg:justify-end min-h-[300px] sm:min-h-[400px]">
+          <SlideUp delay={0.2} className="w-full h-full flex justify-center">
+            
+            {/* CONTAINER FOR MODEL & ANIMATIONS */}
+            <div className="relative w-full max-w-[350px] sm:max-w-[500px] aspect-square flex items-center justify-center scale-90 sm:scale-100">
+              
+              {/* --- ALIVE ANIMATED BACKGROUND START --- */}
+              
+              {/* 1. Breathing Outer Circle */}
+              <div className="absolute inset-0 border border-[#3F2965] opacity-15 rounded-full animate-[ping_3s_ease-in-out_infinite]" />
+              
+              {/* 2. Pulsing Mid Circle */}
+              <div className="absolute inset-8 border-2 border-[#Dd1764] opacity-20 rounded-full animate-[pulse_2s_ease-in-out_infinite]" />
+              
+              {/* 3. Static Inner Circle */}
+              <div className="absolute inset-16 border border-[#3F2965] opacity-10 rounded-full" />
 
-        {/* LEFT: Text Content */}
-        <div className="max-w-3xl relative z-10 min-w-0 flex flex-col justify-center items-center text-center md:items-start md:text-left">
-          <Reveal>
-            <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-white shadow-sm text-[#Dd1764] font-bold text-xs sm:text-sm tracking-wide mb-4 sm:mb-6">
-              <span className="w-2 h-2 rounded-full bg-[#Dd1764]" />
-              <span className="whitespace-nowrap">Mental Well-Being & Psycho-Education</span>
+              {/* 4. Fast Rotating Dashed Circle */}
+              <div className="absolute inset-4 border border-dashed border-[#Dd1764] opacity-25 rounded-full animate-[spin_8s_linear_infinite]" />
+              
+              {/* 5. Slow Counter Rotating Dashed Circle */}
+              <div className="absolute inset-12 border border-dashed border-[#3F2965] opacity-20 rounded-full animate-[spin_15s_linear_infinite_reverse]" />
+
+              {/* 6. Pulsing Center Ring - Heartbeat effect */}
+              <div className="absolute inset-[35%] border-2 border-[#Dd1764] opacity-30 rounded-full animate-[ping_1.5s_ease-in-out_infinite]" />
+
+              {/* --- ALIVE ANIMATED BACKGROUND END --- */}
+
+              {/* 3D Model */}
+              <ModelViewer
+                src="/assets/heart+with+brain+3d+model.glb"
+                alt="MindSettler 3D model"
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  zIndex: 10,
+                  transform: "scale(1.4)",
+                }}
+                camera-orbit="45deg 75deg 2.5m"
+                field-of-view="30deg"
+                exposure="1.2"
+                shadow-intensity="1"
+                camera-controls
+                disable-zoom
+                interaction-prompt="none"
+                auto-rotate
+                auto-rotate-delay="0"
+                rotation-per-second="15deg"
+                suppressHydrationWarning
+              />
             </div>
-          </Reveal>
-
-          {/* Heading */}
-          <div className="text-3xl sm:text-4xl md:text-5xl lg:text-[4rem] leading-tight sm:leading-[1.1] font-bold text-[#3F2965] tracking-tight mb-4 sm:mb-6 md:mb-8 w-full">
-            <div className="mb-1 sm:mb-2">
-              <CharReveal delay={0}>
-                Understanding
-              </CharReveal>
-            </div>
-            <div className="mb-1 sm:mb-2">
-              <CharReveal delay={0.2}>
-                Your Mind.
-              </CharReveal>
-            </div>
-            <div className="text-[#Dd1764] italic font-serif">
-              <CharReveal delay={0.4}>
-                Supporting Your Healing.
-              </CharReveal>
-            </div>
-          </div>
-
-          {/* Paragraph */}
-          <SlideUp delay={0.6} className="mb-6 sm:mb-8 md:mb-10 w-full">
-            <p className="text-base sm:text-lg md:text-xl leading-relaxed text-[#3F2965]/70 max-w-lg font-medium">
-              A structured path to mental clarity. We combine professional psychotherapy with psycho-education to help you navigate life's challenges.
-            </p>
-          </SlideUp>
-
-          {/* Buttons */}
-          <SlideUp delay={0.8} className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 md:gap-5 w-full sm:w-auto">
-            <Link href="/book">
-              <button className="w-full sm:w-auto relative px-6 sm:px-8 md:px-10 py-3 sm:py-3.5 md:py-4 rounded-full bg-[#Dd1764] text-white font-bold text-sm sm:text-base tracking-wide overflow-hidden group transition-all duration-300 hover:shadow-2xl hover:shadow-[#3F2965]/20 hover:-translate-y-1">
-                <span className="absolute top-0 left-[-25%] w-[75%] h-full bg-gradient-to-r from-[#3F2965] to-[#513681] -skew-x-12 -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-left" />
-                <span className="absolute top-0 right-[-25%] w-[75%] h-full bg-gradient-to-l from-[#3F2965] to-[#513681] -skew-x-12 translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-right" />
-                <span className="relative z-10">Book Appointment</span>
-              </button>
-            </Link>
-            <Link href="#howitworks">
-              <button className="w-full sm:w-auto relative px-6 sm:px-8 md:px-10 py-3 sm:py-3.5 md:py-4 rounded-full border-2 border-[#3F2965]/10 text-[#3F2965] font-bold text-sm sm:text-base tracking-wide overflow-hidden group transition-all duration-300 hover:border-[#3F2965] hover:-translate-y-1">
-                <span className="absolute top-0 left-[-25%] w-[75%] h-full bg-gradient-to-r from-[#3F2965] to-[#513681] -skew-x-12 -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-left" />
-                <span className="absolute top-0 right-[-25%] w-[75%] h-full bg-gradient-to-l from-[#3F2965] to-[#513681] -skew-x-12 translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-right" />
-                <span className="relative z-10 group-hover:text-white transition-colors duration-300">
-                  How It Works
-                </span>
-              </button>
-            </Link>
           </SlideUp>
         </div>
 
-        {/* RIGHT: 3D Model */}
-        <Reveal delay={0.2}>
-          <div className="relative w-full h-[280px] sm:h-[320px] md:h-[380px] lg:h-[480px] flex items-center justify-center min-w-0">
-            {/* Adjusted Glow for Purple Background */}
-            <div className="absolute w-[200px] sm:w-[240px] md:w-[280px] lg:w-[320px] h-[200px] sm:h-[240px] md:h-[280px] lg:h-[320px] rounded-full bg-white/60 blur-[60px] sm:blur-[80px]" />
-            <ModelViewer
-              src="/assets/heart+with+brain+3d+model.glb"
-              alt="MindSettler 3D model"
-              style={{
-                width: "100%",
-                height: "100%",
-                zIndex: 10,
-                transform: "scale(1.3)",
-              }}
-              camera-orbit="90deg 75deg 2.5m"
-              field-of-view="30deg"
-              exposure="1.2"
-              shadow-intensity="1"
-              camera-controls
-              disable-zoom
-              interaction-prompt="none"
-              auto-rotate
-              auto-rotate-delay="0"
-              rotation-per-second="10deg"
-              suppressHydrationWarning
-            />
+        {/* RIGHT COLUMN: Text Content (Swapped to Right) */}
+        {/* Mobile: order-1 (Top), Desktop: order-2 (Right) */}
+        <div className="order-1 lg:order-2 flex flex-col items-center lg:items-start text-center lg:text-left">
+          
+          <Reveal>
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-[#3F2965]/10 text-[#3F2965] font-bold text-xs uppercase tracking-widest mb-6 hover:border-[#3F2965]/20 transition-all cursor-default">
+              <span className="w-2 h-2 rounded-full bg-[#Dd1764] animate-pulse" />
+              <span>Mental Well-Being & Psycho-Education</span>
+            </div>
+          </Reveal>
+
+          <div className="text-3xl sm:text-5xl md:text-6xl lg:text-[4.5rem] leading-[1.1] font-extrabold text-[#3F2965] tracking-tight mb-6 sm:mb-8">
+            <div className="mb-1">
+              <CharReveal delay={0}>Understand</CharReveal>
+            </div>
+            <div className="flex flex-wrap justify-center lg:justify-start gap-x-2 sm:gap-x-3">
+              <span className="text-[#3F2965]">
+                <CharReveal delay={0.1}>Your</CharReveal>
+              </span>
+              <span className="text-[#Dd1764] font-serif">
+                <CharReveal delay={0.2}>Mind.</CharReveal>
+              </span>
+            </div>
+            <div className="text-[#3F2965]/90 mt-1">
+              <CharReveal delay={0.3}>Heal Your Life.</CharReveal>
+            </div>
           </div>
-        </Reveal>
+
+          <SlideUp delay={0.4} className="mb-8 sm:mb-10 w-full">
+            <p className="text-base sm:text-xl text-[#3F2965]/70 max-w-lg mx-auto lg:mx-0 font-medium leading-relaxed px-2 sm:px-0">
+              We bridge the gap between professional therapy and self-understanding. A structured, compassionate path to finding your balance.
+            </p>
+          </SlideUp>
+
+          <SlideUp delay={0.5} className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto px-4 sm:px-0">
+            <Link href="/book" className="w-full sm:w-auto">
+              <button className="w-full relative px-8 py-4 rounded-xl bg-[#Dd1764] text-white font-bold text-lg tracking-wide overflow-hidden group transition-all duration-300 hover:-translate-y-1">
+                <span className="absolute top-0 left-[-25%] w-[80%] h-full bg-white/20 -skew-x-12 -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-left" />
+                <span className="relative z-10 flex items-center justify-center gap-2">
+                  Book Appointment
+                </span>
+              </button>
+            </Link>
+            
+            <Link href="#howitworks" className="w-full sm:w-auto">
+              <button className="w-full px-8 py-4 rounded-xl bg-white border border-[#3F2965]/10 text-[#3F2965] font-bold text-lg tracking-wide transition-all duration-300 hover:border-[#3F2965]/30 hover:bg-white/50 hover:-translate-y-1">
+                How It Works
+              </button>
+            </Link>
+          </SlideUp>
+
+        </div>
+
       </div>
+
+      {/* BOTTOM BAR: Trust Indicators / Stats */}
+      <div className="relative z-10 max-w-[1440px] mx-auto w-full mt-12 sm:mt-16 lg:mt-24 px-4">
+        <SlideUp delay={0.7}>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 md:gap-12 py-6 sm:py-8 border-t border-[#3F2965]/5">
+            {[
+              { label: "Lives Touched", value: "500+", icon: Users },
+              { label: "Expert Therapists", value: "Certified", icon: ShieldCheck },
+              { label: "Client Satisfaction", value: "4.9/5", icon: Star },
+            ].map((stat, i) => (
+              <div key={i} className="flex items-center justify-center sm:justify-start gap-4 group">
+                <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center text-[#Dd1764] group-hover:scale-110 transition-transform duration-300">
+                  <stat.icon size={24} strokeWidth={1.5} />
+                </div>
+                <div>
+                  <div className="text-2xl font-bold text-[#3F2965]">{stat.value}</div>
+                  <div className="text-sm font-medium text-[#3F2965]/60 uppercase tracking-wide">{stat.label}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </SlideUp>
+      </div>
+
     </section>
   );
 }
