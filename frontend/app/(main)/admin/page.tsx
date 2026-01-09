@@ -161,7 +161,7 @@ export default function AdminBookingsPage() {
   if (error === "Admin access only") return <div>Access Denied</div>;
 
   return (
-    <div className="min-h-screen bg-white pt-20 sm:pt-24 pb-8 sm:pb-12 px-4 sm:px-6 md:px-8">
+    <div className="min-h-screen bg-[#F9F6FF] pt-20 sm:pt-24 pb-8 sm:pb-12 px-4 sm:px-6 md:px-8">
       
       {/* ✨ CONFIRMATION MODAL */}
       {confirmModal.isOpen && (
@@ -224,8 +224,6 @@ export default function AdminBookingsPage() {
            </div>
          </div>
       )}
-
-      <div className="max-w-[1440px] mx-auto bg-[#F9F6FF] rounded-[2.5rem] p-6 md:p-12 shadow-sm min-h-[80vh] text-[#3F2965]">
         
         {/* HEADER & ACTIONS */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
@@ -329,7 +327,6 @@ export default function AdminBookingsPage() {
           </div>
         )}
       </div>
-    </div>
   );
 }
 

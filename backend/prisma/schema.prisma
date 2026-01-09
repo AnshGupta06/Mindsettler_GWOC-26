@@ -30,6 +30,8 @@ model User {
   email        String    @unique
   name         String?
   phone        String?
+  adminNotes  String?   
+  isBlocked   Boolean   @default(false) 
   bookings     Booking[]
   createdAt    DateTime  @default(now())
 }
@@ -55,7 +57,7 @@ model Booking {
 
   userId    String
   slotId    String @unique
-
+  meetingLink String?
   user      User        @relation(fields: [userId], references: [id])
   slot      SessionSlot @relation(fields: [slotId], references: [id])
 
