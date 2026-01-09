@@ -6,7 +6,7 @@ import { CharReveal, SlideUp, ImageWipeReveal } from "../common/RevealComponent"
 export default function PersonalPathSection() {
   return (
     // UPDATED: Full width White background, No inner box
-    <section className="py-20 md:py-28 px-4 sm:px-6 md:px-8 bg-white relative overflow-hidden">
+    <section className="py-20 md:py-28 px-4 sm:px-6 md:px-8 bg-[#F9F6FF] relative overflow-hidden">
         
           <div className="grid lg:grid-cols-2 gap-10 sm:gap-12 md:gap-16 lg:gap-20 items-center">
 
