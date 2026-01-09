@@ -6,7 +6,7 @@ import HeroCarousel from "./components/HeroCarousel";
 import Image from "next/image";
 import { awarenessAreas } from "./awarenessCardsData";
 import { CharReveal, SlideUp, StaggerContainer, StaggerItem } from "../components/common/RevealComponent";
-import { ArrowRight, BrainCircuit, Sparkles } from "lucide-react";
+import { ArrowRight, BrainCircuit, Sparkles, Video } from "lucide-react";
 
 export default function AwarenessPage() {
   return (
@@ -75,21 +75,49 @@ export default function AwarenessPage() {
       <section className="relative py-12 lg:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           
+          
+
           <div className="text-center mb-12 md:mb-16">
-            <motion.div 
+            {/* <motion.div 
               initial={{ opacity: 0, y: 10 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#F9F6FF] border border-[#3F2965]/10 text-[#Dd1764] font-bold text-xs uppercase tracking-widest mb-4"
             >
               <Sparkles size={12} /> Key Topics
-            </motion.div>
-            
+            </motion.div> */}
+
+        
+
+          {/* Left Decorative SVG */}
+          <div className="pointer-events-none absolute left-45 top-25 -translate-y-1/2 hidden lg:block">
+            <Image
+              src="/icons/overwhelmed-animate.svg"
+              alt="Decorative awareness illustration"
+              width={260}
+              height={260}
+              className="max-w-none"
+            />
+          </div>
+
+
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#3F2965]">
               <CharReveal delay={0.2}>
                 Areas of Awareness
               </CharReveal>
             </h2>
+
+            <div className="pointer-events-none absolute right-35 top-25 -translate-y-1/2 hidden lg:block">
+            <Image
+              src="/icons/Overwhelmed-bro.svg"
+              alt="Decorative awareness illustration"
+              width={260}
+              height={260}
+              className="max-w-none"
+            />
+          </div>
+
+                
             <SlideUp delay={0.3}>
               <p className="mt-4 text-[#3F2965]/60 max-w-2xl mx-auto text-lg">
                 Explore common mental health concerns and find the clarity you need to move forward.

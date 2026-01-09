@@ -61,12 +61,7 @@ export default async function AwarenessDetailPage(props: AwarenessPageProps) {
             
             {/* Left: Content */}
             <div className="order-2 lg:order-1 space-y-6 md:space-y-8">
-               <SlideUp>
-                  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-[#3F2965]/10 text-[#Dd1764] font-bold text-[10px] md:text-xs uppercase tracking-widest shadow-sm">
-                    <Activity size={14} />
-                    {content.category}
-                  </div>
-               </SlideUp>
+               
                
                <div className="space-y-4">
                  <h1 className="text-3xl sm:text-4xl lg:text-7xl font-bold text-[#3F2965] leading-[1.1]">
@@ -118,16 +113,25 @@ export default async function AwarenessDetailPage(props: AwarenessPageProps) {
 
       {/* --- 2. WHAT IS IT? --- */}
       <section className="py-12 md:py-20 bg-white relative">
+
+        <div className="pointer-events-none absolute left-2 top-115 -translate-y-1/2 hidden lg:block">
+                  <Image
+                    src="/icons/Thinking face-cuate.svg"
+                    alt="Decorative awareness illustration"
+                    width={260}
+                    height={260}
+                    className="max-w-none"
+                  />
+                </div>
+
+
         <div className="max-w-5xl mx-auto px-4 sm:px-6 relative z-10">
           <SlideUp>
             <div className="relative bg-[#F9F6FF] rounded-[2rem] md:rounded-[2.5rem] p-8 md:p-16 border border-[#3F2965]/5 text-center group">
               <Quote className="absolute top-6 left-6 md:top-10 md:left-10 text-[#Dd1764]/10 rotate-180 w-12 h-12 md:w-20 md:h-20" />
               
-              <div className="relative z-10 space-y-6 md:space-y-8">
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-[#3F2965]/10 text-[#3F2965] font-bold text-[10px] md:text-xs uppercase tracking-widest shadow-sm">
-                  <Sparkles size={12} className="text-[#Dd1764]" />
-                  Definition
-                </div>
+                <div className="relative z-10 space-y-6 md:space-y-8">
+                
                 
                 <h2 className="text-2xl md:text-5xl font-bold text-[#3F2965]">
                   What is {content.title}?
@@ -155,10 +159,10 @@ export default async function AwarenessDetailPage(props: AwarenessPageProps) {
         <div className="grid lg:grid-cols-12 gap-10 md:gap-16">
           {/* Header Column */}
           <div className="lg:col-span-4 space-y-4 md:space-y-6 lg:sticky lg:top-24 lg:self-start">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#Dd1764]/10 text-[#Dd1764] font-bold uppercase tracking-widest text-[10px] md:text-sm">
+            {/* <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#Dd1764]/10 text-[#Dd1764] font-bold uppercase tracking-widest text-[10px] md:text-sm">
               <AlertCircle size={16} /> 
               Recognition
-            </div>
+            </div> */}
             
             <h2 className="text-3xl md:text-5xl font-bold text-[#3F2965] leading-tight">
               Signs & <br/> Symptoms
@@ -219,12 +223,12 @@ export default async function AwarenessDetailPage(props: AwarenessPageProps) {
           
           <div className="max-w-6xl mx-auto px-4 sm:px-6 relative z-10 text-center">
             <div className="mb-10 md:mb-16 space-y-4">
-              <SlideUp>
+              {/* <SlideUp>
                 <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20 text-white font-bold text-[10px] md:text-xs uppercase tracking-widest">
                   <Brain size={12} />
                   Understanding
                 </div>
-              </SlideUp>
+              </SlideUp> */}
               
               <SlideUp delay={0.1}>
                 <h2 className="text-3xl md:text-5xl font-bold">Common Triggers</h2>
@@ -258,12 +262,12 @@ export default async function AwarenessDetailPage(props: AwarenessPageProps) {
       {content.statistics && (
         <section className="py-16 md:py-24 max-w-7xl mx-auto px-4 sm:px-6 relative">
           <div className="text-center mb-10 md:mb-16 space-y-4">
-            <SlideUp>
+            {/* <SlideUp>
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#F9F6FF] border border-[#3F2965]/10 text-[#Dd1764] font-bold text-[10px] md:text-xs uppercase tracking-widest">
                 <Activity size={12} />
                 Insights
               </div>
-            </SlideUp>
+            </SlideUp> */}
             
             <SlideUp delay={0.1}>
               <h2 className="text-3xl md:text-5xl font-bold text-[#3F2965]">Did You Know?</h2>
@@ -298,10 +302,10 @@ export default async function AwarenessDetailPage(props: AwarenessPageProps) {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 relative z-10">
           
           <div className="text-center mb-12 md:mb-20 space-y-4 md:space-y-6">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-[#3F2965]/10 text-[#3F2965] font-bold text-[10px] md:text-xs uppercase tracking-widest">
+            {/* <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-[#3F2965]/10 text-[#3F2965] font-bold text-[10px] md:text-xs uppercase tracking-widest">
               <Sparkles size={12} />
               Our Approach
-            </div>
+            </div> */}
             
             <h2 className="text-3xl md:text-5xl font-bold text-[#3F2965]">
               How MindSettler Helps

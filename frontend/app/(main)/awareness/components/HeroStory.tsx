@@ -81,9 +81,7 @@ export default function HeroStory() {
     
       {/* Page Heading */}
       <div className="relative z-10 pt-10 pb-4 text-center">
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-[#3F2965]/10 text-[#Dd1764] font-bold text-xs uppercase tracking-widest mb-4 shadow-sm">
-           <Sparkles size={14} /> Spotlight
-        </div>
+        
         <div className="text-3xl md:text-5xl font-extrabold text-[#3F2965] tracking-tight">
             <CharReveal delay={0.1}>
                 Mental Health Awareness
