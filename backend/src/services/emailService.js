@@ -1,19 +1,30 @@
-import { Resend } from "resend";
+import brevo from "@getbrevo/brevo";
 import "dotenv/config";
 
-const resend = new Resend(process.env.RESEND_API_KEY); //
+// Initialize Brevo API
+const apiInstance = new brevo.TransactionalEmailsApi();
+const apiKey = apiInstance.authentications["apiKey"];
+apiKey.apiKey = process.env.BREVO_API_KEY; // Make sure this matches your .env
 
 export const sendEmail = async (to, subject, html) => {
   try {
-    await resend.emails.send({
-      from: "MindSettler <onboarding@resend.dev>", 
-      to,
-      subject,
-      html,
-    });
+    const sendSmtpEmail = new brevo.SendSmtpEmail();
 
-    console.log(`📧 Booking Email sent to ${to}`);
-  } catch (err) {
-    console.error("❌ Email failed:", err);
+    sendSmtpEmail.subject = subject;
+    sendSmtpEmail.htmlContent = html;
+    
+    // ⚠️ IMPORTANT: This email MUST match the one you verified in Brevo
+    sendSmtpEmail.sender = { 
+      name: "MindSettler", 
+      email: process.env.SENDER_EMAIL 
+    };
+
+    sendSmtpEmail.to = [{ email: to }];
+
+    await apiInstance.sendTransacEmail(sendSmtpEmail);
+    console.log(`✅ Email sent to ${to} via Brevo`);
+    
+  } catch (error) {
+    console.error("❌ Email failed:", error?.response?.body || error.message);
   }
 };
