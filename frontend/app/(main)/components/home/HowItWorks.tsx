@@ -48,9 +48,10 @@ export default function HowItWorks() {
   };
 
   return (
-    <section className="pt-2 pb-24 relative overflow-hidden bg-white" id="howitworks">
-
-      <div className="max-w-[1440px] mx-auto bg-[#F9F6FF] rounded-2xl sm:rounded-3xl md:rounded-[3rem] px-4 sm:px-8 md:px-12 lg:px-20 py-12 sm:py-16 md:py-20 lg:py-24 overflow-hidden relative">
+    // Full width Purple background (#F9F6FF)
+    <section className="pt-20 pb-24 relative overflow-hidden bg-[#F9F6FF]" id="howitworks">
+      
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-8 md:px-12 lg:px-20 relative">
 
         {/* Header */}
         <div className="text-center mb-16 md:mb-20">
@@ -70,7 +71,9 @@ export default function HowItWorks() {
             transition={{ delay: 0.1 }}
             className="text-3xl md:text-5xl font-bold text-[#3F2965]"
           >
-            Your Journey to <span className="text-[#Dd1764]">Wellness</span>
+            Your Journey to 
+            {/* Italic Pink Serif Style */}
+            <span className="text-[#Dd1764] italic font-serif ml-2">Wellness</span>
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -100,6 +103,7 @@ export default function HowItWorks() {
               variants={itemVariants}
               className="relative group"
             >
+              {/* Card is White to pop against Purple BG */}
               <div className="bg-white rounded-[2rem] p-8 border border-[#3F2965]/5 shadow-lg shadow-[#3F2965]/5 hover:shadow-xl hover:shadow-[#3F2965]/10 hover:-translate-y-2 transition-all duration-300 h-full flex flex-col items-center text-center">
 
                 {/* Step Number Badge */}
@@ -107,7 +111,7 @@ export default function HowItWorks() {
                   {step.step}
                 </div>
 
-                {/* Icon */}
+                {/* Icon Wrapper */}
                 <div className="w-20 h-20 rounded-2xl bg-[#F9F6FF] flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-[#3F2965] group-hover:text-white transition-all duration-300 text-[#3F2965] shadow-inner">
                   <step.icon size={32} strokeWidth={1.5} />
                 </div>
@@ -146,4 +150,4 @@ export default function HowItWorks() {
       </div>
     </section>
   );
-} 
+}

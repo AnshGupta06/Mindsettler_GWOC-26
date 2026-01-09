@@ -5,12 +5,14 @@ import Reveal from "../common/Reveal";
 import { CharReveal, SlideUp } from "../common/RevealComponent";
 
 export default function HeroSection() {
+  // Use a simple string for the custom element to avoid TS errors
   const ModelViewer: any = "model-viewer";
 
   return (
-    <section className="min-h-screen flex items-center pt-20 sm:pt-24 pb-2 px-4 sm:px-6 md:px-8 bg-white">
+    // UPDATED: Full width background #F9F6FF, no inner rounded box
+    <section className="min-h-screen flex items-center pt-32 pb-16 px-4 sm:px-6 md:px-8 bg-[#F9F6FF] overflow-hidden relative">
 
-      <div className="max-w-[1440px] mx-auto w-full bg-[#F9F6FF] rounded-2xl sm:rounded-3xl md:rounded-[3rem] px-4 sm:px-8 md:px-12 lg:px-20 py-12 sm:py-16 md:py-20 relative overflow-visible grid md:grid-cols-[1.6fr_0.6fr] gap-8 sm:gap-10 md:gap-12 items-center">
+      <div className="max-w-[1440px] mx-auto w-full relative grid md:grid-cols-[1.6fr_0.6fr] gap-8 sm:gap-10 md:gap-12 items-center">
 
         {/* LEFT: Text Content */}
         <div className="max-w-3xl relative z-10 min-w-0 flex flex-col justify-center items-center text-center md:items-start md:text-left">
@@ -33,7 +35,7 @@ export default function HeroSection() {
                 Your Mind.
               </CharReveal>
             </div>
-            <div className="text-[#Dd1764]">
+            <div className="text-[#Dd1764] italic font-serif">
               <CharReveal delay={0.4}>
                 Supporting Your Healing.
               </CharReveal>
@@ -71,7 +73,8 @@ export default function HeroSection() {
         {/* RIGHT: 3D Model */}
         <Reveal delay={0.2}>
           <div className="relative w-full h-[280px] sm:h-[320px] md:h-[380px] lg:h-[480px] flex items-center justify-center min-w-0">
-            <div className="absolute w-[200px] sm:w-[240px] md:w-[280px] lg:w-[320px] h-[200px] sm:h-[240px] md:h-[280px] lg:h-[320px] rounded-full bg-white/40 blur-[60px] sm:blur-[80px]" />
+            {/* Adjusted Glow for Purple Background */}
+            <div className="absolute w-[200px] sm:w-[240px] md:w-[280px] lg:w-[320px] h-[200px] sm:h-[240px] md:h-[280px] lg:h-[320px] rounded-full bg-white/60 blur-[60px] sm:blur-[80px]" />
             <ModelViewer
               src="/assets/heart+with+brain+3d+model.glb"
               alt="MindSettler 3D model"

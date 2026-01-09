@@ -1,100 +1,124 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Minus } from "lucide-react";
-import { CharReveal, SlideUp, StaggerContainer, StaggerItem } from "../common/RevealComponent";
-import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
+import { Plus, Minus, HelpCircle } from "lucide-react";
+import { CharReveal, SlideUp } from "../common/RevealComponent";
+
 export default function FAQSection() {
+  const faqs = [
+    {
+      question: "What is the difference between therapy and psycho-education?",
+      answer: "Therapy focuses on treating mental health conditions and deep emotional healing. Psycho-education is about teaching you how your mind works, giving you the tools and knowledge to understand your own patterns."
+    },
+    {
+      question: "Are the sessions confidential?",
+      answer: "Absolutely. We adhere to strict ethical guidelines. Everything shared in a session remains 100% confidential, except in cases where there is a risk of harm to self or others."
+    },
+    {
+      question: "Can I switch between online and offline sessions?",
+      answer: "Yes! We offer a hybrid model. You can book an in-person session one week and an online session the next, depending on your schedule and comfort."
+    },
+    {
+      question: "How do I know if I need therapy?",
+      answer: "If you are feeling overwhelmed, stuck, or finding it hard to cope with daily life, therapy can help. You don't need to be in a crisis to seek support; it's also great for personal growth."
+    }
+  ];
+
   return (
-    <section className="py-8 sm:py-10 md:py-12 px-4 sm:px-6 md:px-8 bg-white">
+    // UPDATED: Full width White background, No inner box
+    <section className="py-20 md:py-28 px-4 sm:px-6 md:px-8 bg-white relative overflow-hidden">
       
-      {/* Container */}
-      <div className="max-w-[1440px] mx-auto bg-[#F9F6FF] rounded-2xl sm:rounded-3xl md:rounded-[3rem] px-4 sm:px-8 md:px-12 lg:px-20 py-12 sm:py-16 md:py-20 lg:py-24 relative overflow-hidden">
-        
-        {/* Decor */}
-        <div className="absolute top-0 right-0 w-[300px] sm:w-[400px] h-[300px] sm:h-[400px] bg-[#3F2965]/5 rounded-full blur-[80px] sm:blur-[100px] pointer-events-none" />
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-8 md:px-12 lg:px-20 relative z-10">
 
-        <div className="max-w-4xl mx-auto relative z-10">
-            
-            {/* Header */}
-            <div className="text-center mb-10 sm:mb-12 md:mb-16">
-                 <SlideUp>
-                    <span className="block text-[#Dd1764] font-bold text-xs sm:text-sm tracking-wide mb-2 sm:mb-3 uppercase">
-                        FAQs
-                    </span>
-                 </SlideUp>
-                 <div className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-[#3F2965]">
-                    <CharReveal delay={0.1} className="justify-center">
-                        Common questions, answered
-                    </CharReveal>
-                 </div>
-            </div>
+        <div className="grid lg:grid-cols-12 gap-12 lg:gap-20">
 
-            {/* STAGGERED LIST */}
-            <StaggerContainer className="space-y-4 sm:space-y-6">
-                {faqs.map((faq, index) => (
-                    <StaggerItem key={index}>
-                        <FAQItem question={faq.question} answer={faq.answer} />
-                    </StaggerItem>
-                ))}
-            </StaggerContainer>
-
-            <Link href="/faqs">
-            <SlideUp delay={0.4} className="mt-10 sm:mt-12 md:mt-16 text-center">
-                <button className="w-full sm:w-auto relative px-8 sm:px-10 py-3 sm:py-4 rounded-full border-2 border-[#3F2965]/10 text-[#3F2965] font-bold text-sm sm:text-base tracking-wide overflow-hidden group transition-all duration-300 hover:border-[#3F2965] hover:-translate-y-1">
-                    <span className="absolute top-0 left-[-25%] w-[80%] h-full bg-gradient-to-r from-[#3F2965] to-[#513681] -skew-x-12 -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-left" />
-                    <span className="absolute top-0 right-[-25%] w-[80%] h-full bg-gradient-to-l from-[#3F2965] to-[#513681] -skew-x-12 translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-right" />
-                    <span className="relative z-10 group-hover:text-white transition-colors duration-300">View All FAQs</span>
-                </button>
+          {/* LEFT: Header */}
+          <div className="lg:col-span-4 text-center lg:text-left">
+            <SlideUp>
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-[#3F2965]/10 shadow-sm text-[#Dd1764] font-bold text-xs uppercase tracking-widest mb-6">
+                <HelpCircle size={14} /> Common Questions
+              </div>
             </SlideUp>
-            </Link>
+
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#3F2965] leading-tight mb-6">
+              <div>
+                <CharReveal delay={0.1}>
+                  Clarity Before
+                </CharReveal>
+              </div>
+              {/* UPDATED: Italic Pink Serif Style */}
+              <div className="text-[#Dd1764] italic font-serif mt-1">
+                <CharReveal delay={0.2}>
+                  Commitment
+                </CharReveal>
+              </div>
+            </h2>
+
+            <SlideUp delay={0.3}>
+              <p className="text-lg text-[#3F2965]/70 mb-8 font-medium">
+                We know starting therapy can bring up a lot of questions. Here are clear answers to help you feel ready.
+              </p>
+            </SlideUp>
+          </div>
+
+          {/* RIGHT: Accordion */}
+          <div className="lg:col-span-8">
+            <div className="space-y-4">
+              {faqs.map((faq, index) => (
+                <FAQItem key={index} faq={faq} index={index} />
+              ))}
+            </div>
+          </div>
+
         </div>
       </div>
     </section>
   );
 }
 
-function FAQItem({ question, answer }: { question: string; answer: string }) {
-  const [open, setOpen] = useState(false);
+function FAQItem({ faq, index }: { faq: { question: string; answer: string }; index: number }) {
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className={`rounded-2xl sm:rounded-[20px] transition-all duration-300 ${open ? "bg-white shadow-xl shadow-[#3F2965]/5" : "bg-white/50 hover:bg-white"}`}>
-      <button
-        onClick={() => setOpen(!open)}
-        className="w-full flex items-start sm:items-center justify-between gap-4 px-4 sm:px-6 md:px-8 py-4 sm:py-5 md:py-6 text-left"
-      >
-        <span className={`text-base sm:text-lg md:text-xl font-bold transition-colors ${open ? "text-[#Dd1764]" : "text-[#3F2965]"}`}>
-          {question}
-        </span>
-        <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-colors ${open ? "bg-[#Dd1764] text-white" : "bg-[#3F2965]/5 text-[#3F2965]"}`}>
-            {open ? <Minus size={18} /> : <Plus size={18} />}
-        </div>
-      </button>
-
-      <div
-        className={`overflow-hidden transition-all duration-500 ease-in-out ${
-          open ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+    <SlideUp delay={0.1 * index} className="w-full">
+      <div 
+        onClick={() => setIsOpen(!isOpen)}
+        className={`group cursor-pointer rounded-2xl border transition-all duration-300 overflow-hidden ${
+          // Adjusted styling for White background context
+          isOpen 
+            ? "bg-[#F9F6FF] border-[#Dd1764]/30 shadow-lg shadow-[#3F2965]/5" 
+            : "bg-white border-[#3F2965]/10 hover:border-[#3F2965]/30 hover:shadow-md"
         }`}
       >
-        <div className="px-4 sm:px-6 md:px-8 pb-4 sm:pb-6 md:pb-8 text-[#3F2965]/70 text-sm sm:text-base md:text-lg leading-relaxed">
-          {answer}
+        <div className="p-6 flex items-start justify-between gap-4">
+          <h3 className={`text-lg sm:text-xl font-bold transition-colors ${
+            isOpen ? "text-[#Dd1764]" : "text-[#3F2965]"
+          }`}>
+            {faq.question}
+          </h3>
+          <div className={`flex-shrink-0 mt-1 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${
+            isOpen ? "bg-[#Dd1764] text-white rotate-180" : "bg-[#F9F6FF] text-[#3F2965] group-hover:bg-[#3F2965] group-hover:text-white"
+          }`}>
+            {isOpen ? <Minus size={18} /> : <Plus size={18} />}
+          </div>
         </div>
+
+        <AnimatePresence>
+          {isOpen && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+            >
+              <div className="px-6 pb-6 text-[#3F2965]/70 leading-relaxed font-medium">
+                {faq.answer}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
-    </div>
+    </SlideUp>
   );
 }
-
-const faqs = [
-  {
-    question: "How do I book a session with MindSettler?",
-    answer: "You can book a session by selecting an available online or offline consultation slot through our booking page. Once submitted, your appointment will be confirmed by our team.",
-  },
-  {
-    question: "Are online therapy sessions as effective?",
-    answer: "Yes. Online therapy sessions are structured to provide the same level of professional care and confidentiality as offline sessions, allowing flexibility without compromising quality.",
-  },
-  {
-    question: "Is my information kept confidential?",
-    answer: "Absolutely. All sessions are conducted in a safe and confidential environment, following ethical guidelines and respecting your privacy at every step.",
-  },
-];

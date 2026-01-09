@@ -342,9 +342,6 @@ export default function BookPage() {
                                     </option>
                                 ))}
                                 </select>
-                                <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
-                                <ChevronRight className="text-[#3F2965]/40 rotate-90" size={16} />
-                                </div>
                             </div>
                             </div>
                         </div>

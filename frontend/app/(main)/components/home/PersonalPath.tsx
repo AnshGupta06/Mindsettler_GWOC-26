@@ -5,36 +5,32 @@ import { CharReveal, SlideUp, ImageWipeReveal } from "../common/RevealComponent"
 
 export default function PersonalPathSection() {
   return (
-    <section className="py-8 sm:py-10 md:py-12 px-4 sm:px-6 md:px-8 bg-white">
-      
-      {/* Container */}
-      <div className="max-w-[1440px] mx-auto bg-[#F9F6FF] rounded-2xl sm:rounded-3xl md:rounded-[3rem] px-4 sm:px-8 md:px-12 lg:px-20 py-12 sm:py-16 md:py-20 lg:py-24 overflow-hidden relative">
+    // UPDATED: Full width White background, No inner box
+    <section className="py-20 md:py-28 px-4 sm:px-6 md:px-8 bg-white relative overflow-hidden">
         
-        {/* Background Decor */}
-        <div className="absolute bottom-[-10%] left-[-10%] w-[350px] sm:w-[450px] md:w-[500px] h-[350px] sm:h-[450px] md:h-[500px] bg-[#Dd1764]/5 rounded-full blur-[80px] sm:blur-[100px] pointer-events-none" />
-
-        <div className="grid lg:grid-cols-2 gap-10 sm:gap-12 md:gap-16 lg:gap-20 items-center relative z-10">
+          <div className="grid lg:grid-cols-2 gap-10 sm:gap-12 md:gap-16 lg:gap-20 items-center">
 
            {/* LEFT: IMAGE */}
-<SlideUp>
-  <div className="relative group">
-    <ImageWipeReveal delay={0.1}>
-      <div className="relative rounded-xl sm:rounded-2xl md:rounded-[2.5rem] overflow-hidden shadow-2xl shadow-[#3F2965]/10 h-[350px] sm:h-[400px] md:h-[450px] lg:h-[500px] w-full border-2 sm:border-4 border-white">
+            <SlideUp>
+              <div className="relative group">
+                <ImageWipeReveal delay={0.1}>
+                  {/* Changed border-white to border-[#F9F6FF] (very subtle) or just relied on shadow since bg is white */}
+                  <div className="relative rounded-xl sm:rounded-2xl md:rounded-[2.5rem] overflow-hidden shadow-2xl shadow-[#3F2965]/10 h-[350px] sm:h-[400px] md:h-[450px] lg:h-[500px] w-full border-4 border-[#F9F6FF]">
 
-        <Image
-          src="/assets/new_journey.jpeg" 
-          alt="Person walking on a peaceful path"
-          fill
-          className="object-cover transition-transform duration-700 group-hover:scale-105"
-        />
+                    <Image
+                      src="/assets/new_journey.jpeg" 
+                      alt="Person walking on a peaceful path"
+                      fill
+                      className="object-cover transition-transform duration-700 group-hover:scale-105"
+                    />
 
-        {/* Subtle Overlay */}
-        <div className="absolute inset-0 bg-[#3F2965]/10 group-hover:bg-transparent transition-colors duration-500" />
+                    {/* Subtle Overlay */}
+                    <div className="absolute inset-0 bg-[#3F2965]/10 group-hover:bg-transparent transition-colors duration-500" />
 
-      </div>
-    </ImageWipeReveal>
-  </div>
-</SlideUp>
+                  </div>
+                </ImageWipeReveal>
+              </div>
+            </SlideUp>
 
             {/* RIGHT: TEXT */}
             <div className="max-w-xl mx-auto lg:mx-0">
@@ -51,7 +47,8 @@ export default function PersonalPathSection() {
                                 Every journey is unique.
                             </CharReveal>
                         </div>
-                        <div className="text-[#Dd1764]">
+                        {/* Italic Pink Serif Style */}
+                        <div className="text-[#Dd1764] italic font-serif mt-1">
                             <CharReveal delay={0.1}>
                                 Your care should be too.
                             </CharReveal>
@@ -83,7 +80,6 @@ export default function PersonalPathSection() {
             </div>
 
         </div>
-      </div>
     </section>
   );
 }

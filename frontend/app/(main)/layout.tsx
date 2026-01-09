@@ -2,20 +2,17 @@ import Script from "next/script";
 import Navbar from "./components/common/Navbar";
 import { Chatbot } from '../components/shared/Chatbot';
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google"; // Import the font here
 import ToastProvider from "./components/common/ToastProvider";
 import Footer from "./components/common/Footer";
 import SessionTimeout from "../(auth)/login/components/SessionTimeout";
 import "../globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+// Configure the font
+const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-jakarta", // Create a CSS variable
 });
 
 export const metadata: Metadata = {
@@ -30,7 +27,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      {/* Apply the font variable and className to body */}
+      <body className={`${jakarta.variable} font-sans antialiased bg-slate-50 text-slate-900`}>
         <Navbar />
         <Script
           type="module"

@@ -167,15 +167,17 @@ export default function ServicesPage() {
   };
 
   return (
-    <>
+    // MAIN PAGE BACKGROUND set to continuous Light Purple (#F9F6FF)
+    <main className="min-h-screen bg-[#F9F6FF]">
+      
       {/* Hero Section */}
-      <section className="relative bg-white overflow-hidden pt-24 pb-4 sm:pt-32 sm:pb-8 px-4 sm:px-6 md:px-8">
-        <div className="max-w-[1440px] mx-auto w-full bg-[#F9F6FF] rounded-2xl sm:rounded-3xl md:rounded-[3rem] px-4 sm:px-8 md:px-12 lg:px-20 py-12 sm:py-20 lg:py-24 relative overflow-visible">
+      {/* Removed the inner nested container style so it blends with the main bg */}
+      <section className="relative overflow-visible pt-32 pb-12 sm:pt-40 sm:pb-16 px-4 sm:px-6 md:px-8">
+        <div className="max-w-[1440px] mx-auto w-full relative">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-20 items-center">
 
-            {/* Left Column: Text - REMOVED 'order-2' so it appears first naturally */}
+            {/* Left Column: Text */}
             <div className="text-center lg:text-left z-10">
-              
               <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-[5rem] leading-tight font-bold tracking-tight mb-6 flex flex-col items-center lg:items-start">
                 <span className="text-[#3F2965] mb-2">
                   <CharReveal className="justify-center lg:justify-start" delay={baseDelay}>
@@ -211,10 +213,9 @@ export default function ServicesPage() {
               </SlideUp>
             </div>
 
-            {/* Right Column: Animated Images - REMOVED 'order-1' so it appears second naturally */}
+            {/* Right Column: Animated Images */}
             <div className="relative h-[300px] sm:h-[500px] w-full flex items-center justify-center lg:justify-end perspective-1000 lg:pr-40">
               <SlideUp delay={baseDelay} className="w-full h-full relative flex items-center justify-center lg:justify-end">
-                {/* Mobile Optimization: Scale down images slightly on mobile */}
                 <div className="relative w-full h-full flex items-center justify-center scale-[0.65] sm:scale-100 origin-center lg:origin-right">
                   {/* Image 1 (Back) */}
                   <div
@@ -257,8 +258,8 @@ export default function ServicesPage() {
                 </div>
               </SlideUp>
 
-              {/* Decorative Circle Background */}
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] sm:w-[500px] h-[300px] sm:h-[500px] bg-gradient-to-tr from-[#eadcf8] to-transparent rounded-full opacity-30 blur-3xl -z-10" />
+              {/* Decorative Circle Background - Adjusted color to blend with new bg */}
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] sm:w-[500px] h-[300px] sm:h-[500px] bg-gradient-to-tr from-[#3F2965]/10 to-transparent rounded-full opacity-50 blur-3xl -z-10" />
             </div>
           </div>
 
@@ -304,10 +305,9 @@ export default function ServicesPage() {
             </div>
           )}
 
-          {/* Therapy Sessions Section with purple container */}
-          <div className="pt-12 sm:pt-20"></div>
+          {/* Therapy Sessions Section */}
+          <div className="pt-20 sm:pt-32"></div>
 
-          {/* Title inside the purple container */}
           <div className="text-center mb-10 sm:mb-16 max-w-3xl mx-auto">
             <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-[4rem] leading-tight sm:leading-[1.1] font-bold tracking-tight mb-4 sm:mb-6 md:mb-8 flex flex-col items-center">
               <div className="text-[#3F2965] mb-1 sm:mb-2">
@@ -332,8 +332,8 @@ export default function ServicesPage() {
           >
             {therapyApproaches.map((therapy) => (
               <StaggerItem key={therapy.id} className="h-full">
-                <Card className="flex flex-col h-full overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300 bg-white border border-[#3F2965]/5">
-                  {/* Image Section - Top with improved cropping */}
+                <Card className="flex flex-col h-full overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 bg-white border border-[#3F2965]/5">
+                  {/* Image Section */}
                   <div className="relative h-48 w-full overflow-hidden">
                     <Image
                       src={therapy.image}
@@ -348,13 +348,11 @@ export default function ServicesPage() {
                     <div className="absolute inset-0 bg-gradient-to-t from-white/0 via-transparent to-transparent" />
                   </div>
 
-                  {/* Rest of the card content */}
                   <div className="flex flex-col flex-1 p-5 sm:p-6">
                     <CardTitle className="font-headline text-xl mb-4 text-center text-[#3F2965]">
                       {therapy.title}
                     </CardTitle>
 
-                    {/* Points instead of paragraph */}
                     <ul className="space-y-2 mb-6 flex-1">
                       {therapy.points.map((point, index) => (
                         <li key={index} className="flex items-start text-sm text-[#3F2965]/70">
@@ -364,7 +362,7 @@ export default function ServicesPage() {
                       ))}
                     </ul>
 
-                    {/* Buttons Section with Animation */}
+                    {/* Buttons Section */}
                     <div className="mt-auto space-y-3">
                       <div className="flex flex-col sm:flex-row gap-2 justify-center">
                         {/* Online Button */}
@@ -441,26 +439,23 @@ export default function ServicesPage() {
       </section>
 
       {/* Corporate Services Section */}
-      <section className="py-12 sm:py-16 md:py-20 lg:py-24 px-4 sm:px-6 md:px-8 bg-white">
+      <section className="py-12 sm:py-16 md:py-20 lg:py-24 px-4 sm:px-6 md:px-8 bg-[#F9F6FF]">
         <div className="max-w-4xl mx-auto text-center flex flex-col items-center">
 
-          {/* Icon: Slide Up */}
           <SlideUp delay={baseDelay}>
-            <div className="inline-flex items-center justify-center w-20 h-20 sm:w-24 sm:h-24 rounded-2xl sm:rounded-3xl bg-[#F9F6FF] text-[#Dd1764] mb-6 sm:mb-8 shadow-sm">
+            {/* Changed background to White to stand out against Purple page */}
+            <div className="inline-flex items-center justify-center w-20 h-20 sm:w-24 sm:h-24 rounded-2xl sm:rounded-3xl bg-white text-[#Dd1764] mb-6 sm:mb-8 shadow-sm">
               <Building2 size={40} strokeWidth={1.5} className="sm:w-12 sm:h-12" />
             </div>
           </SlideUp>
 
-          {/* Heading Area */}
           <div className="mb-4 sm:mb-6 flex flex-col items-center">
-              {/* Label */}
               <SlideUp delay={baseDelay + 0.1}>
                   <span className="block text-[#Dd1764] font-bold text-xs sm:text-sm tracking-wide mb-2 sm:mb-3 uppercase">
                       Corporate & Organizational Care
                   </span>
               </SlideUp>
 
-              {/* Title: Alphabet Reveal */}
               <div className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-[#3F2965] space-y-1">
                   <div>
                       <CharReveal delay={baseDelay + 0.1} className="justify-center">
@@ -475,14 +470,12 @@ export default function ServicesPage() {
               </div>
           </div>
 
-          {/* Paragraph */}
           <SlideUp delay={baseDelay + 0.2} className="mb-8 sm:mb-10 md:mb-12">
             <p className="text-base sm:text-lg md:text-xl text-[#3F2965]/70 leading-relaxed max-w-2xl mx-auto font-medium px-4">
               We partner with organizations to foster mentally healthy and productive work environments through workshops, group sessions, and collaborative programs.
             </p>
           </SlideUp>
 
-          {/* Button */}
           <SlideUp delay={baseDelay + 0.3}>
             <Link href="/corporate">
               <button className="w-full sm:w-auto relative px-8 sm:px-10 py-3 sm:py-4 rounded-full bg-[#Dd1764] text-white font-bold text-sm sm:text-base tracking-wide overflow-hidden group transition-all duration-300 hover:shadow-2xl hover:shadow-[#3F2965]/20 hover:-translate-y-1">
@@ -496,7 +489,7 @@ export default function ServicesPage() {
       </section>
 
       {/* Who We Work With Section */}
-      <section className="py-8 sm:py-12 bg-white">
+      <section className="py-8 sm:py-12 bg-[#F9F6FF]">
         <div className="container mx-auto px-4">
           <div className="text-center mb-10 sm:mb-16">
             <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-[4rem] leading-tight sm:leading-[1.1] font-bold tracking-tight mb-4 sm:mb-6 md:mb-8 flex flex-col items-center">
@@ -521,7 +514,6 @@ export default function ServicesPage() {
                 key={group.title}
                 className="relative rounded-lg overflow-hidden shadow-sm group hover:shadow-lg transition-shadow duration-300 h-full min-h-[250px] sm:min-h-[auto]"
               >
-                {/* Background Image */}
                 <div className="absolute inset-0 z-0">
                   <Image
                     src={group.image}
@@ -530,11 +522,9 @@ export default function ServicesPage() {
                     className="object-cover transition-transform duration-500 group-hover:scale-105"
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 20vw"
                   />
-                  {/* Dark overlay for better text visibility */}
                   <div className="absolute inset-0 bg-black/50 group-hover:bg-black/60 transition-colors duration-300" />
                 </div>
 
-                {/* Content */}
                 <div className="relative z-10 p-6 text-center h-full flex flex-col justify-center min-h-[200px]">
                   <h3 className="font-headline text-xl font-semibold text-white mb-2">
                     {group.title}
@@ -550,7 +540,7 @@ export default function ServicesPage() {
       </section>
 
       {/* What You Can Expect Section */}
-      <section className="py-8 sm:py-12 bg-white">
+      <section className="py-8 sm:py-12 bg-[#F9F6FF]">
         <div className="container mx-auto px-4">
           <div className="text-center mb-10 sm:mb-16">
             <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-[4rem] leading-tight sm:leading-[1.1] font-bold tracking-tight mb-4 sm:mb-6 md:mb-8 flex flex-col items-center">
@@ -569,15 +559,17 @@ export default function ServicesPage() {
             </SlideUp>
           </div>
 
-          {/* Light Purple Cards */}
+          {/* Cards */}
           <div className="max-w-4xl mx-auto">
             {/* First Row - 2 Cards */}
             <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 mb-6 sm:mb-8" delay={staggerDelay}>
               {whatToExpect.slice(0, 2).map((item) => (
                 <StaggerItem key={item.title}>
-                  <div className="bg-[#F9F6FF] rounded-2xl p-8 shadow-sm hover:shadow-md transition-all duration-300 border border-[#3F2965]/10 hover:border-[#3F2965]/20 hover:-translate-y-1 h-full">
+                  {/* Changed BG to WHITE to pop on Purple Page */}
+                  <div className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-md transition-all duration-300 border border-[#3F2965]/10 hover:border-[#3F2965]/20 hover:-translate-y-1 h-full">
                     <div className="flex flex-col items-center text-center">
-                      <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center mb-6 shadow-sm">
+                      {/* Icon BG changed to light purple */}
+                      <div className="w-16 h-16 rounded-full bg-[#F9F6FF] flex items-center justify-center mb-6 shadow-sm text-[#3F2965]">
                         {item.icon}
                       </div>
                       <h3 className="text-xl font-bold font-headline text-[#3F2965] mb-4">
@@ -596,9 +588,11 @@ export default function ServicesPage() {
             <StaggerContainer className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8" delay={staggerDelay + 0.1}>
               {whatToExpect.slice(2, 5).map((item) => (
                 <StaggerItem key={item.title}>
-                  <div className="bg-[#F9F6FF] rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-300 border border-[#3F2965]/10 hover:border-[#3F2965]/20 hover:-translate-y-1 h-full">
+                  {/* Changed BG to WHITE */}
+                  <div className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-300 border border-[#3F2965]/10 hover:border-[#3F2965]/20 hover:-translate-y-1 h-full">
                     <div className="flex flex-col items-center text-center">
-                      <div className="w-14 h-14 rounded-full bg-white flex items-center justify-center mb-4 shadow-sm">
+                      {/* Icon BG changed to light purple */}
+                      <div className="w-14 h-14 rounded-full bg-[#F9F6FF] flex items-center justify-center mb-4 shadow-sm">
                         {item.icon}
                       </div>
                       <h3 className="text-lg font-bold font-headline text-[#3F2965] mb-3">
@@ -614,7 +608,6 @@ export default function ServicesPage() {
             </StaggerContainer>
           </div>
 
-          {/* Animated Book Your First Session Button */}
           <div className="mt-12 sm:mt-20 text-center">
             <Link href="/book">
               <button className="relative px-8 py-4 rounded-full bg-[#Dd1764] text-white font-bold text-lg tracking-wide overflow-hidden group transition-all duration-300 hover:shadow-lg hover:shadow-[#3F2965]/20 hover:-translate-y-0.5 w-full sm:w-auto">
@@ -629,11 +622,10 @@ export default function ServicesPage() {
         </div>
       </section>
 
-      {/* Testimonial Carousel Section Wrapped in Purple Rectangle */}
-      <section className="flex items-center py-8 sm:py-12 px-4 sm:px-6 md:px-8 bg-white">
-        <div className="max-w-[1440px] mx-auto w-full bg-[#F9F6FF] rounded-2xl sm:rounded-3xl md:rounded-[3rem] px-4 sm:px-8 md:px-12 lg:px-20 py-12 sm:py-16 md:py-20 relative overflow-visible">
+      {/* Testimonials - Removed the inner box styling */}
+      <section className="flex items-center py-12 sm:py-16 md:py-20 px-4 sm:px-6 md:px-8 bg-[#F9F6FF]">
+        <div className="max-w-[1440px] mx-auto w-full relative overflow-visible">
 
-          {/* Title inside the purple container */}
           <div className="text-center mb-10 sm:mb-16 max-w-3xl mx-auto">
             <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-[4rem] leading-tight sm:leading-[1.1] font-bold tracking-tight mb-4 sm:mb-6 md:mb-8 flex flex-col items-center">
               <div className="text-[#3F2965] mb-1 sm:mb-2">
@@ -651,13 +643,11 @@ export default function ServicesPage() {
             </SlideUp>
           </div>
 
-          {/* Testimonial Carousel */}
           <SlideUp delay={baseDelay + 0.3}
             className="relative"
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
           >
-            {/* Navigation Arrows - Only show if we have more than 1 slide */}
             {slidesCount > 1 && (
               <>
                 <button
@@ -678,7 +668,6 @@ export default function ServicesPage() {
               </>
             )}
 
-            {/* Carousel Container - Dynamic grid columns based on itemsPerSlide */}
             <div className="overflow-hidden px-2">
               <div className={`grid gap-8 transition-all duration-500 ease-in-out ${
                 itemsPerSlide === 1 ? 'grid-cols-1' : itemsPerSlide === 2 ? 'grid-cols-2' : 'grid-cols-3'
@@ -686,26 +675,22 @@ export default function ServicesPage() {
                 {getCurrentTestimonials().map((testimonial) => (
                   <div
                     key={testimonial.id}
+                    // Cards kept white
                     className="bg-white rounded-2xl p-6 shadow-md hover:shadow-lg transition-all duration-300 border border-[#3F2965]/5 transform hover:-translate-y-1 h-full flex flex-col"
                   >
-                    {/* Quote Icon */}
                     <div className="mb-4">
                       <Quote className="h-8 w-8 text-[#Dd1764]/30" />
                     </div>
 
-                    {/* Rating */}
                     <div className="mb-4">
                       {renderStars(testimonial.rating)}
                     </div>
 
-                    {/* Testimonial Content */}
                     <p className="text-[#3F2965] text-sm sm:text-base leading-relaxed mb-6 italic flex-grow">
                       "{testimonial.content}"
                     </p>
 
-                    {/* Client Info */}
                     <div className="flex items-center gap-4 mt-auto">
-                      {/* Avatar Placeholder */}
                       <div className="w-12 h-12 flex-shrink-0 rounded-full bg-gradient-to-br from-[#3F2965] to-[#513681] flex items-center justify-center text-white font-bold">
                         {testimonial.name.charAt(0)}
                       </div>
@@ -726,7 +711,6 @@ export default function ServicesPage() {
               </div>
             </div>
 
-            {/* Dots Indicator */}
             {slidesCount > 1 && (
               <div className="flex justify-center items-center gap-2 mt-8">
                 {[...Array(slidesCount)].map((_, index) => (
@@ -744,7 +728,6 @@ export default function ServicesPage() {
             )}
           </SlideUp>
 
-          {/* CTA after testimonials */}
           <div className="mt-12 sm:mt-20 text-center">
             <div className="max-w-2xl mx-auto mb-8">
               <h3 className="text-2xl sm:text-3xl font-bold text-[#3F2965] mb-4">
@@ -768,6 +751,6 @@ export default function ServicesPage() {
           </div>
         </div>
       </section>
-    </>
+    </main>
   );
 }
