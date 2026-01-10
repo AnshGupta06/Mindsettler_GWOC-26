@@ -3,12 +3,12 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "../../../lib/firebase"; // Ensure path is correct
+import { auth } from "../../../lib/firebase"; 
 import { API_URL } from "@/app/lib/api";
 import { 
-  Users, Search, Mail, Phone, Calendar, ArrowLeft, 
-  Eye, FileText, X, Clock, Trash2, Edit2, Ban, 
-  MoreVertical, Check, ShieldAlert, Smartphone
+  Users, Search, Mail, Phone, Calendar, 
+  Edit2, Ban, CheckCircle, Save, X, ShieldAlert, Check, 
+  ChevronDown, ChevronUp, Clock, MapPin, Filter
 } from "lucide-react";
 import Loader from "../../components/common/Loader";
 import { motion, AnimatePresence } from "framer-motion";
@@ -21,461 +21,346 @@ type Booking = {
   type: "FIRST" | "FOLLOW_UP";
   therapyType?: string;
   reason?: string;
-  slot: { 
-    date: string;
-    startTime: string; 
+  slot: {
+    startTime: string;
     endTime: string;
     mode: "ONLINE" | "OFFLINE";
-  };
-  user: {
-    name?: string;
-    email: string;
-    phone?: string;
   };
 };
 
 type Client = {
+  id: string;
   email: string;
   name: string;
   phone: string;
   totalBookings: number;
-  lastSession: string;
-  status: "Active" | "Inactive" | "Suspended";
-  history: Booking[];
+  lastSession: string | null;
+  adminNotes: string;
+  isBlocked: boolean;
+  bookings: Booking[];
 };
 
 export default function AdminClientsPage() {
   const router = useRouter();
-  const [loading, setLoading] = useState(true);
   const [clients, setClients] = useState<Client[]>([]);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [loading, setLoading] = useState(true);
   
-  // Modal & Editing States
-  const [selectedClient, setSelectedClient] = useState<Client | null>(null);
-  const [isEditing, setIsEditing] = useState(false);
-  const [editForm, setEditForm] = useState({ name: "", phone: "" });
-  const [adminNote, setAdminNote] = useState(""); 
+  // Search & Filters
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState<"ALL" | "ACTIVE" | "BLOCKED">("ALL");
+  const [activityFilter, setActivityFilter] = useState<"ALL" | "REGULAR" | "NEW">("ALL");
 
-  // --- Data Fetching ---
+  // State
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editNotes, setEditNotes] = useState("");
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (user) => {
       if (!user) { router.replace("/login"); return; }
       const token = await user.getIdToken();
-      
-      try {
-        const res = await fetch(`${API_URL}/api/admin/bookings`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const bookings: Booking[] = await res.json();
-
-        const clientMap = new Map<string, Client>();
-
-        bookings.forEach((b) => {
-          const email = b.user.email;
-          if (!email) return;
-
-          const existing = clientMap.get(email);
-          const bookingDate = new Date(b.slot.date);
-          const isRecent = (new Date().getTime() - bookingDate.getTime()) < (30 * 24 * 60 * 60 * 1000);
-
-          if (!existing) {
-            clientMap.set(email, {
-              email,
-              name: b.user.name || "Unknown",
-              phone: b.user.phone || "-",
-              totalBookings: 1,
-              lastSession: b.slot.date,
-              status: isRecent ? "Active" : "Inactive",
-              history: [b]
-            });
-          } else {
-            existing.totalBookings += 1;
-            existing.history.push(b);
-            existing.history.sort((a, b) => new Date(b.slot.date).getTime() - new Date(a.slot.date).getTime());
-
-            if (new Date(existing.lastSession) < bookingDate) {
-              existing.lastSession = b.slot.date;
-              existing.status = existing.status === "Suspended" ? "Suspended" : (isRecent ? "Active" : "Inactive");
-            }
-            if (!existing.phone || existing.phone === "-") existing.phone = b.user.phone || "-";
-            if (!existing.name || existing.name === "Unknown") existing.name = b.user.name || "Unknown";
-          }
-        });
-
-        setClients(Array.from(clientMap.values()));
-      } catch (err) {
-        console.error("Failed to load clients", err);
-        toast.error("Could not load client database");
-      } finally {
-        setLoading(false);
-      }
+      fetchClients(token);
     });
     return () => unsub();
-  }, [router]);
+  }, []);
 
-  // --- Actions ---
-
-  const handleDeleteClient = (email: string) => {
-    if (!confirm("Are you sure you want to remove this client? This cannot be undone.")) return;
-    
-    // Optimistic Update
-    setClients(prev => prev.filter(c => c.email !== email));
-    if (selectedClient?.email === email) setSelectedClient(null);
-    toast.success("Client removed from database");
-  };
-
-  const handleToggleStatus = (client: Client) => {
-    const newStatus = client.status === "Suspended" ? "Active" : "Suspended";
-    
-    setClients(prev => prev.map(c => c.email === client.email ? { ...c, status: newStatus } : c));
-    if (selectedClient?.email === client.email) {
-      setSelectedClient({ ...selectedClient, status: newStatus });
+  const fetchClients = async (token: string) => {
+    try {
+      const res = await fetch(`${API_URL}/api/admin/clients`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error("Failed to fetch clients");
+      const data = await res.json();
+      setClients(data);
+    } catch (err) {
+      toast.error("Failed to load client database");
+    } finally {
+      setLoading(false);
     }
-    toast.success(`Client marked as ${newStatus}`);
   };
 
-  const handleEditInit = () => {
-    if (!selectedClient) return;
-    setEditForm({ name: selectedClient.name, phone: selectedClient.phone });
-    setIsEditing(true);
+  // --- Client Actions ---
+  const handleSaveNotes = async (id: string) => {
+    const token = await auth.currentUser?.getIdToken();
+    const toastId = toast.loading("Saving note...");
+    try {
+      await fetch(`${API_URL}/api/admin/clients/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ adminNotes: editNotes }),
+      });
+      setClients(prev => prev.map(c => c.id === id ? { ...c, adminNotes: editNotes } : c));
+      setEditingId(null);
+      toast.success("Note saved!", { id: toastId });
+    } catch (err) { toast.error("Failed to save", { id: toastId }); }
   };
 
-  const handleSaveEdit = () => {
-    if (!selectedClient) return;
+  const toggleBlock = async (client: Client) => {
+    if (!confirm(`Are you sure you want to ${client.isBlocked ? "UNBLOCK" : "BLOCK"} this user?`)) return;
+    const token = await auth.currentUser?.getIdToken();
+    try {
+      await fetch(`${API_URL}/api/admin/clients/${client.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ isBlocked: !client.isBlocked }),
+      });
+      setClients(prev => prev.map(c => c.id === client.id ? { ...c, isBlocked: !client.isBlocked } : c));
+      toast.success(client.isBlocked ? "Unblocked" : "Blocked");
+    } catch (err) { toast.error("Failed to update status"); }
+  };
+
+  const handleBookingStatus = async (bookingId: string, status: "CONFIRMED" | "REJECTED") => {
+    const token = await auth.currentUser?.getIdToken();
+    const toastId = toast.loading("Updating booking...");
+    try {
+      await fetch(`${API_URL}/api/admin/bookings/${bookingId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ status }),
+      });
+      if(token) fetchClients(token);
+      toast.success(`Booking ${status}`, { id: toastId });
+    } catch (err) { toast.error("Failed to update", { id: toastId }); }
+  };
+
+  // --- Filter Logic ---
+  const filteredClients = clients.filter(c => {
+    const matchesSearch = (c.name || "").toLowerCase().includes(search.toLowerCase()) || 
+                          (c.email || "").toLowerCase().includes(search.toLowerCase());
     
-    const updatedClient = { ...selectedClient, ...editForm };
-    
-    setClients(prev => prev.map(c => c.email === selectedClient.email ? updatedClient : c));
-    setSelectedClient(updatedClient);
-    setIsEditing(false);
-    toast.success("Client details updated");
-  };
+    const matchesStatus = statusFilter === "ALL" ? true :
+                          statusFilter === "BLOCKED" ? c.isBlocked :
+                          !c.isBlocked; // Active
 
-  const handleSaveNote = () => {
-    toast.success("Admin note saved");
-    // In real app: POST /api/admin/clients/notes
-  };
+    const matchesActivity = activityFilter === "ALL" ? true :
+                            activityFilter === "REGULAR" ? c.totalBookings > 0 :
+                            c.totalBookings === 0; // New
 
-  // --- Filtering ---
-  const filteredClients = clients.filter(c => 
-    c.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    c.email.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+    return matchesSearch && matchesStatus && matchesActivity;
+  });
 
-  if (loading) return <Loader fullScreen={true} message="Loading Client Base..." />;
+  if (loading) return <Loader fullScreen message="Loading Client Base..." />;
 
   return (
-    <div className="min-h-screen bg-white pt-24 pb-12 px-4 sm:px-6 md:px-8 relative">
-      <div className="max-w-[1440px] mx-auto bg-[#F9F6FF] rounded-[2.5rem] p-6 md:p-8 shadow-sm min-h-[80vh]">
+    <div className="min-h-screen bg-[#F9F6FF] pt-24 pb-12 px-4 sm:px-8">
+      <div className="max-w-7xl mx-auto">
         
-        {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
-          <div className="flex items-center gap-4">
-            <button onClick={() => router.back()} className="p-2 bg-white rounded-full hover:shadow-md transition-all text-[#3F2965]">
-                <ArrowLeft size={20} />
-            </button>
-            <div>
-                <h1 className="text-2xl md:text-3xl font-bold text-[#3F2965] flex items-center gap-3">
-                  <Users className="text-[#Dd1764]" /> Client Base
-                </h1>
-                <p className="text-[#3F2965]/60 mt-1 text-sm md:text-base">Manage your active details & history</p>
-            </div>
+        {/* Header Section */}
+        <div className="flex flex-col gap-6 mb-10">
+          <div>
+            <h1 className="text-3xl font-bold flex items-center gap-3 text-[#3F2965]">
+              <Users className="text-[#Dd1764]" size={32} /> Client Management
+            </h1>
+            <p className="text-[#3F2965]/60 mt-2">Manage users, notes, and booking history.</p>
           </div>
 
-          <div className="relative w-full md:w-96">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#3F2965]/40" size={20} />
-            <input 
-              type="text" 
-              placeholder="Search by name or email..." 
-              className="w-full pl-12 pr-4 py-3 rounded-xl border border-[#3F2965]/10 bg-white focus:outline-none focus:border-[#Dd1764]/50 focus:ring-4 focus:ring-[#Dd1764]/5 transition-all shadow-sm"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-        </div>
-
-        {/* --- MOBILE VIEW: CARDS (Visible on small screens) --- */}
-        <div className="grid grid-cols-1 gap-4 md:hidden">
-            {filteredClients.length === 0 ? (
-                 <div className="text-center p-8 text-[#3F2965]/50">No clients found.</div>
-            ) : filteredClients.map((client) => (
-                <div key={client.email} className="bg-white p-5 rounded-2xl shadow-sm border border-[#3F2965]/5 flex flex-col gap-4">
-                    <div className="flex justify-between items-start">
-                        <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-full bg-[#3F2965]/10 text-[#3F2965] flex items-center justify-center font-bold">
-                                {client.name.charAt(0)}
-                            </div>
-                            <div>
-                                <h3 className="font-bold text-[#3F2965]">{client.name}</h3>
-                                <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
-                                    client.status === "Active" ? "bg-green-100 text-green-700" : 
-                                    client.status === "Suspended" ? "bg-red-100 text-red-700" : "bg-gray-100 text-gray-500"
-                                }`}>
-                                    {client.status}
-                                </span>
-                            </div>
-                        </div>
-                        <button 
-                            onClick={() => setSelectedClient(client)} 
-                            className="p-2 bg-[#F9F6FF] text-[#3F2965] rounded-lg"
-                        >
-                            <Eye size={18} />
-                        </button>
-                    </div>
-                    
-                    <div className="space-y-2 text-sm text-[#3F2965]/70 border-t border-dashed border-[#3F2965]/10 pt-3">
-                        <div className="flex items-center gap-2">
-                            <Mail size={14} /> {client.email}
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <Phone size={14} /> {client.phone}
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <Calendar size={14} /> Last: {new Date(client.lastSession).toLocaleDateString()}
-                        </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-2 mt-1">
-                        <a href={`mailto:${client.email}`} className="flex items-center justify-center gap-2 py-2 rounded-lg bg-[#3F2965] text-white text-xs font-bold">
-                            <Mail size={14}/> Email
-                        </a>
-                        <a href={`tel:${client.phone}`} className="flex items-center justify-center gap-2 py-2 rounded-lg border border-[#3F2965]/10 text-[#3F2965] text-xs font-bold">
-                            <Phone size={14}/> Call
-                        </a>
-                    </div>
-                </div>
-            ))}
-        </div>
-
-        {/* --- DESKTOP VIEW: TABLE (Hidden on mobile) --- */}
-        <div className="hidden md:block bg-white rounded-3xl overflow-hidden shadow-sm border border-[#3F2965]/5">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-[#3F2965]/5 text-[#3F2965] text-xs uppercase tracking-wider font-bold">
-                  <th className="p-6">Client Name</th>
-                  <th className="p-6">Contact Info</th>
-                  <th className="p-6 text-center">Sessions</th>
-                  <th className="p-6">Last Active</th>
-                  <th className="p-6 text-center">Status</th>
-                  <th className="p-6 text-center">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="text-sm text-[#3F2965]/80 divide-y divide-[#3F2965]/5">
-                {filteredClients.length === 0 ? (
-                    <tr><td colSpan={6} className="p-10 text-center text-[#3F2965]/40">No clients found.</td></tr>
-                ) : filteredClients.map((client, i) => (
-                  <tr key={i} className="hover:bg-[#F9F6FF] transition-colors group">
-                    <td className="p-6 font-bold text-[#3F2965] flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-[#3F2965]/10 flex items-center justify-center text-xs">
-                            {client.name.charAt(0)}
-                        </div>
-                        {client.name}
-                    </td>
-                    <td className="p-6">
-                      <div className="flex flex-col gap-1">
-                        <span className="flex items-center gap-2 cursor-pointer hover:text-[#Dd1764]" onClick={() => window.location.href=`mailto:${client.email}`}>
-                            <Mail size={12} className="opacity-50"/> {client.email}
-                        </span>
-                        <span className="flex items-center gap-2">
-                            <Phone size={12} className="opacity-50"/> {client.phone}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="p-6 text-center font-bold">{client.totalBookings}</td>
-                    <td className="p-6">
-                        <div className="flex items-center gap-2">
-                            <Calendar size={14} className="opacity-50"/>
-                            {new Date(client.lastSession).toLocaleDateString()}
-                        </div>
-                    </td>
-                    <td className="p-6 text-center">
-                        <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase ${
-                             client.status === "Active" ? "bg-green-100 text-green-700" : 
-                             client.status === "Suspended" ? "bg-red-100 text-red-700" : "bg-gray-100 text-gray-500"
-                        }`}>
-                            {client.status}
-                        </span>
-                    </td>
-                    <td className="p-6">
-                        <div className="flex items-center justify-center gap-2">
-                            <button onClick={() => setSelectedClient(client)} className="p-2 rounded-lg hover:bg-[#3F2965]/10 text-[#3F2965] transition-all" title="View Details">
-                                <Eye size={18} />
-                            </button>
-                            <button onClick={() => handleDeleteClient(client.email)} className="p-2 rounded-lg hover:bg-red-50 text-red-400 hover:text-red-600 transition-all" title="Delete Client">
-                                <Trash2 size={18} />
-                            </button>
-                        </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      {/* ✨ CLIENT DETAILS SLIDE-OVER */}
-      <AnimatePresence>
-        {selectedClient && (
-          <>
-            <motion.div 
-                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                onClick={() => { setSelectedClient(null); setIsEditing(false); }}
-                className="fixed inset-0 bg-[#3F2965]/20 backdrop-blur-sm z-40"
-            />
+          {/* Search & Filters Bar */}
+          <div className="flex flex-col md:flex-row gap-4">
             
+            {/* Search */}
+            <div className="relative flex-1 group">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#3F2965]/40 group-focus-within:text-[#Dd1764]" size={20} />
+              <input 
+                className="w-full pl-12 pr-4 py-3 bg-white rounded-xl border border-[#3F2965]/10 focus:outline-none focus:border-[#Dd1764] text-[#3F2965] shadow-sm"
+                placeholder="Search clients by name or email..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </div>
+
+            {/* Status Filter */}
+            <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-xl border border-[#3F2965]/10 shadow-sm">
+                <Filter size={16} className="text-[#3F2965]/40" />
+                <select 
+                    value={statusFilter}
+                    onChange={(e) => setStatusFilter(e.target.value as any)}
+                    className="bg-transparent text-sm font-bold text-[#3F2965] outline-none cursor-pointer"
+                >
+                    <option value="ALL">All Status</option>
+                    <option value="ACTIVE">Active Only</option>
+                    <option value="BLOCKED">Blocked Only</option>
+                </select>
+            </div>
+
+            {/* Activity Filter */}
+            <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-xl border border-[#3F2965]/10 shadow-sm">
+                <Calendar size={16} className="text-[#3F2965]/40" />
+                <select 
+                    value={activityFilter}
+                    onChange={(e) => setActivityFilter(e.target.value as any)}
+                    className="bg-transparent text-sm font-bold text-[#3F2965] outline-none cursor-pointer"
+                >
+                    <option value="ALL">All Activity</option>
+                    <option value="REGULAR">With Bookings</option>
+                    <option value="NEW">New Signups</option>
+                </select>
+            </div>
+
+          </div>
+        </div>
+
+        {/* Clients List */}
+        <div className="space-y-4">
+          {filteredClients.length === 0 ? (
+             <div className="text-center py-20 bg-white rounded-3xl border border-dashed border-[#3F2965]/20">
+                <Users className="mx-auto h-12 w-12 text-[#3F2965]/20 mb-3" />
+                <p className="text-[#3F2965]/40 font-bold">No clients found matching your filters.</p>
+                <button 
+                    onClick={() => {setSearch(""); setStatusFilter("ALL"); setActivityFilter("ALL");}}
+                    className="mt-4 text-[#Dd1764] font-bold text-sm hover:underline"
+                >
+                    Clear Filters
+                </button>
+             </div>
+          ) : (
+            filteredClients.map((client) => (
             <motion.div 
-                initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "100%" }}
-                transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                className="fixed top-0 right-0 h-full w-full md:w-[600px] bg-white shadow-2xl z-50 p-6 md:p-8 overflow-y-auto border-l border-[#3F2965]/5"
+              key={client.id}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className={`bg-white rounded-3xl shadow-sm border overflow-hidden transition-all ${
+                  client.isBlocked ? "border-red-200 bg-red-50/10" : "border-[#3F2965]/5 hover:shadow-md"
+              }`}
             >
-                <div className="flex justify-between items-center mb-8">
-                    <h2 className="text-2xl font-bold text-[#3F2965]">Client Profile</h2>
-                    <div className="flex gap-2">
-                        {/* Action Buttons in Header */}
-                        <button 
-                            onClick={() => handleToggleStatus(selectedClient)}
-                            className={`p-2 rounded-full transition-colors ${selectedClient.status === "Suspended" ? "bg-green-100 text-green-700" : "bg-red-50 text-red-600"}`}
-                            title={selectedClient.status === "Suspended" ? "Activate" : "Suspend"}
-                        >
-                            {selectedClient.status === "Suspended" ? <Check size={20} /> : <Ban size={20} />}
-                        </button>
-                        <button 
-                            onClick={() => handleDeleteClient(selectedClient.email)}
-                            className="p-2 hover:bg-red-50 text-red-400 rounded-full transition-colors"
-                            title="Delete"
-                        >
-                            <Trash2 size={20} />
-                        </button>
-                        <button 
-                            onClick={() => { setSelectedClient(null); setIsEditing(false); }} 
-                            className="p-2 hover:bg-[#F9F6FF] rounded-full transition-colors"
-                        >
-                            <X size={24} className="text-[#3F2965]/60" />
-                        </button>
+              <div className="p-6 md:p-8 flex flex-col lg:flex-row gap-8">
+                
+                {/* 1. Client Info */}
+                <div className="flex-1 space-y-5">
+                  <div className="flex items-start gap-4">
+                    <div className={`w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold ${
+                        client.isBlocked ? "bg-red-100 text-red-600" : "bg-[#F9F6FF] text-[#3F2965]"
+                    }`}>
+                        {client.name?.charAt(0) || "U"}
                     </div>
+                    <div>
+                        <h3 className="text-lg font-bold text-[#3F2965] flex items-center gap-2">
+                          {client.name || "Unknown"}
+                          {client.isBlocked && <span className="bg-red-100 text-red-600 px-2 py-0.5 rounded text-[10px] font-bold flex items-center gap-1"><ShieldAlert size={10} /> BLOCKED</span>}
+                        </h3>
+                        <div className="flex flex-col sm:flex-row gap-1 sm:gap-3 text-sm text-[#3F2965]/60 mt-1">
+                           <span className="flex items-center gap-1.5"><Mail size={12}/> {client.email}</span>
+                           {client.phone && <span className="hidden sm:inline">•</span>}
+                           {client.phone && <span className="flex items-center gap-1.5"><Phone size={12}/> {client.phone}</span>}
+                        </div>
+                    </div>
+                  </div>
+                  
+                  {/* Stats */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="p-3 rounded-2xl bg-gray-50 border border-gray-100">
+                        <p className="text-[10px] font-bold text-gray-400 uppercase">Bookings</p>
+                        <p className="font-bold text-[#3F2965] text-xl">{client.totalBookings}</p>
+                    </div>
+                    <div className="p-3 rounded-2xl bg-gray-50 border border-gray-100">
+                        <p className="text-[10px] font-bold text-gray-400 uppercase">Last Session</p>
+                        <p className="font-bold text-[#3F2965] text-xl truncate">
+                            {client.lastSession ? new Date(client.lastSession).toLocaleDateString(undefined, {month:'short', day:'numeric'}) : "-"}
+                        </p>
+                    </div>
+                  </div>
                 </div>
 
-                {/* Profile Card */}
-                <div className="bg-[#F9F6FF] p-6 rounded-3xl mb-8 flex flex-col sm:flex-row items-start gap-5 relative group">
-                    
-                    {!isEditing && (
-                        <button onClick={handleEditInit} className="absolute top-4 right-4 p-2 bg-white rounded-full shadow-sm text-[#3F2965] opacity-0 group-hover:opacity-100 transition-opacity">
-                            <Edit2 size={16} />
-                        </button>
-                    )}
-
-                    <div className="w-16 h-16 rounded-full bg-[#3F2965] text-white flex items-center justify-center text-xl font-bold shrink-0">
-                        {selectedClient.name.charAt(0)}
-                    </div>
-                    
-                    <div className="flex-1 w-full">
-                        {isEditing ? (
-                            <div className="space-y-3">
-                                <input 
-                                    className="w-full p-2 rounded-lg border border-[#3F2965]/20 text-sm font-bold text-[#3F2965]"
-                                    value={editForm.name}
-                                    onChange={(e) => setEditForm({...editForm, name: e.target.value})}
-                                    placeholder="Client Name"
-                                />
-                                <input 
-                                    className="w-full p-2 rounded-lg border border-[#3F2965]/20 text-sm"
-                                    value={editForm.phone}
-                                    onChange={(e) => setEditForm({...editForm, phone: e.target.value})}
-                                    placeholder="Phone Number"
-                                />
-                                <div className="flex gap-2 mt-2">
-                                    <button onClick={handleSaveEdit} className="px-3 py-1 bg-[#3F2965] text-white text-xs rounded-lg">Save</button>
-                                    <button onClick={() => setIsEditing(false)} className="px-3 py-1 bg-white border border-[#3F2965]/20 text-[#3F2965] text-xs rounded-lg">Cancel</button>
-                                </div>
+                {/* 2. Admin Notes */}
+                <div className="flex-1 bg-gray-50 p-5 rounded-2xl border border-gray-100 relative group flex flex-col">
+                    <div className="flex justify-between items-center mb-2">
+                        <p className="text-xs font-bold text-gray-400 uppercase flex items-center gap-2"><Edit2 size={12} /> Admin Notes</p>
+                        {editingId === client.id ? (
+                            <div className="flex gap-2">
+                                <button onClick={() => setEditingId(null)} className="p-1 hover:bg-white rounded text-red-500"><X size={14}/></button>
+                                <button onClick={() => handleSaveNotes(client.id)} className="p-1 hover:bg-white rounded text-green-600"><Check size={14}/></button>
                             </div>
                         ) : (
-                            <>
-                                <h3 className="text-xl font-bold text-[#3F2965] flex items-center gap-2">
-                                    {selectedClient.name}
-                                    <span className={`text-[10px] px-2 py-0.5 rounded-full uppercase ${
-                                        selectedClient.status === "Active" ? "bg-green-100 text-green-700" : 
-                                        selectedClient.status === "Suspended" ? "bg-red-100 text-red-700" : "bg-gray-100 text-gray-500"
-                                    }`}>{selectedClient.status}</span>
-                                </h3>
-                                <p className="text-[#3F2965]/60 text-sm mb-4">{selectedClient.email}</p>
-                                
-                                <div className="flex gap-2 flex-wrap">
-                                    <a href={`mailto:${selectedClient.email}`} className="flex-1 min-w-[120px] py-2.5 bg-white border border-[#3F2965]/10 rounded-xl text-xs font-bold text-[#3F2965] flex items-center justify-center gap-2 hover:bg-[#3F2965] hover:text-white transition-all shadow-sm">
-                                        <Mail size={14} /> Email
-                                    </a>
-                                    {selectedClient.phone !== "-" && (
-                                        <a href={`tel:${selectedClient.phone}`} className="flex-1 min-w-[120px] py-2.5 bg-white border border-[#3F2965]/10 rounded-xl text-xs font-bold text-[#3F2965] flex items-center justify-center gap-2 hover:bg-[#3F2965] hover:text-white transition-all shadow-sm">
-                                            <Phone size={14} /> Call
-                                        </a>
-                                    )}
-                                </div>
-                            </>
+                            <button onClick={() => { setEditingId(client.id); setEditNotes(client.adminNotes || ""); }} className="p-1 hover:bg-white rounded opacity-0 group-hover:opacity-100 text-gray-400 hover:text-[#3F2965]">
+                                <Edit2 size={14} />
+                            </button>
                         )}
                     </div>
-                </div>
-
-                {/* Admin Notes */}
-                <div className="mb-8">
-                    <h4 className="font-bold text-[#3F2965] mb-3 flex items-center gap-2">
-                        <FileText size={18} className="text-[#Dd1764]" /> Admin Notes
-                    </h4>
-                    <div className="relative">
+                    {editingId === client.id ? (
                         <textarea 
-                            className="w-full h-32 p-4 bg-white border border-[#3F2965]/10 rounded-xl text-sm focus:outline-none focus:border-[#Dd1764]/50 resize-none shadow-sm"
-                            placeholder="Write private notes about this client here (only visible to admins)..."
-                            value={adminNote}
-                            onChange={(e) => setAdminNote(e.target.value)}
+                            className="w-full flex-1 bg-white p-2 rounded-xl text-sm border focus:border-[#3F2965]/30 focus:outline-none resize-none"
+                            rows={3} value={editNotes} onChange={(e) => setEditNotes(e.target.value)} autoFocus
                         />
-                        <button onClick={handleSaveNote} className="absolute bottom-3 right-3 px-3 py-1.5 bg-[#3F2965] text-white text-xs font-bold rounded-lg hover:bg-[#513681] transition-colors shadow-md">
-                            Save
-                        </button>
-                    </div>
+                    ) : (
+                        <p className="text-sm text-[#3F2965]/70 italic whitespace-pre-wrap">{client.adminNotes || "No notes."}</p>
+                    )}
                 </div>
 
-                {/* Booking History */}
-                <div>
-                    <h4 className="font-bold text-[#3F2965] mb-4 flex items-center gap-2">
-                        <Clock size={18} className="text-[#Dd1764]" /> Session History
-                    </h4>
+                {/* 3. Actions */}
+                <div className="flex flex-col justify-center gap-3 border-t lg:border-t-0 lg:border-l border-gray-100 pt-6 lg:pt-0 lg:pl-8 min-w-[140px]">
+                    <button 
+                        onClick={() => toggleBlock(client)}
+                        className={`w-full py-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-2 ${client.isBlocked ? "bg-green-100 text-green-700" : "bg-white border border-red-100 text-red-500 hover:bg-red-50"}`}
+                    >
+                        {client.isBlocked ? <><CheckCircle size={14}/> Unblock</> : <><Ban size={14}/> Block User</>}
+                    </button>
                     
-                    <div className="space-y-3 pb-8">
-                        {selectedClient.history.map((booking) => (
-                            <div key={booking.id} className="p-4 rounded-2xl border border-[#3F2965]/5 bg-white hover:border-[#3F2965]/20 hover:shadow-md transition-all">
-                                <div className="flex justify-between items-start mb-2">
-                                    <span className="font-bold text-[#3F2965] flex items-center gap-2">
-                                        <Calendar size={14} className="text-[#Dd1764]"/>
-                                        {new Date(booking.slot.date).toLocaleDateString()}
-                                    </span>
-                                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
-                                        booking.status === "CONFIRMED" ? "bg-green-100 text-green-700" : 
-                                        booking.status === "REJECTED" ? "bg-red-100 text-red-700" : "bg-yellow-100 text-yellow-700"
-                                    }`}>
-                                        {booking.status}
-                                    </span>
+                    <button 
+                        onClick={() => setExpandedId(expandedId === client.id ? null : client.id)}
+                        className={`w-full py-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-colors ${expandedId === client.id ? "bg-[#3F2965] text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}
+                    >
+                        {expandedId === client.id ? "Hide History" : "View History"} 
+                        {expandedId === client.id ? <ChevronUp size={14}/> : <ChevronDown size={14}/>}
+                    </button>
+                </div>
+              </div>
+
+              {/* ✨ EXPANDABLE BOOKING HISTORY */}
+              <AnimatePresence>
+                {expandedId === client.id && (
+                  <motion.div 
+                    initial={{ height: 0, opacity: 0 }} 
+                    animate={{ height: "auto", opacity: 1 }} 
+                    exit={{ height: 0, opacity: 0 }}
+                    className="bg-[#F9F6FF] border-t border-[#3F2965]/5 overflow-hidden"
+                  >
+                    <div className="p-6 md:p-8">
+                      <h4 className="text-sm font-bold text-[#3F2965]/60 uppercase tracking-wider mb-4">Booking History</h4>
+                      
+                      {client.bookings.length === 0 ? (
+                        <p className="text-sm text-gray-400 italic">No booking history found.</p>
+                      ) : (
+                        <div className="grid gap-3">
+                          {client.bookings.map(booking => (
+                            <div key={booking.id} className="bg-white p-4 rounded-xl border border-[#3F2965]/5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                                <div>
+                                    <div className="flex items-center gap-3 mb-1">
+                                        <p className="font-bold text-[#3F2965]">
+                                            {new Date(booking.slot.startTime).toLocaleDateString(undefined, {weekday:'short', month:'short', day:'numeric'})}
+                                        </p>
+                                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                                            booking.status === "CONFIRMED" ? "bg-green-100 text-green-700" :
+                                            booking.status === "PENDING" ? "bg-amber-100 text-amber-700" : "bg-red-100 text-red-700"
+                                        }`}>
+                                            {booking.status}
+                                        </span>
+                                    </div>
+                                    <div className="flex gap-4 text-xs text-[#3F2965]/60">
+                                        <span className="flex items-center gap-1"><Clock size={12}/> {new Date(booking.slot.startTime).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>
+                                        <span className="flex items-center gap-1"><MapPin size={12}/> {booking.slot.mode}</span>
+                                        <span className="font-bold text-[#3F2965]/40">{booking.type}</span>
+                                    </div>
+                                    {booking.reason && <p className="text-xs text-[#3F2965]/50 italic mt-1">"{booking.reason}"</p>}
                                 </div>
-                                <div className="flex justify-between text-xs text-[#3F2965]/60 pl-6">
-                                    <span className="flex items-center gap-1">{booking.type === "FIRST" ? "First Session" : "Follow Up"} • {booking.slot.mode}</span>
-                                    <span className="flex items-center gap-1">
-                                        <Clock size={12}/>
-                                        {new Date(booking.slot.startTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                                    </span>
-                                </div>
-                                {booking.reason && (
-                                    <div className="mt-3 ml-6 text-xs bg-[#F9F6FF] p-3 rounded-lg text-[#3F2965]/80 italic border border-[#3F2965]/5">
-                                        "{booking.reason}"
+
+                                {booking.status === "PENDING" && (
+                                    <div className="flex gap-2 w-full md:w-auto">
+                                        <button onClick={() => handleBookingStatus(booking.id, "CONFIRMED")} className="flex-1 md:flex-none px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-bold rounded-lg transition-colors">Confirm</button>
+                                        <button onClick={() => handleBookingStatus(booking.id, "REJECTED")} className="flex-1 md:flex-none px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 text-xs font-bold rounded-lg transition-colors">Reject</button>
                                     </div>
                                 )}
                             </div>
-                        ))}
+                          ))}
+                        </div>
+                      )}
                     </div>
-                </div>
-
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+            ))
+          )}
+        </div>
+      </div>
     </div>
   );
 }

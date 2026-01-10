@@ -1,4 +1,5 @@
 "use client";
+import { useState } from "react";
 
 import Reveal from "../common/Reveal";
 import { SlideUp, StaggerContainer, StaggerItem } from "../common/RevealComponent";
@@ -6,8 +7,18 @@ import Image from "next/image";
 import Link from "next/link";
 
 export default function AboutPreview() {
+  const [flippedIndices, setFlippedIndices] = useState<number[]>([]);
+
+  const handleFlip = (index: number) => {
+    setFlippedIndices((prev) =>
+      prev.includes(index)
+        ? prev.filter((i) => i !== index)
+        : [...prev, index]
+    );
+  };
+
   return (
-    <section className="py-20 md:py-28 px-4 sm:px-6 md:px-8 bg-white overflow-hidden relative">
+    <section className="py-20 md:py-28 px-4 sm:px-6 md:px-8 bg-[#F9F6FF] overflow-hidden relative">
 
       {/* Background Decor */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-full pointer-events-none">
@@ -16,10 +27,10 @@ export default function AboutPreview() {
       </div>
 
       <div className="max-w-[1440px] mx-auto w-full relative overflow-visible z-10">
-        
+
         {/* TOP SECTION: Grid Layout (Left SVG | Center Text | Right SVG) */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center mb-14">
-          
+
           {/* Left Column: Peace Of Mind SVG */}
           <div className="w-full flex justify-center lg:justify-start order-1 lg:col-span-3 mb-8 lg:mb-0">
              <div className="w-full max-w-[280px] sm:max-w-[320px] lg:max-w-[380px]">
@@ -29,7 +40,7 @@ export default function AboutPreview() {
 
           {/* Center Column: Text Content */}
           <div className="flex flex-col items-center text-center order-2 lg:col-span-6">
-            
+
             {/* Heading */}
             <div className="mb-6 md:mb-8">
               <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-[3.5rem] xl:text-[4rem] font-extrabold text-[#3F2965] leading-[1.1] tracking-tight">
@@ -69,7 +80,7 @@ export default function AboutPreview() {
 
         {/* BOTTOM SECTION: Hearts & CTA (Centered) */}
         <div className="flex flex-col items-center">
-          
+
           {/* FLIPPY CIRCLE TILES GRID */}
           <div className="w-full mb-10 md:mb-14">
             <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-10 justify-items-center">
@@ -80,8 +91,11 @@ export default function AboutPreview() {
                 { title: "Safe Care", text: "Experience safe & confidential care" }
               ].map((item, i) => (
                 <StaggerItem key={i}>
-                  <div className="group w-48 h-48 sm:w-56 sm:h-56 perspective-1000 cursor-pointer">
-                    <div className="relative w-full h-full duration-500 transform-style-3d group-hover:rotate-y-180">
+                  <div
+                    className="group w-48 h-48 sm:w-56 sm:h-56 perspective-1000 cursor-pointer"
+                    onClick={() => handleFlip(i)}
+                  >
+                    <div className={`relative w-full h-full duration-500 transform-style-3d ${flippedIndices.includes(i) ? 'rotate-y-180' : 'lg:group-hover:rotate-y-180'}`}>
 
                       {/* FRONT FACE (Logo) */}
                       <div className="absolute w-full h-full backface-hidden bg-white hover:bg-[#F9F6FF] rounded-full shadow-xl shadow-[#3F2965]/10 border border-[#3F2965]/5 flex flex-col items-center justify-center p-6 transition-colors duration-300">

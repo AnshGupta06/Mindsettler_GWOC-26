@@ -5,6 +5,7 @@ import bookingRoutes from "./routes/bookingRoutes.js";
 import adminSlotRoutes from "./routes/adminSlotRoutes.js";
 import adminBookingRoutes from "./routes/adminBookingRoutes.js";
 import discountRoutes from "./routes/discountRoutes.js";
+import adminClientRoutes from "./routes/adminClientRoutes.js";
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import hpp from 'hpp';
@@ -63,6 +64,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/bookings", bookingRoutes);
 app.use("/api/discounts", discountRoutes);
 app.use("/api/admin/slots", adminSlotRoutes);
+app.use("/api/admin/clients", adminClientRoutes);
 
 app.get("/", (req, res) => {
   res.json({ message: "MindSettler backend running" });
