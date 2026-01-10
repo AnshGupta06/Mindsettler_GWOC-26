@@ -55,14 +55,7 @@ export default function HowItWorks() {
 
         {/* Header */}
         <div className="text-center mb-16 md:mb-20">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-[#3F2965]/10 shadow-sm text-[#Dd1764] font-bold text-xs uppercase tracking-widest mb-4"
-          >
-            <Sparkles size={14} /> Simple Process
-          </motion.div>
+          
 
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
@@ -136,12 +129,40 @@ export default function HowItWorks() {
           transition={{ delay: 0.6 }}
           className="mt-16 text-center"
         >
-          <Link
-            href="/book"
-            className="inline-flex items-center gap-2 bg-[#Dd1764] text-white px-8 py-4 rounded-xl font-bold text-lg shadow-lg shadow-[#Dd1764]/20 hover:bg-[#c01255] hover:-translate-y-1 transition-all"
+          <Link href="/book" className="inline-flex">
+          <button
+            className="relative inline-flex items-center gap-2 px-8 py-4 rounded-xl 
+                      bg-[#Dd1764] text-white font-bold text-lg tracking-wide 
+                      overflow-hidden group transition-all duration-300 
+                      hover:-translate-y-1 hover:shadow-lg hover:shadow-[#3F2965]/20"
           >
-            Book Your Session Now <ArrowRight size={20} />
-          </Link>
+            {/* LEFT SLIDE */}
+            <span
+              className="absolute top-0 left-[-25%] w-[80%] h-full 
+                        bg-gradient-to-r from-[#3F2965] to-[#513681] 
+                        -skew-x-12 -translate-x-full 
+                        group-hover:translate-x-0 
+                        transition-transform duration-500 ease-out origin-left"
+            />
+
+            {/* RIGHT SLIDE */}
+            <span
+              className="absolute top-0 right-[-25%] w-[80%] h-full 
+                        bg-gradient-to-l from-[#3F2965] to-[#513681] 
+                        -skew-x-12 translate-x-full 
+                        group-hover:translate-x-0 
+                        transition-transform duration-500 ease-out origin-right"
+            />
+
+            {/* CONTENT */}
+            <span className="relative z-10 flex items-center gap-2">
+              Book Your Session Now
+              <ArrowRight size={20} className="transition-transform group-hover:translate-x-1" />
+            </span>
+          </button>
+        </Link>
+
+          
           <p className="mt-4 text-xs font-medium text-[#3F2965]/40 uppercase tracking-wider">
             No Hidden Fees • Instant Confirmation
           </p>

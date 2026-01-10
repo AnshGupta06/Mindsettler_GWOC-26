@@ -157,8 +157,14 @@ export default function AboutPreview() {
 
             <SlideUp delay={0.4}>
               <Link href="/about">
-                <button className="flex items-center gap-3 px-8 py-4 rounded-full bg-[#3F2965] text-white font-bold text-sm tracking-wide transition-all duration-300 hover:bg-[#281a41] hover:shadow-xl hover:-translate-y-1 active:scale-95">
-                  More About Us
+                {/* <button className="flex items-center gap-3 px-8 py-4 rounded-full bg-[#3F2965] text-white font-bold text-sm tracking-wide transition-all duration-300 hover:bg-[#281a41] hover:shadow-xl hover:-translate-y-1 active:scale-95"> */}
+                  
+                  <button className="flex items-center gap-3 w-full relative px-8 py-4 md:px-10 md:py-4 rounded-full bg-[#3F2965] text-white border-[#3F2965]/10 text-lg font-bold tracking-wide overflow-hidden group transition-all duration-300 hover:shadow-lg hover:shadow-[#3F2965]/30 hover:-translate-y-0.5">
+                <span className="absolute top-0 left-[-25%] w-[80%] h-full bg-gradient-to-r from-[#Dd1764] to-[#Dd1764] -skew-x-12 -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-left" />
+                <span className="absolute top-0 right-[-25%] w-[80%] h-full bg-gradient-to-l from-[#Dd1764] to-[#Dd1764] -skew-x-12 translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-right" />
+                
+                <span className="relative z-10 group-hover:text-white">More About Us</span>
+                  
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M5 12h14" />
                     <path d="m12 5 7 7-7 7" />
