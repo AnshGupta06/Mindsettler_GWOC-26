@@ -404,8 +404,7 @@ export default function CorporatePage() {
           <FastScrollReveal>
             <div className="text-center mb-12">
               <h2 className="font-headline text-4xl font-bold tracking-tight sm:text-5xl flex items-center justify-center" style={{ color: '#3f2965' }}>
-                Our <span style={{ color: '#de206a' }}>Workshop</span> Offerings
-                <Image src="/assets/mental-health-animate.svg" alt="Mental Health Animation" width={50} height={50} className="ml-4" />
+                Our <span style={{ color: '#de206a' }}> Workshop </span> Offerings 
               </h2>
               <p className="mt-4 max-w-2xl mx-auto text-lg leading-8" style={{ color: '#766693' }}>
                 Customizable sessions to address the unique challenges of your workplace
