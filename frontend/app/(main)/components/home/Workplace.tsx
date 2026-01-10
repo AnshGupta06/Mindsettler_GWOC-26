@@ -59,8 +59,12 @@ export default function WorkplaceWellnessSection() {
         {/* CTA Button */}
         <SlideUp delay={0.6}>
           <Link href="/corporate">
-            <button className="relative px-10 py-4 rounded-full bg-[#3F2965] text-white font-bold text-sm sm:text-base tracking-wide overflow-hidden group transition-all duration-300 hover:shadow-xl hover:shadow-[#3F2965]/20 hover:-translate-y-1">
-              <span className="absolute top-0 left-[-25%] w-[75%] h-full bg-white/20 -skew-x-12 -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-left" />
+            {/* <button className="relative px-10 py-4 rounded-full bg-[#3F2965] text-white font-bold text-sm sm:text-base tracking-wide overflow-hidden group transition-all duration-300 hover:shadow-xl hover:shadow-[#3F2965]/20 hover:-translate-y-1"> */}
+              {/* <span className="absolute top-0 left-[-25%] w-[75%] h-full bg-white/20 -skew-x-12 -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-left" /> */}
+              <button className="w-full sm:w-auto relative px-8 sm:px-10 py-3 sm:py-4 rounded-full bg-[#3F2965] text-white font-bold text-sm sm:text-base tracking-wide overflow-hidden group transition-all duration-300 hover:shadow-2xl hover:shadow-[#3F2965]/20 hover:-translate-y-1">
+                <span className="absolute top-0 left-[-25%] w-[80%] h-full bg-gradient-to-r from-[#Dd1764] to-[#Dd1764] -skew-x-12 -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-left" />
+                <span className="absolute top-0 right-[-25%] w-[80%] h-full bg-gradient-to-l from-[#Dd1764] to-[#Dd1764] -skew-x-12 translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-right" />
+                        
               <span className="relative z-10 flex items-center gap-2">
                 Partner With Us
               </span>

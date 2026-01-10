@@ -105,17 +105,19 @@ export default function HeroSection() {
 
           <SlideUp delay={0.5} className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto px-4 sm:px-0">
             <Link href="/book" className="w-full sm:w-auto">
-              <button className="w-full relative px-8 py-4 rounded-xl bg-[#Dd1764] text-white font-bold text-lg tracking-wide overflow-hidden group transition-all duration-300 hover:-translate-y-1">
-                <span className="absolute top-0 left-[-25%] w-[80%] h-full bg-white/20 -skew-x-12 -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-left" />
-                <span className="relative z-10 flex items-center justify-center gap-2">
-                  Book Appointment
-                </span>
+              <button className="w-full relative px-8 py-4 rounded-xl bg-[#Dd1764] text-white text-lg font-bold tracking-wide overflow-hidden group transition-all duration-300 hover:shadow-lg hover:shadow-[#3F2965]/20 hover:-translate-y-0.5">
+                <span className="absolute top-0 left-[-25%] w-[80%] h-full bg-gradient-to-r from-[#3F2965] to-[#513681] -skew-x-12 -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-left" />
+                <span className="absolute top-0 right-[-25%] w-[80%] h-full bg-gradient-to-l from-[#3F2965] to-[#513681] -skew-x-12 translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-right" />
+                          
+                <span className="relative z-10 group-hover:text-white">Book Appointment</span>
               </button>
             </Link>
             
             <Link href="#howitworks" className="w-full sm:w-auto">
-              <button className="w-full px-8 py-4 rounded-xl bg-white border border-[#3F2965]/10 text-[#3F2965] font-bold text-lg tracking-wide transition-all duration-300 hover:border-[#3F2965]/30 hover:bg-white/50 hover:-translate-y-1">
-                How It Works
+              <button className="w-full relative px-8 py-4 rounded-xl bg-white text-[#3F2965] border-[#3F2965]/10 text-lg font-bold tracking-wide overflow-hidden group transition-all duration-300 hover:shadow-lg hover:shadow-[#3F2965]/30 hover:-translate-y-0.5">
+                <span className="absolute top-0 left-[-25%] w-[80%] h-full bg-gradient-to-r from-[#3F2965] to-[#513681] -skew-x-12 -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-left" />
+                <span className="absolute top-0 right-[-25%] w-[80%] h-full bg-gradient-to-l from-[#3F2965] to-[#513681] -skew-x-12 translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-right" />
+                <span className="relative z-10 group-hover:text-white">How It Works</span>
               </button>
             </Link>
           </SlideUp>
