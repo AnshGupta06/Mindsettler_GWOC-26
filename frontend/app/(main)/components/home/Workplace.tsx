@@ -56,7 +56,6 @@ export default function WorkplaceWellnessSection() {
           ))}
         </div>
 
-        {/* CTA Button */}
         <SlideUp delay={0.6}>
           <Link href="/corporate">
             {/* <button className="relative px-10 py-4 rounded-full bg-[#3F2965] text-white font-bold text-sm sm:text-base tracking-wide overflow-hidden group transition-all duration-300 hover:shadow-xl hover:shadow-[#3F2965]/20 hover:-translate-y-1"> */}
