@@ -76,61 +76,61 @@ export default function HeroStory() {
   };
 
   return (
-    <section className="relative bg-[#F9F6FF] rounded-[2.5rem] overflow-hidden border border-[#3F2965]/5 shadow-sm">
-    
+    <section className="relative overflow-hidden">
+
       {/* Page Heading */}
       <div className="relative z-10 pt-8 pb-2 md:pt-8 md:pb-2 text-center">
         <div className="text-2xl md:text-5xl font-extrabold text-[#3F2965] tracking-tight px-4">
-            <CharReveal delay={0.1}>
-                Mental Health Awareness
-            </CharReveal>
+          <CharReveal delay={0.1}>
+            Mental Health Awareness
+          </CharReveal>
         </div>
       </div>
 
       <div className="container mx-auto px-4 md:px-6 py-6 md:py-6 lg:py-6 relative z-10">
         {/* CHANGED: Reduced gap-6 to gap-2 for mobile to pull items closer */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10 lg:gap-10 items-center">
-          
+
           {/* IMAGE AREA */}
           <div className="relative h-[300px] md:h-[500px] lg:h-[500px] w-full flex items-center justify-center order-1">
             <div className="relative w-full h-full max-w-[500px] aspect-[4/5] md:aspect-square">
-               <AnimatePresence mode="popLayout" custom={direction}>
-                 <motion.div
-                   key={activeIndex}
-                   custom={direction}
-                   initial={{ opacity: 0, scale: 0.9, rotate: direction * 2 }}
-                   animate={{ opacity: 1, scale: 1, rotate: 0 }}
-                   exit={{ opacity: 0, scale: 0.9, rotate: direction * -2 }}
-                   transition={{ duration: 0.6, ease: "anticipate" }}
-                   className="absolute inset-0"
-                 >
-                    <div className="relative w-full h-full rounded-[2rem] overflow-hidden shadow-2xl shadow-[#3F2965]/20 border-[6px] border-white">
-                      <Image
-                        src={slides[activeIndex].image}
-                        alt="Awareness"
-                        fill
-                        className="object-cover"
-                        priority
-                      />
-                    </div>
-                 </motion.div>
-               </AnimatePresence>
+              <AnimatePresence mode="popLayout" custom={direction}>
+                <motion.div
+                  key={activeIndex}
+                  custom={direction}
+                  initial={{ opacity: 0, scale: 0.9, rotate: direction * 2 }}
+                  animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                  exit={{ opacity: 0, scale: 0.9, rotate: direction * -2 }}
+                  transition={{ duration: 0.6, ease: "anticipate" }}
+                  className="absolute inset-0"
+                >
+                  <div className="relative w-full h-full rounded-[2rem] overflow-hidden shadow-2xl shadow-[#3F2965]/20 border-[6px] border-white">
+                    <Image
+                      src={slides[activeIndex].image}
+                      alt="Awareness"
+                      fill
+                      className="object-cover"
+                      priority
+                    />
+                  </div>
+                </motion.div>
+              </AnimatePresence>
             </div>
 
             {/* Mobile Nav Buttons */}
             <div className="absolute md:hidden inset-0 flex items-center justify-between pointer-events-none px-2 z-20">
-               <button
-                  onClick={goPrev}
-                  className="pointer-events-auto w-10 h-10 rounded-full bg-white/90 shadow-lg text-[#3F2965] flex items-center justify-center backdrop-blur-sm active:scale-90 transition-all"
-               >
-                 <ChevronLeft size={20} />
-               </button>
-               <button
-                  onClick={goNext}
-                  className="pointer-events-auto w-10 h-10 rounded-full bg-white/90 shadow-lg text-[#3F2965] flex items-center justify-center backdrop-blur-sm active:scale-90 transition-all"
-               >
-                 <ChevronRight size={20} />
-               </button>
+              <button
+                onClick={goPrev}
+                className="pointer-events-auto w-10 h-10 rounded-full bg-white/90 shadow-lg text-[#3F2965] flex items-center justify-center backdrop-blur-sm active:scale-90 transition-all"
+              >
+                <ChevronLeft size={20} />
+              </button>
+              <button
+                onClick={goNext}
+                className="pointer-events-auto w-10 h-10 rounded-full bg-white/90 shadow-lg text-[#3F2965] flex items-center justify-center backdrop-blur-sm active:scale-90 transition-all"
+              >
+                <ChevronRight size={20} />
+              </button>
             </div>
           </div>
 
@@ -138,25 +138,25 @@ export default function HeroStory() {
           <div className="order-2 flex flex-col items-center md:items-start text-center md:text-left">
             {/* CHANGED: switched 'items-center' to 'items-start' on mobile to remove top gap */}
             <div className="relative h-[120px] md:h-[200px] w-full flex items-start md:items-center justify-center md:justify-start pt-2 md:pt-0">
-               <AnimatePresence mode="wait" custom={direction}>
-                 <motion.div
-                   key={activeIndex}
-                   custom={direction}
-                   variants={variants}
-                   initial="enter"
-                   animate="center"
-                   exit="exit"
-                   transition={{ duration: 0.4, ease: "easeOut" }}
-                   className="absolute w-full px-2 md:px-0"
-                 >
-                   <h2 className="text-2xl md:text-5xl lg:text-6xl font-bold text-[#3F2965] leading-[1.2] md:leading-[1.1]">
-                     {slides[activeIndex].title}
-                   </h2>
-                   <p className="mt-3 md:mt-4 text-xl md:text-4xl font-serif italic text-[#Dd1764]">
-                     {slides[activeIndex].highlight}
-                   </p>
-                 </motion.div>
-               </AnimatePresence>
+              <AnimatePresence mode="wait" custom={direction}>
+                <motion.div
+                  key={activeIndex}
+                  custom={direction}
+                  variants={variants}
+                  initial="enter"
+                  animate="center"
+                  exit="exit"
+                  transition={{ duration: 0.4, ease: "easeOut" }}
+                  className="absolute w-full px-2 md:px-0"
+                >
+                  <h2 className="text-2xl md:text-5xl lg:text-6xl font-bold text-[#3F2965] leading-[1.2] md:leading-[1.1]">
+                    {slides[activeIndex].title}
+                  </h2>
+                  <p className="mt-3 md:mt-4 text-xl md:text-4xl font-serif italic text-[#Dd1764]">
+                    {slides[activeIndex].highlight}
+                  </p>
+                </motion.div>
+              </AnimatePresence>
             </div>
 
             {/* Controls */}
@@ -167,29 +167,28 @@ export default function HeroStory() {
                   <button
                     key={i}
                     onClick={() => goToSlide(i)}
-                    className={`h-2 rounded-full transition-all duration-500 ease-out ${
-                      activeIndex === i 
-                        ? "w-8 bg-[#Dd1764]" 
+                    className={`h-2 rounded-full transition-all duration-500 ease-out ${activeIndex === i
+                        ? "w-8 bg-[#Dd1764]"
                         : "w-2 bg-[#3F2965]/20 hover:bg-[#3F2965]/40"
-                    }`}
+                      }`}
                     aria-label={`Go to slide ${i + 1}`}
                   />
                 ))}
               </div>
 
               <div className="hidden md:flex gap-3">
-                 <button
-                    onClick={goPrev}
-                    className="w-12 h-12 rounded-full border-2 border-[#3F2965]/10 text-[#3F2965] flex items-center justify-center hover:bg-[#3F2965] hover:text-white hover:border-[#3F2965] transition-all duration-300"
-                 >
-                   <ChevronLeft size={24} />
-                 </button>
-                 <button
-                    onClick={goNext}
-                    className="w-12 h-12 rounded-full border-2 border-[#3F2965]/10 text-[#3F2965] flex items-center justify-center hover:bg-[#3F2965] hover:text-white hover:border-[#3F2965] transition-all duration-300"
-                 >
-                   <ChevronRight size={24} />
-                 </button>
+                <button
+                  onClick={goPrev}
+                  className="w-12 h-12 rounded-full border-2 border-[#3F2965]/10 text-[#3F2965] flex items-center justify-center hover:bg-[#3F2965] hover:text-white hover:border-[#3F2965] transition-all duration-300"
+                >
+                  <ChevronLeft size={24} />
+                </button>
+                <button
+                  onClick={goNext}
+                  className="w-12 h-12 rounded-full border-2 border-[#3F2965]/10 text-[#3F2965] flex items-center justify-center hover:bg-[#3F2965] hover:text-white hover:border-[#3F2965] transition-all duration-300"
+                >
+                  <ChevronRight size={24} />
+                </button>
               </div>
             </div>
           </div>
