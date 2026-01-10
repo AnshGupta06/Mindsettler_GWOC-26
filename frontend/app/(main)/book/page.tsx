@@ -196,7 +196,7 @@ export default function BookPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white pt-20 sm:pt-24 pb-8 sm:pb-12 px-4 sm:px-6 md:px-8 relative">
+    <div className="min-h-screen bg-[#F9F6FF] pt-20 sm:pt-24 pb-8 sm:pb-12 px-4 sm:px-6 md:px-8 relative">
       
       {/* Scrollbar Styles */}
       <style jsx global>{`
@@ -225,15 +225,7 @@ export default function BookPage() {
       )}
 
       <div className={`transition-all duration-500 h-full ${!user ? 'blur-md pointer-events-none opacity-50 select-none grayscale-[0.5]' : ''}`}>
-        
-        {/* Main Wrapper - Height constrained on Desktop for independent scrolling */}
-        <div className="max-w-[1440px] mx-auto bg-[#F9F6FF] rounded-[2.5rem] relative shadow-sm lg:h-[85vh] lg:overflow-hidden flex flex-col">
-          
-          {/* Background Decoration */}
-          <div className="absolute inset-0 rounded-[2.5rem] overflow-hidden pointer-events-none z-0">
-             <div className="absolute top-0 right-0 w-96 h-96 bg-[#Dd1764]/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-          </div>
-
+                  
           {/* Content Container */}
           <div className="relative z-10 text-[#3F2965] h-full">
 
@@ -678,6 +670,5 @@ export default function BookPage() {
           </div>
         </div>
       </div>
-    </div>
   );
 }

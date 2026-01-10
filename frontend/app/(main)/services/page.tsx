@@ -6,7 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useEffect, useRef } from 'react';
 import { SlideUp, StaggerContainer, StaggerItem, CharReveal } from '../components/common/RevealComponent';
-
+import SectionDivider from '../components/common/SectionDivider';
 // Import JSON data
 import therapyApproachesData from '../../../data/therapyApproaches.json';
 import testimonialsData from '../../../data/testimonials.json';
@@ -256,9 +256,6 @@ export default function ServicesPage() {
                   </div>
                 </div>
               </SlideUp>
-
-              {/* Decorative Circle Background */}
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] sm:w-[500px] h-[300px] sm:h-[500px] bg-gradient-to-tr from-[#3F2965]/10 to-transparent rounded-full opacity-50 blur-3xl -z-10" />
             </div>
           </div>
 
@@ -471,7 +468,7 @@ export default function ServicesPage() {
           </StaggerContainer>
         </div>
       </section>
-
+<SectionDivider/>
       {/* Corporate Services Section */}
       <section className="py-12 sm:py-16 md:py-20 lg:py-24 px-4 sm:px-6 md:px-8 bg-[#F9F6FF]">
         <div className="max-w-7xl mx-auto">
@@ -542,7 +539,7 @@ export default function ServicesPage() {
           </div>
         </div>
       </section>
-
+<SectionDivider/>
       {/* Who We Work With Section */}
       <section className="py-8 sm:py-12 bg-[#F9F6FF]">
         <div className="container mx-auto px-4">
@@ -593,7 +590,7 @@ export default function ServicesPage() {
           </StaggerContainer>
         </div>
       </section>
-
+<SectionDivider/>
       {/* What You Can Expect Section */}
       <section className="py-8 sm:py-12 bg-[#F9F6FF]">
         <div className="container mx-auto px-4">
@@ -676,7 +673,7 @@ export default function ServicesPage() {
           </div>
         </div>
       </section>
-
+<SectionDivider/>
       {/* Testimonials - Removed the inner box styling */}
       <section className="flex items-center py-12 sm:py-16 md:py-20 px-4 sm:px-6 md:px-8 bg-[#F9F6FF]">
         <div className="max-w-[1440px] mx-auto w-full relative overflow-visible">
