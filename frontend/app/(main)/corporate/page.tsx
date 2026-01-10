@@ -22,6 +22,7 @@ import { Textarea } from '../../components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import workshopsData from '@/data/workshops.json';
+import Image from 'next/image';
 
 const corporateFormSchema = z.object({
   companyName: z.string().min(2, 'Company name must be at least 2 characters.'),
@@ -402,8 +403,9 @@ export default function CorporatePage() {
         <div className="container mx-auto px-4">
           <FastScrollReveal>
             <div className="text-center mb-12">
-              <h2 className="font-headline text-4xl font-bold tracking-tight sm:text-5xl" style={{ color: '#3f2965' }}>
+              <h2 className="font-headline text-4xl font-bold tracking-tight sm:text-5xl flex items-center justify-center" style={{ color: '#3f2965' }}>
                 Our <span style={{ color: '#de206a' }}>Workshop</span> Offerings
+                <Image src="/assets/mental-health-animate.svg" alt="Mental Health Animation" width={50} height={50} className="ml-4" />
               </h2>
               <p className="mt-4 max-w-2xl mx-auto text-lg leading-8" style={{ color: '#766693' }}>
                 Customizable sessions to address the unique challenges of your workplace

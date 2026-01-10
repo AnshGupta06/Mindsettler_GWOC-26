@@ -70,10 +70,9 @@ export const CharReveal = ({ children, className = "", delay = 0 }: CharRevealPr
 export const SlideUp = ({ children, className = "", delay = 0 }: WrapperProps) => {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: delay, ease: "easeOut" }}
-      viewport={{ once: true, amount: 0.1 }}
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8, delay: delay, ease: "easeOut" }}
       className={className}
     >
       {children}
