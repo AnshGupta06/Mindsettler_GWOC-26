@@ -1,4 +1,5 @@
 import admin from "../config/firebaseAdmin.js";
+import prisma from "../config/prisma.js"; // 👈 Added Prisma import
 
 export const requireAuth = async (req, res, next) => {
   const header = req.headers.authorization || "";
@@ -11,6 +12,19 @@ export const requireAuth = async (req, res, next) => {
   try {
     const decoded = await admin.auth().verifyIdToken(token, true);
     
+    // ✨ NEW: Check if the user is blocked in the database
+    const user = await prisma.user.findUnique({
+      where: { firebaseUid: decoded.uid },
+      select: { isBlocked: true }
+    });
+
+    if (user?.isBlocked) {
+      return res.status(403).json({ 
+        error: "ACCOUNT_BLOCKED", 
+        message: "Your account has been restricted. Please contact support." 
+      });
+    }
+
     req.user = decoded;
     next();
   } catch (err) {

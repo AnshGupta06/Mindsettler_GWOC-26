@@ -2,48 +2,27 @@ import prisma from "../config/prisma.js";
 import { sendEmail } from "../services/emailService.js";
 import "dotenv/config";
 
-
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
 
-/* -------------------------------------------------------------------------- */
-/*                                EMAIL TEMPLATES                              */
-/* -------------------------------------------------------------------------- */
+// CONFIGURATION
+const BOOKING_COOLDOWN_MS = 2 * 60 * 1000; // 2 minutes
+const MAX_ACTIVE_BOOKINGS = 3;
 
+/* -------------------------------------------------------------------------- */
+/* EMAIL TEMPLATES                              */
+/* -------------------------------------------------------------------------- */
 const newBookingAdminTemplate = ({ userName, userEmail, type, therapyType, reason }) => `
 <!DOCTYPE html>
 <html>
   <body style="margin:0;padding:0;background:#f4f4f7;font-family:Arial,Helvetica,sans-serif;">
-    <table width="100%" cellpadding="0" cellspacing="0">
-      <tr>
-        <td align="center" style="padding:30px 15px;">
-          <table width="100%" style="max-width:600px;background:#ffffff;border-radius:12px;">
-            <tr>
-              <td style="background:#3F2965;padding:24px 32px;color:#ffffff;">
-                <h2 style="margin:0;">New Booking Request</h2>
-              </td>
-            </tr>
-            <tr>
-              <td style="padding:32px;color:#333;">
-                <p>A new booking request has been submitted.</p>
-                <table width="100%" style="background:#f9f6ff;border-radius:10px;padding:16px;">
-                  <tr><td><strong>User:</strong> ${userName || "N/A"}</td></tr>
-                  <tr><td><strong>Email:</strong> ${userEmail}</td></tr>
-                  <tr><td><strong>Session Type:</strong> ${type}</td></tr>
-                  ${therapyType ? `<tr><td><strong>Therapy Type:</strong> ${therapyType}</td></tr>` : ''}
-                  <tr><td><strong>Reason:</strong> ${reason || "—"}</td></tr>
-                </table>
-                <p style="margin-top:24px;">
-                  Please review this booking in the admin dashboard.
-                </p>
-                <p style="font-size:14px;color:#555;">
-                  — MindSettler System
-                </p>
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-    </table>
+    <div style="background:#ffffff;max-width:600px;margin:auto;padding:20px;border-radius:10px;">
+      <h2 style="color:#3F2965;">New Booking Request</h2>
+      <p><strong>User:</strong> ${userName}</p>
+      <p><strong>Email:</strong> ${userEmail}</p>
+      <p><strong>Type:</strong> ${type}</p>
+      ${therapyType ? `<p><strong>Therapy:</strong> ${therapyType}</p>` : ''}
+      <p><strong>Reason:</strong> ${reason || "—"}</p>
+    </div>
   </body>
 </html>
 `;
@@ -52,42 +31,19 @@ const refundAlertTemplate = ({ userName, userEmail, sessionDate, status }) => `
 <!DOCTYPE html>
 <html>
   <body style="margin:0;padding:0;background:#f4f4f7;font-family:Arial,Helvetica,sans-serif;">
-    <table width="100%" cellpadding="0" cellspacing="0">
-      <tr>
-        <td align="center" style="padding:30px 15px;">
-          <table width="100%" style="max-width:600px;background:#ffffff;border-radius:12px;">
-            <tr>
-              <td style="background:#92400e;padding:24px 32px;color:#ffffff;">
-                <h2 style="margin:0;">Refund Action Required</h2>
-              </td>
-            </tr>
-            <tr>
-              <td style="padding:32px;color:#333;">
-                <p>A confirmed booking has been cancelled.</p>
-                <table width="100%" style="background:#fff7ed;border-radius:10px;padding:16px;">
-                  <tr><td><strong>User:</strong> ${userName}</td></tr>
-                  <tr><td><strong>Email:</strong> ${userEmail}</td></tr>
-                  <tr><td><strong>Session Date:</strong> ${sessionDate}</td></tr>
-                  <tr><td><strong>Previous Status:</strong> ${status}</td></tr>
-                </table>
-                <p style="margin-top:20px;color:#b91c1c;font-weight:bold;">
-                  Action required: Please verify payment and process refund manually.
-                </p>
-                <p style="font-size:14px;color:#555;">
-                  — MindSettler System
-                </p>
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-    </table>
+    <div style="background:#ffffff;max-width:600px;margin:auto;padding:20px;border-radius:10px;border:1px solid #92400e;">
+      <h2 style="color:#92400e;">Refund Action Required</h2>
+      <p><strong>User:</strong> ${userName}</p>
+      <p><strong>Email:</strong> ${userEmail}</p>
+      <p><strong>Date:</strong> ${sessionDate}</p>
+      <p><strong>Previous Status:</strong> ${status}</p>
+    </div>
   </body>
 </html>
 `;
 
 /* -------------------------------------------------------------------------- */
-/*                                   CONTROLLERS                               */
+/* CONTROLLERS                               */
 /* -------------------------------------------------------------------------- */
 
 export const getSlots = async (req, res) => {
@@ -102,8 +58,8 @@ export const getSlots = async (req, res) => {
 
     if (therapyType) {
       whereCondition.OR = [
-        { therapyType: null }, // General slots available for all therapies
-        { therapyType }, // Slots specific to selected therapy
+        { therapyType: null }, 
+        { therapyType }, 
       ];
     }
 
@@ -130,13 +86,88 @@ export const createBooking = async (req, res) => {
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
+    if (user.isBlocked) {
+      return res.status(403).json({ error: "You are restricted from making new bookings." });
+    }
 
+  // 1. SPAM PREVENTION
+    const activeFutureBookings = await prisma.booking.count({
+      where: {
+        userId: user.id,
+        slot: { startTime: { gt: new Date() } },
+        status: { not: "REJECTED" } 
+      }
+    });
+
+    if (activeFutureBookings >= MAX_ACTIVE_BOOKINGS) {
+      return res.status(400).json({ error: `You cannot have more than ${MAX_ACTIVE_BOOKINGS} active bookings.` });
+    }
+
+    const lastBooking = await prisma.booking.findFirst({
+      where: { userId: user.id },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    if (lastBooking) {
+      const timeSinceLast = new Date().getTime() - new Date(lastBooking.createdAt).getTime();
+      if (timeSinceLast < BOOKING_COOLDOWN_MS) {
+        return res.status(429).json({ error: "Please wait a moment before booking another session." });
+      }
+    }
+    // 2. SESSION TYPE VALIDATION
+    const historyCheckQuery = {
+      userId: user.id,
+      status: { not: "REJECTED" },
+    };
+    if (therapyType) {
+      historyCheckQuery.therapyType = therapyType;
+    }
+
+    const previousBookingsCount = await prisma.booking.count({ where: historyCheckQuery });
+
+    if (previousBookingsCount === 0 && type === "FOLLOW_UP") {
+      const msg = therapyType 
+        ? `This is your first session for ${therapyType}. Please select 'First Session'.`
+        : "Welcome! Since this is your first booking, please select 'First Session'.";
+      return res.status(400).json({ error: msg });
+    }
+
+    if (previousBookingsCount > 0 && type === "FIRST") {
+      const msg = therapyType
+        ? `You have already started ${therapyType}. Please select 'Follow-up Session'.`
+        : "It looks like you've booked with us before. Please select 'Follow-up Session'.";
+      return res.status(400).json({ error: msg });
+    }
+   
+    // 3. EXECUTE BOOKING (With Unique Constraint Fix)
     const booking = await prisma.$transaction(async (tx) => {
       const slot = await tx.sessionSlot.findUnique({ where: { id: slotId } });
-      if (!slot || slot.isBooked) throw new Error("Slot unavailable");
+      if (!slot) throw new Error("Slot not found");
+      if (slot.isBooked) throw new Error("Slot unavailable");
+
+      // ✨ CRITICAL FIX: Handle Unique Constraint on slotId
+      // If a 'REJECTED' booking exists on this slot, delete it so we can create a new one.
+      const existingBooking = await tx.booking.findUnique({ where: { slotId } });
+      
+      if (existingBooking) {
+        if (existingBooking.status === "REJECTED") {
+          // It's safe to overwrite a rejected booking
+          await tx.booking.delete({ where: { id: existingBooking.id } });
+        } else {
+          // This slot is occupied by a valid booking (should be caught by slot.isBooked, but double safety)
+          throw new Error("Slot is already tied to an active booking.");
+        }
+      }
 
       const created = await tx.booking.create({
-        data: { userId: user.id, slotId, type, reason, therapyType },
+        data: { 
+          userId: user.id, 
+          slotId, 
+          type, 
+          reason, 
+          therapyType,
+          status: "PENDING"
+        },
       });
 
       await tx.sessionSlot.update({
@@ -147,19 +178,20 @@ export const createBooking = async (req, res) => {
       return created;
     });
 
-    // respond fast
     res.json(booking);
 
-    // notify admin (fire-and-forget)
     sendEmail(
       ADMIN_EMAIL,
       "🔔 New MindSettler Booking Request",
       newBookingAdminTemplate({
         userName: user.name,
         userEmail: user.email,
-        type,        therapyType,        reason,
+        type,
+        therapyType,
+        reason,
       })
     );
+
   } catch (err) {
     console.error("❌ Create booking error:", err);
     res.status(500).json({ error: err.message || "Failed to create booking" });
@@ -214,7 +246,7 @@ export const cancelBooking = async (req, res) => {
       prisma.booking.delete({ where: { id } }),
     ]);
 
-    if (["CONFIRMED", "ACCEPTED"].includes(booking.status)) {
+    if (booking.status === "CONFIRMED") {
       sendEmail(
         ADMIN_EMAIL,
         "💰 Refund Required: Booking Cancelled",

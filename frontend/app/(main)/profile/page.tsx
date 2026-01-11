@@ -94,6 +94,11 @@ export default function ProfilePage() {
       ]);
 
       const userData = await userRes.json();
+      if (userRes.status === 403 && userData.error === "ACCOUNT_BLOCKED") {
+      toast.error("Your account is restricted. Contact support.", { duration: 5000 });
+      router.push("/"); // Redirect away from private pages
+      return;
+    }
       setDbUser(userData);
       
       // Initialize Edit State

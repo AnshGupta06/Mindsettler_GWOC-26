@@ -7,9 +7,10 @@ import { auth } from "../../lib/firebase";
 import { API_URL } from "@/app/lib/api";
 import Link from "next/link";
 import { 
-  Calendar, Clock, MapPin, CheckCircle, AlertCircle, ShieldCheck, 
-  Sparkles, ArrowRight, Wallet, User as UserIcon, Banknote, BrainCircuit, ChevronRight,
-  Monitor, Building2, CalendarDays, Receipt, Mail, Bell
+  Calendar, Clock, CheckCircle, AlertCircle, ShieldCheck, 
+  Sparkles, ArrowRight, Wallet, Banknote, BrainCircuit,
+  Monitor, Building2, CalendarDays, Receipt, Mail, Bell, Lock,
+  Copy, Check, Smartphone, Tag, Loader2
 } from "lucide-react";
 import { motion } from "framer-motion";
 import AlertModal from "../components/common/AlertModal";
@@ -26,65 +27,158 @@ type Slot = {
   mode: "ONLINE" | "OFFLINE";
 };
 
+type BookingHistory = {
+  id: string;
+  therapyType?: string;
+  status: string;
+  createdAt: string;
+};
+
+// Backend Discount Type
+type ApplicableDiscount = {
+    label: string;
+    discountPercent: number;
+};
+
+const PRICING = {
+  FIRST: 1499,
+  FOLLOW_UP: 999
+};
+
+const UPI_ID = "mindsettler@upi"; 
+
 export default function BookPage() {
   const router = useRouter();
   
   const [user, setUser] = useState<User | null>(null);
   const [authChecking, setAuthChecking] = useState(true);
+  
+  // Data State
   const [slots, setSlots] = useState<Slot[]>([]);
+  const [bookingHistory, setBookingHistory] = useState<BookingHistory[]>([]);
+  const [discount, setDiscount] = useState<ApplicableDiscount | null>(null);
+  const [checkingDiscount, setCheckingDiscount] = useState(false);
+  
+  // Selection State
   const [selectedSlot, setSelectedSlot] = useState<Slot | null>(null);
   const [type, setType] = useState<"FIRST" | "FOLLOW_UP">("FIRST");
   const [paymentMethod, setPaymentMethod] = useState<"UPI" | "CASH">("UPI");
   const [reason, setReason] = useState("");
+  const [therapyType, setTherapyType] = useState<string>("");
+  const [slotModeFilter, setSlotModeFilter] = useState<"ONLINE" | "OFFLINE" | "BOTH">("BOTH");
+  
+  // UI State
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [agreed, setAgreed] = useState(false);
-  const [therapyType, setTherapyType] = useState<string>("");
   const [bookingSuccess, setBookingSuccess] = useState(false);
-  const [slotModeFilter, setSlotModeFilter] = useState<"ONLINE" | "OFFLINE" | "BOTH">("BOTH");
+  const [copied, setCopied] = useState(false);
+
+  // Logic State
+  const [isFirstSessionAllowed, setIsFirstSessionAllowed] = useState(true);
 
   const therapyApproaches = therapyApproachesData;
 
+  // 1. Initial Auth & Data Fetch
   useEffect(() => {
-    if (therapyType) {
-      const selectedTherapy = therapyApproaches.find(therapy => therapy.title === therapyType);
-      if (selectedTherapy) {
-        if (selectedTherapy.availableOnline && !selectedTherapy.availableOffline) {
-          setSlotModeFilter("ONLINE");
-        }
-        else if (!selectedTherapy.availableOnline && selectedTherapy.availableOffline) {
-          setSlotModeFilter("OFFLINE");
-        }
-        else {
-          setSlotModeFilter("BOTH");
-        }
-      }
-    } else {
-      setSlotModeFilter("BOTH");
-    }
-  }, [therapyType, therapyApproaches]);
-
-  useEffect(() => {
-    const unsub = onAuthStateChanged(auth, async (user) => {
-      setUser(user);
+    const unsub = onAuthStateChanged(auth, async (currentUser) => {
+      setUser(currentUser);
       setAuthChecking(false);
       
-      if (!user) return;
+      if (currentUser) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const therapy = urlParams.get('therapy');
+        if (therapy) setTherapyType(decodeURIComponent(therapy));
 
-      const urlParams = new URLSearchParams(window.location.search);
-      const therapy = urlParams.get('therapy');
-      if (therapy) {
-        setTherapyType(decodeURIComponent(therapy));
+        // Fetch user data
+        fetchBookingHistory(currentUser);
+        fetchApplicableDiscount(currentUser);
       }
     });
     
     return () => unsub();
   }, []);
 
+  // 2. Fetch Slots
   useEffect(() => {
     if (user) fetchSlots();
   }, [therapyType, user]);
+
+  // 3. Dynamic Session Logic
+  useEffect(() => {
+    if (!user) return;
+
+    const relevantBookings = bookingHistory.filter(b => {
+      const isNotRejected = b.status !== "REJECTED";
+      const matchesTherapy = therapyType ? b.therapyType === therapyType : true;
+      return isNotRejected && matchesTherapy;
+    });
+
+    const hasPriorHistory = relevantBookings.length > 0;
+
+    if (hasPriorHistory) {
+      setIsFirstSessionAllowed(false);
+      setType("FOLLOW_UP"); 
+    } else {
+      setIsFirstSessionAllowed(true);
+      setType("FIRST");
+    }
+
+    // Filter Logic
+    if (therapyType) {
+      const selectedTherapy = therapyApproaches.find(t => t.title === therapyType);
+      if (selectedTherapy) {
+        if (selectedTherapy.availableOnline && !selectedTherapy.availableOffline) {
+          setSlotModeFilter("ONLINE");
+        } else if (!selectedTherapy.availableOnline && selectedTherapy.availableOffline) {
+          setSlotModeFilter("OFFLINE");
+        } else {
+          setSlotModeFilter("BOTH");
+        }
+      }
+    } else {
+      setSlotModeFilter("BOTH");
+    }
+
+  }, [bookingHistory, therapyType, user, therapyApproaches]);
+
+  // --- API CALLS ---
+
+  const fetchApplicableDiscount = async (currentUser: User) => {
+    try {
+        setCheckingDiscount(true);
+        const token = await currentUser.getIdToken();
+        const res = await fetch(`${API_URL}/api/discounts/check`, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        
+        if (res.ok) {
+            const data = await res.json();
+            // Backend returns { discount: { label, discountPercent } | null }
+            setDiscount(data.discount); 
+        }
+    } catch (err) {
+        console.error("Failed to check discounts", err);
+    } finally {
+        setCheckingDiscount(false);
+    }
+  };
+
+  const fetchBookingHistory = async (currentUser: User) => {
+    try {
+      const token = await currentUser.getIdToken();
+      const res = await fetch(`${API_URL}/api/bookings/my`, { 
+        headers: { Authorization: `Bearer ${token}` } 
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setBookingHistory(data);
+      }
+    } catch (err) {
+      console.error("Failed to fetch history", err);
+    }
+  };
 
   const fetchSlots = async () => {
     if (!user) return;
@@ -104,8 +198,7 @@ export default function BookPage() {
       setSlots(data || []); 
     } catch (err) {
       console.error(err);
-      toast.error("Failed to load available slots");
-      setError("Failed to load slots.");
+      toast.error("Could not load available times");
       setSlots([]);
     } finally {
       setLoading(false);
@@ -126,18 +219,47 @@ export default function BookPage() {
     return acc;
   }, {} as Record<string, Slot[]>);
 
+  // --- CALCULATIONS ---
+
+  const calculateTotal = () => {
+    const basePrice = type === "FIRST" ? PRICING.FIRST : PRICING.FOLLOW_UP;
+    if (!discount) return basePrice;
+    
+    // Calculate percentage discount
+    const discountAmount = (basePrice * discount.discountPercent) / 100;
+    return Math.max(0, Math.ceil(basePrice - discountAmount));
+  };
+
+  const finalPrice = calculateTotal();
+
+  // --- UPI HELPERS ---
+  const handleCopyUpi = () => {
+    navigator.clipboard.writeText(UPI_ID);
+    setCopied(true);
+    toast.success("UPI ID Copied!");
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const upiDeepLink = `upi://pay?pa=${UPI_ID}&pn=MindSettler&am=${finalPrice}&cu=INR`;
+  const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(upiDeepLink)}`;
+
+
   const handleSubmit = async () => {
     if (!selectedSlot) { 
       toast.error("Please select a time slot.");
       return; 
     }
     if (!agreed) { 
-      toast.error("You must agree to the Confidentiality Policy.");
+      toast.error("Please agree to the Confidentiality Policy.");
       return; 
+    }
+    if (!therapyType) {
+        toast.error("Please select a therapy type first.");
+        return;
     }
 
     setSubmitting(true);
-    const toastId = toast.loading("Confirming your session...");
+    const toastId = toast.loading("Securing your session...");
     setError("");
 
     try {
@@ -154,6 +276,12 @@ export default function BookPage() {
         headers: { Authorization: `Bearer ${token}` },
       });
 
+      // Append Discount info to reason for Admin Visibility
+      let finalReason = reason;
+      if (discount) {
+        finalReason += ` | [${discount.label}: ${discount.discountPercent}% OFF APPLIED]`;
+      }
+
       const res = await fetch(`${API_URL}/api/bookings`, {
         method: "POST",
         headers: {
@@ -163,15 +291,16 @@ export default function BookPage() {
         body: JSON.stringify({
           slotId: selectedSlot.id,
           type,
-          reason,
+          reason: finalReason,
           paymentMethod,
           therapyType,
         }),
       });
 
+      const data = await res.json();
+
       if (!res.ok) {
-        const errData = await res.json();
-        throw new Error(errData.error || "Booking failed");
+        throw new Error(data.error || "Booking failed");
       }
 
       toast.success("Session Booked Successfully! 🎉", { id: toastId });
@@ -180,8 +309,8 @@ export default function BookPage() {
       
     } catch (err: any) {
       console.error(err);
-      toast.error(err.message || "Booking Failed", { id: toastId });
-      setError(err.message || "Booking failed. Please try again.");
+      toast.error(err.message, { id: toastId, duration: 5000 });
+      setError(err.message);
     } finally {
       setSubmitting(false);
     }
@@ -196,9 +325,8 @@ export default function BookPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F9F6FF] pt-20 sm:pt-24 pb-8 sm:pb-12 px-4 sm:px-6 md:px-8 relative">
+    <div className="min-h-screen lg:h-screen bg-[#F9F6FF] pt-20 sm:pt-24 px-4 sm:px-6 md:px-8 relative flex flex-col">
       
-      {/* Scrollbar Styles */}
       <style jsx global>{`
         .custom-scrollbar::-webkit-scrollbar {
           width: 6px;
@@ -224,13 +352,12 @@ export default function BookPage() {
         />
       )}
 
-      <div className={`transition-all duration-500 h-full ${!user ? 'blur-md pointer-events-none opacity-50 select-none grayscale-[0.5]' : ''}`}>
+      <div className={`transition-all duration-500 flex-1 min-h-0 ${!user ? 'blur-md pointer-events-none opacity-50 select-none grayscale-[0.5]' : ''}`}>
                   
-          {/* Content Container */}
           <div className="relative z-10 text-[#3F2965] h-full">
 
             {bookingSuccess ? (
-              <div className="h-full flex flex-col items-center justify-center text-center animate-in fade-in zoom-in duration-500 p-12">
+              <div className="h-full flex flex-col items-center justify-center text-center animate-in fade-in zoom-in duration-500 p-12 overflow-y-auto">
                 <div className="w-24 h-24 bg-yellow-50 border-4 border-yellow-100 rounded-full flex items-center justify-center mb-6 shadow-sm">
                   <Clock size={48} className="text-yellow-600" />
                 </div>
@@ -248,11 +375,10 @@ export default function BookPage() {
               </div>
             ) : (
               
-              /* LAYOUT: Split Pane Grid */
-              <div className="grid lg:grid-cols-12 h-full">
+              <div className="grid lg:grid-cols-12 h-full gap-0 lg:gap-8">
                 
-                {/* --- LEFT COLUMN (Form) - Scrollable --- */}
-                <div className="lg:col-span-8 lg:overflow-y-auto custom-scrollbar p-6 md:p-10 lg:pr-6">
+                {/* --- LEFT COLUMN (Form) --- */}
+                <div className="lg:col-span-8 h-full overflow-y-auto custom-scrollbar p-1 pb-20 lg:p-4 lg:pr-2">
                   <div className="space-y-10">
                     
                     <div className="space-y-8">
@@ -266,81 +392,153 @@ export default function BookPage() {
                         </p>
                         </div>
 
-                        {/* 1. Session Type */}
+                        {/* STEP 1: Therapy Selection */}
                         <section>
                         <div className="flex items-center gap-3 mb-4">
                             <div className="w-8 h-8 rounded-xl bg-[#3F2965] text-white flex items-center justify-center font-bold text-sm shadow-lg shadow-[#3F2965]/20">1</div>
-                            <h2 className="text-xl font-bold">Choose Session Type</h2>
-                        </div>
-                        
-                        <div className="grid sm:grid-cols-2 gap-4">
-                            {[
-                            { id: "FIRST", label: "First Session (60m)", desc: "New clients.", icon: Sparkles },
-                            { id: "FOLLOW_UP", label: "Follow-up (60m)", desc: "Returning.", icon: ArrowRight }
-                            ].map((item) => (
-                            <button
-                                key={item.id}
-                                onClick={() => setType(item.id as any)}
-                                className={`relative p-4 rounded-2xl border-2 text-left transition-all duration-300 group overflow-hidden ${
-                                type === item.id
-                                    ? "border-[#Dd1764] bg-white shadow-xl shadow-[#Dd1764]/10"
-                                    : "border-transparent bg-white/60 hover:bg-white hover:border-[#3F2965]/10"
-                                }`}
-                            >
-                                <div className={`absolute top-0 right-0 p-3 opacity-0 transition-opacity ${type === item.id ? 'opacity-100' : ''}`}>
-                                <CheckCircle className="text-[#Dd1764] fill-[#Dd1764]/10" size={20} />
-                                </div>
-                                <div className={`w-10 h-10 rounded-xl mb-3 flex items-center justify-center transition-colors ${
-                                type === item.id ? "bg-[#Dd1764] text-white" : "bg-[#F9F6FF] text-[#3F2965]"
-                                }`}>
-                                <item.icon size={18} />
-                                </div>
-                                <h3 className="font-bold text-base mb-1">{item.label}</h3>
-                                <p className="text-xs text-[#3F2965]/60">{item.desc}</p>
-                            </button>
-                            ))}
-                        </div>
-                        </section>
-
-                        {/* 2. Therapy Selection */}
-                        <section>
-                        <div className="flex items-center gap-3 mb-4">
-                            <div className="w-8 h-8 rounded-xl bg-[#3F2965] text-white flex items-center justify-center font-bold text-sm shadow-lg shadow-[#3F2965]/20">2</div>
                             <h2 className="text-xl font-bold">Choose Therapy</h2>
                         </div>
 
-                        <div className="bg-white/60 rounded-2xl p-6 border border-[#3F2965]/5">
-                            <div className="space-y-4">
-                            <div className="flex items-center gap-3 mb-2">
-                                <div className="w-10 h-10 rounded-xl bg-[#F9F6FF] flex items-center justify-center">
-                                <BrainCircuit className="text-[#Dd1764]" size={20} />
+                        <div className="bg-white/60 rounded-2xl p-6 border border-[#3F2965]/5 relative overflow-hidden group">
+                             <div className="absolute top-0 right-0 w-32 h-32 bg-[#Dd1764]/5 rounded-full -mr-10 -mt-10 blur-2xl group-hover:bg-[#Dd1764]/10 transition-colors"></div>
+                            
+                            <div className="space-y-4 relative z-10">
+                                <div className="flex items-start gap-4 mb-2">
+                                    <div className="w-12 h-12 rounded-2xl bg-[#F9F6FF] flex items-center justify-center shadow-sm shrink-0">
+                                        <BrainCircuit className="text-[#Dd1764]" size={24} />
+                                    </div>
+                                    <div>
+                                        <h3 className="font-bold text-lg text-[#3F2965]">Select Approach</h3>
+                                        <p className="text-sm text-[#3F2965]/60 leading-relaxed">
+                                            Different approaches work for different needs. Select one to see available slots and customized pricing.
+                                        </p>
+                                    </div>
                                 </div>
-                                <div>
-                                <h3 className="font-bold text-base text-[#3F2965]">Select Approach</h3>
-                                <p className="text-xs text-[#3F2965]/60">What best fits your needs?</p>
-                                </div>
-                            </div>
 
-                            <div className="relative">
-                                <select
-                                value={therapyType}
-                                onChange={(e) => setTherapyType(e.target.value)}
-                                className="w-full bg-white border-2 border-[#F9F6FF] hover:border-[#Dd1764]/30 focus:border-[#Dd1764] rounded-xl p-3 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-[#Dd1764]/10 transition-all cursor-pointer"
-                                >
-                                <option value="" className="text-[#3F2965]/60">Select a therapy approach...</option>
-                                {therapyApproaches.map((therapy) => (
-                                    <option key={therapy.id} value={therapy.title} className="text-[#3F2965] py-2">
-                                    {therapy.title}
-                                    </option>
-                                ))}
-                                </select>
-                            </div>
+                                <div className="relative">
+                                    <select
+                                    value={therapyType}
+                                    onChange={(e) => setTherapyType(e.target.value)}
+                                    className="w-full bg-white border-2 border-[#F9F6FF] hover:border-[#Dd1764]/30 focus:border-[#Dd1764] rounded-xl p-4 pr-10 text-base font-medium focus:outline-none focus:ring-4 focus:ring-[#Dd1764]/5 transition-all cursor-pointer shadow-sm"
+                                    >
+                                    <option value="" className="text-[#3F2965]/60">Select a therapy approach...</option>
+                                    {therapyApproaches.map((therapy) => (
+                                        <option key={therapy.id} value={therapy.title} className="text-[#3F2965] py-2">
+                                        {therapy.title}
+                                        </option>
+                                    ))}
+                                    </select>
+                                    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-[#3F2965]/40">
+                                        <ArrowRight size={16} className="rotate-90" />
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         </section>
 
-                        {/* 3. Slot Selection */}
-                        <section>
+                        {/* STEP 2: Session Type */}
+                        <section className={!therapyType ? "opacity-50 grayscale pointer-events-none blur-[1px] transition-all" : "transition-all"}>
+                        <div className="flex items-center gap-3 mb-4">
+                            <div className="w-8 h-8 rounded-xl bg-[#3F2965] text-white flex items-center justify-center font-bold text-sm shadow-lg shadow-[#3F2965]/20">2</div>
+                            <h2 className="text-xl font-bold">Select Session Type</h2>
+                        </div>
+                        
+                        <div className="grid sm:grid-cols-2 gap-4">
+                            
+                            {/* FIRST SESSION */}
+                            <button
+                                disabled={!isFirstSessionAllowed}
+                                onClick={() => setType("FIRST")}
+                                className={`relative p-5 rounded-2xl border-2 text-left transition-all duration-300 group overflow-hidden flex flex-col justify-between min-h-[160px] ${
+                                type === "FIRST"
+                                    ? "border-[#Dd1764] bg-white shadow-xl shadow-[#Dd1764]/10 scale-[1.01]"
+                                    : isFirstSessionAllowed 
+                                        ? "border-transparent bg-white/60 hover:bg-white hover:border-[#3F2965]/10"
+                                        : "border-transparent bg-gray-100/80 opacity-60 cursor-not-allowed"
+                                }`}
+                            >
+                                <div>
+                                    <div className="flex justify-between items-start mb-4">
+                                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-colors ${
+                                            type === "FIRST" ? "bg-[#Dd1764] text-white" : "bg-[#F9F6FF] text-[#3F2965]"
+                                        }`}>
+                                            <Sparkles size={20} />
+                                        </div>
+                                        <div className={`transition-all duration-300 ${type === "FIRST" ? 'opacity-100 scale-100' : 'opacity-0 scale-50'}`}>
+                                            <CheckCircle className="text-[#Dd1764] fill-[#Dd1764]/10" size={24} />
+                                        </div>
+                                    </div>
+                                    <h3 className="font-bold text-lg mb-1 text-[#3F2965]">First Session</h3>
+                                    <p className="text-xs text-[#3F2965]/60 font-medium mb-1">60 Minutes • Intake</p>
+                                    <p className="text-[11px] leading-relaxed text-[#3F2965]/50">
+                                        Detailed initial consultation to understand your needs.
+                                    </p>
+                                </div>
+                                <div className="mt-4 flex justify-end">
+                                    <span className={`px-4 py-1.5 rounded-full text-sm font-bold border transition-colors ${
+                                        type === "FIRST" 
+                                            ? "bg-[#Dd1764]/10 text-[#Dd1764] border-[#Dd1764]/20" 
+                                            : "bg-[#F9F6FF] text-[#3F2965] border-[#3F2965]/5"
+                                    }`}>
+                                        ₹{PRICING.FIRST}
+                                    </span>
+                                </div>
+                                {!isFirstSessionAllowed && (
+                                   <div className="absolute top-3 right-3 bg-gray-200/80 p-1.5 rounded-lg z-10" title="You have previous bookings">
+                                     <Lock size={16} className="text-gray-400" />
+                                   </div>
+                                )}
+                            </button>
+
+                            {/* FOLLOW UP */}
+                            <button
+                                disabled={isFirstSessionAllowed} 
+                                onClick={() => setType("FOLLOW_UP")}
+                                className={`relative p-5 rounded-2xl border-2 text-left transition-all duration-300 group overflow-hidden flex flex-col justify-between min-h-[160px] ${
+                                type === "FOLLOW_UP"
+                                    ? "border-[#Dd1764] bg-white shadow-xl shadow-[#Dd1764]/10 scale-[1.01]"
+                                    : !isFirstSessionAllowed
+                                        ? "border-transparent bg-white/60 hover:bg-white hover:border-[#3F2965]/10"
+                                        : "border-transparent bg-gray-100/80 opacity-60 cursor-not-allowed"
+                                }`}
+                            >
+                                <div>
+                                    <div className="flex justify-between items-start mb-4">
+                                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-colors ${
+                                            type === "FOLLOW_UP" ? "bg-[#Dd1764] text-white" : "bg-[#F9F6FF] text-[#3F2965]"
+                                        }`}>
+                                            <ArrowRight size={20} />
+                                        </div>
+                                        <div className={`transition-all duration-300 ${type === "FOLLOW_UP" ? 'opacity-100 scale-100' : 'opacity-0 scale-50'}`}>
+                                            <CheckCircle className="text-[#Dd1764] fill-[#Dd1764]/10" size={24} />
+                                        </div>
+                                    </div>
+                                    <h3 className="font-bold text-lg mb-1 text-[#3F2965]">Follow-up Session</h3>
+                                    <p className="text-xs text-[#3F2965]/60 font-medium mb-1">60 Minutes • Growth</p>
+                                    <p className="text-[11px] leading-relaxed text-[#3F2965]/50">
+                                        Continue your journey and review progress.
+                                    </p>
+                                </div>
+                                <div className="mt-4 flex justify-end">
+                                    <span className={`px-4 py-1.5 rounded-full text-sm font-bold border transition-colors ${
+                                        type === "FOLLOW_UP" 
+                                            ? "bg-[#Dd1764]/10 text-[#Dd1764] border-[#Dd1764]/20" 
+                                            : "bg-[#F9F6FF] text-[#3F2965] border-[#3F2965]/5"
+                                    }`}>
+                                        ₹{PRICING.FOLLOW_UP}
+                                    </span>
+                                </div>
+                                {isFirstSessionAllowed && (
+                                   <div className="absolute top-3 right-3 bg-gray-200/80 p-1.5 rounded-lg z-10" title="Complete your first session first">
+                                     <Lock size={16} className="text-gray-400" />
+                                   </div>
+                                )}
+                            </button>
+                        </div>
+                        </section>
+
+                        {/* STEP 3: Slot Selection */}
+                        <section className={!therapyType ? "opacity-50 grayscale pointer-events-none blur-[1px] transition-all" : "transition-all"}>
                         <div className="flex items-center gap-3 mb-4">
                             <div className="w-8 h-8 rounded-xl bg-[#3F2965] text-white flex items-center justify-center font-bold text-sm shadow-lg shadow-[#3F2965]/20">3</div>
                             <h2 className="text-xl font-bold">Select Time</h2>
@@ -351,15 +549,15 @@ export default function BookPage() {
                             <div className="flex flex-wrap gap-2">
                             <button
                                 onClick={() => setSlotModeFilter("BOTH")}
-                                className={`px-3 py-2 rounded-lg text-xs font-bold flex items-center gap-2 transition-all ${
+                                className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all ${
                                 slotModeFilter === "BOTH" ? "bg-[#3F2965] text-white shadow-md" : "bg-white text-[#3F2965] border border-[#3F2965]/10"
                                 }`}
                             >
-                                <CalendarDays size={14} /> All
+                                <CalendarDays size={14} /> All Slots
                             </button>
                             <button
                                 onClick={() => setSlotModeFilter("ONLINE")}
-                                className={`px-3 py-2 rounded-lg text-xs font-bold flex items-center gap-2 transition-all ${
+                                className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all ${
                                 slotModeFilter === "ONLINE" ? "bg-green-600 text-white shadow-md" : "bg-white text-green-700 border border-green-100"
                                 }`}
                             >
@@ -367,7 +565,7 @@ export default function BookPage() {
                             </button>
                             <button
                                 onClick={() => setSlotModeFilter("OFFLINE")}
-                                className={`px-3 py-2 rounded-lg text-xs font-bold flex items-center gap-2 transition-all ${
+                                className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all ${
                                 slotModeFilter === "OFFLINE" ? "bg-blue-600 text-white shadow-md" : "bg-white text-blue-700 border border-blue-100"
                                 }`}
                             >
@@ -377,9 +575,9 @@ export default function BookPage() {
                         </div>
 
                         {loading && (
-                            <div className="p-8 text-center">
+                            <div className="p-12 text-center bg-white/40 rounded-3xl border border-dashed border-[#3F2965]/10">
                             <div className="animate-spin w-8 h-8 border-4 border-[#Dd1764] border-t-transparent rounded-full mx-auto mb-4"/>
-                            <p className="text-[#3F2965]/50 text-sm">Loading availability...</p>
+                            <p className="text-[#3F2965]/50 text-sm font-medium">Checking doctor's availability...</p>
                             </div>
                         )}
                         
@@ -387,7 +585,6 @@ export default function BookPage() {
                             <div className="space-y-8">
                             {Object.entries(groupedSlots).map(([dateString, dateSlots]) => (
                                 <div key={dateString} className="relative">
-                                {/* Sticky Date Header */}
                                 <div className="sticky top-0 z-10 -mx-4 px-4 bg-[#F9F6FF]/95 backdrop-blur-md py-3 mb-2 flex items-center gap-3">
                                     <div className="h-px flex-1 bg-[#3F2965]/10"></div>
                                     <span className="font-bold text-[#3F2965]/80 bg-white px-4 py-1.5 rounded-full text-xs shadow-sm border border-[#3F2965]/5 flex items-center gap-2">
@@ -396,7 +593,6 @@ export default function BookPage() {
                                     <div className="h-px flex-1 bg-[#3F2965]/10"></div>
                                 </div>
 
-                                {/* Updated Grid for Mobile (2 cols) */}
                                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-3">
                                     {dateSlots.map((slot) => {
                                     const start = new Date(slot.startTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
@@ -444,10 +640,9 @@ export default function BookPage() {
                   </div>
                 </div>
 
-                {/* --- RIGHT COLUMN: SUMMARY & NEXT STEPS - Scrollable Independently --- */}
-                <div className="lg:col-span-4 lg:h-full lg:overflow-y-auto custom-scrollbar lg:border-l lg:border-[#3F2965]/5 lg:bg-white/30 p-6 md:p-8">
+                {/* --- RIGHT COLUMN (Summary) --- */}
+                <div className="lg:col-span-4 h-full overflow-y-auto custom-scrollbar lg:border-l lg:border-[#3F2965]/5 lg:bg-white/30 p-6 md:p-8 pb-20">
                     
-                    {/* Unified Ticket Card (No longer Sticky to prevent overlap) */}
                     <div className="bg-white rounded-[2rem] shadow-xl shadow-[#3F2965]/5 border border-[#3F2965]/5 overflow-hidden mb-6">
                       
                       <div className="bg-[#3F2965] p-5 text-white text-center relative overflow-hidden">
@@ -459,63 +654,104 @@ export default function BookPage() {
 
                       <div className="p-5 space-y-5">
                         {!selectedSlot ? (
-                          <div className="text-center py-6 border-2 border-dashed border-gray-100 rounded-2xl">
-                            <Clock size={24} className="mx-auto mb-2 text-gray-300" />
-                            <p className="text-xs text-gray-400">Select a time slot</p>
+                          <div className="text-center py-8 border-2 border-dashed border-gray-100 rounded-2xl bg-gray-50/50">
+                            <Clock size={32} className="mx-auto mb-3 text-gray-300" />
+                            <p className="text-sm font-bold text-[#3F2965]/40">No time selected yet</p>
+                            <p className="text-xs text-[#3F2965]/30">Complete steps on left</p>
                           </div>
                         ) : (
-                          <div className="space-y-3">
-                            <div className="flex justify-between items-center pb-3 border-b border-gray-100">
+                          <div className="space-y-4">
+                            {/* Time & Date */}
+                            <div className="flex justify-between items-center pb-4 border-b border-gray-100">
                               <div>
-                                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Date</p>
+                                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">Date</p>
                                 <p className="font-bold text-sm text-[#3F2965]">
                                   {new Date(selectedSlot.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
                                 </p>
                               </div>
                               <div className="text-right">
-                                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Time</p>
+                                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">Time</p>
                                 <p className="font-bold text-sm text-[#3F2965]">
                                   {new Date(selectedSlot.startTime).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}
                                 </p>
                               </div>
                             </div>
 
-                            <div className="flex justify-between items-center">
-                              <div>
-                                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Type</p>
-                                <p className="font-semibold text-xs text-[#Dd1764]">
-                                  {type === "FIRST" ? "First Session" : "Follow-up"}
-                                </p>
-                              </div>
-                              <span className={`px-2 py-1 rounded-full text-[10px] font-bold flex items-center gap-1 ${selectedSlot.mode === 'ONLINE' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}`}>
-                                {selectedSlot.mode === 'ONLINE' ? <Monitor size={8} /> : <Building2 size={8} />}
-                                {selectedSlot.mode}
-                              </span>
+                            {/* Details Grid */}
+                            <div className="space-y-3">
+                                <div className="flex justify-between items-center">
+                                  <span className="text-xs font-medium text-gray-500">Therapy</span>
+                                  <span className="text-xs font-bold text-[#3F2965] max-w-[150px] text-right truncate">
+                                    {therapyType || "Not Selected"}
+                                  </span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                  <span className="text-xs font-medium text-gray-500">Session Type</span>
+                                  <span className="text-xs font-bold text-[#Dd1764]">
+                                    {type === "FIRST" ? "First Session" : "Follow-up"}
+                                  </span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                  <span className="text-xs font-medium text-gray-500">Mode</span>
+                                  <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold flex items-center gap-1 ${selectedSlot.mode === 'ONLINE' ? 'bg-green-50 text-green-700' : 'bg-blue-50 text-blue-700'}`}>
+                                    {selectedSlot.mode === 'ONLINE' ? <Monitor size={8} /> : <Building2 size={8} />}
+                                    {selectedSlot.mode}
+                                  </span>
+                                </div>
                             </div>
 
-                            {therapyType && (
-                              <div className="flex justify-between items-center">
-                                <div>
-                                  <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Therapy</p>
-                                  <p className="font-semibold text-xs text-[#3F2965]">
-                                    {therapyType}
-                                  </p>
+                            {/* --- AUTOMATIC DISCOUNT SECTION --- */}
+                            <div className="pt-2">
+                                {checkingDiscount ? (
+                                    <div className="flex items-center gap-2 text-[#3F2965]/50 text-xs">
+                                        <Loader2 size={12} className="animate-spin" /> Checking eligible discounts...
+                                    </div>
+                                ) : discount ? (
+                                    <div className="bg-green-50 border border-green-100 p-2.5 rounded-lg flex items-center justify-between">
+                                        <div className="flex items-center gap-2">
+                                            <Tag size={14} className="text-green-600" />
+                                            <div>
+                                                <p className="text-[10px] font-bold text-green-700 uppercase">
+                                                    {discount.label} Applied!
+                                                </p>
+                                                <p className="text-[10px] text-green-600">
+                                                    You save {discount.discountPercent}%
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <Check size={14} className="text-green-600" />
+                                    </div>
+                                ) : null}
+                            </div>
+                            
+                            {/* PRICING ROW */}
+                            <div className="pt-3 border-t border-gray-100 flex justify-between items-end">
+                                <span className="text-sm font-bold text-[#3F2965]">Total Amount</span>
+                                <div className="text-right">
+                                  {discount && (
+                                     <span className="block text-xs text-gray-400 line-through decoration-red-400 decoration-2 mr-1">
+                                       ₹{type === "FIRST" ? PRICING.FIRST : PRICING.FOLLOW_UP}
+                                     </span>
+                                  )}
+                                  <span className="text-2xl font-black text-[#3F2965]">
+                                      ₹{finalPrice}
+                                  </span>
                                 </div>
-                              </div>
-                            )}
+                            </div>
+
                           </div>
                         )}
 
-                        <div>
-                          <label className="text-[10px] font-bold text-[#3F2965]/60 mb-1.5 block uppercase tracking-wider">
-                            Note (Optional)
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-bold text-[#3F2965]/60 block uppercase tracking-wider">
+                            Personal Note
                           </label>
                           <textarea
-                            className="w-full bg-[#F9F6FF] border border-transparent focus:bg-white focus:border-[#Dd1764]/20 rounded-xl p-3 text-xs focus:outline-none focus:ring-2 focus:ring-[#Dd1764]/10 resize-none transition-all"
+                            className="w-full bg-[#F9F6FF] border border-transparent focus:bg-white focus:border-[#Dd1764]/20 rounded-xl p-3 text-xs focus:outline-none focus:ring-2 focus:ring-[#Dd1764]/10 resize-none transition-all placeholder:text-gray-400"
                             rows={2}
                             value={reason}
                             onChange={(e) => setReason(e.target.value)}
-                            placeholder="Reason..."
+                            placeholder="Briefly describe what you'd like to discuss..."
                           />
                         </div>
 
@@ -527,7 +763,7 @@ export default function BookPage() {
                           >
                             {selectedSlot.mode === "OFFLINE" && (
                               <div className="space-y-2">
-                                <label className="text-[10px] font-bold text-[#3F2965]/60 uppercase">Payment</label>
+                                <label className="text-[10px] font-bold text-[#3F2965]/60 uppercase">Payment Method</label>
                                 <div className="grid grid-cols-2 gap-2 bg-[#F9F6FF] p-1 rounded-xl">
                                   <button 
                                     onClick={() => setPaymentMethod("UPI")}
@@ -545,32 +781,66 @@ export default function BookPage() {
                               </div>
                             )}
 
-                            <div className="bg-[#F9F6FF] p-3 rounded-xl border border-[#3F2965]/5">
-                              <div className="flex items-center gap-2 mb-2">
-                                {paymentMethod === "UPI" ? (
-                                  <Wallet size={14} className="text-[#Dd1764]" />
-                                ) : (
-                                  <Banknote size={14} className="text-[#Dd1764]" />
-                                )}
-                                <span className="text-xs font-bold text-[#3F2965]">
-                                  {paymentMethod === "UPI" ? "Payment Required" : "Pay at Studio"}
-                                </span>
-                              </div>
+                            {/* --- PAYMENT SECTION --- */}
+                            <div className="bg-[#F9F6FF] p-4 rounded-xl border border-[#3F2965]/5 space-y-3">
+                                
+                                <div className="flex items-center gap-2 mb-1">
+                                    {paymentMethod === "UPI" ? (
+                                        <Wallet size={14} className="text-[#Dd1764]" />
+                                    ) : (
+                                        <Banknote size={14} className="text-[#Dd1764]" />
+                                    )}
+                                    <span className="text-xs font-bold text-[#3F2965]">
+                                        {paymentMethod === "UPI" ? "Scan to Pay" : "Pay at Studio"}
+                                    </span>
+                                </div>
                               
-                              {paymentMethod === "UPI" ? (
-                                <>
-                                  <div className="flex items-center justify-between bg-white p-2 rounded-lg border border-gray-100 shadow-sm">
-                                    <span className="text-[10px] text-gray-400 font-medium">UPI ID</span>
-                                    <code className="font-mono text-xs font-bold text-[#3F2965] select-all">
-                                      mindsettler@upi
-                                    </code>
-                                  </div>
-                                </>
-                              ) : (
-                                <p className="text-[10px] text-[#3F2965]/70 italic bg-white p-2 rounded-lg border border-gray-100">
-                                  Bring exact cash.
-                                </p>
-                              )}
+                                {paymentMethod === "UPI" ? (
+                                    <>
+                                        <div className="flex gap-4 items-center bg-white p-3 rounded-xl border border-gray-100 shadow-sm">
+                                            {/* QR Code */}
+                                            <div className="shrink-0 bg-white p-1 rounded-lg border border-gray-100">
+                                                <img 
+                                                    src={qrCodeUrl} 
+                                                    alt="UPI QR Code" 
+                                                    className="w-20 h-20 object-contain mix-blend-multiply"
+                                                />
+                                            </div>
+
+                                            {/* UPI Actions */}
+                                            <div className="flex-1 space-y-2">
+                                                <div className="flex items-center justify-between bg-gray-50 p-2 rounded-lg border border-gray-100">
+                                                    <code className="text-[10px] font-mono font-bold text-[#3F2965] truncate max-w-[100px]">
+                                                        {UPI_ID}
+                                                    </code>
+                                                    <button 
+                                                        onClick={handleCopyUpi}
+                                                        className="text-gray-400 hover:text-[#Dd1764] transition-colors"
+                                                        title="Copy UPI ID"
+                                                    >
+                                                        {copied ? <Check size={14} className="text-green-500" /> : <Copy size={14} />}
+                                                    </button>
+                                                </div>
+
+                                                {/* HIDDEN ON DESKTOP to fix 'Scheme not found' error */}
+                                                <a 
+                                                    href={upiDeepLink}
+                                                    className="w-full text-center py-1.5 rounded-lg bg-[#3F2965] text-white text-[10px] font-bold hover:bg-[#2a1b45] transition-colors flex items-center justify-center gap-1.5 md:hidden"
+                                                >
+                                                    <Smartphone size={10} /> Open App
+                                                </a>
+                                                <p className="hidden md:block text-[9px] text-gray-400 text-center">
+                                                    Scan QR with GPay/PhonePe
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </>
+                                ) : (
+                                    <p className="text-[10px] text-[#3F2965]/70 italic bg-white p-3 rounded-lg border border-gray-100 text-center">
+                                        Please bring exact change (₹{finalPrice}) to the clinic. <br/>
+                                        Payment collected before session.
+                                    </p>
+                                )}
                             </div>
 
                             <label className="flex items-start gap-2 cursor-pointer group p-1 rounded-lg hover:bg-gray-50 transition-colors">
@@ -584,24 +854,25 @@ export default function BookPage() {
                                 <CheckCircle size={10} className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white opacity-0 peer-checked:opacity-100" />
                               </div>
                               <span className="text-[10px] text-[#3F2965]/70 leading-tight">
-                                I agree to <Link href="/confidentiality" className="underline font-bold text-[#3F2965]">Policy</Link>.
+                                I agree to the <Link href="/confidentiality" className="underline font-bold text-[#3F2965]">Confidentiality Policy</Link>.
                               </span>
                             </label>
 
                             {error && (
-                              <div className="p-2 bg-red-50 border border-red-100 rounded-lg text-[10px] text-red-600 flex items-center gap-2 font-medium">
-                                <AlertCircle size={12} /> {error}
+                              <div className="p-3 bg-red-50 border border-red-100 rounded-lg text-xs text-red-600 flex items-start gap-2 font-medium animate-pulse">
+                                <AlertCircle size={14} className="mt-0.5 shrink-0" /> 
+                                <span>{error}</span>
                               </div>
                             )}
 
                             <button
                               onClick={handleSubmit}
                               disabled={submitting || !agreed}
-                              className="w-full py-3 rounded-xl bg-[#Dd1764] text-white font-bold text-base hover:bg-[#c91559] hover:shadow-lg hover:shadow-[#Dd1764]/20 hover:-translate-y-0.5 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                              className="w-full py-3.5 rounded-xl bg-[#Dd1764] text-white font-bold text-base hover:bg-[#c91559] hover:shadow-lg hover:shadow-[#Dd1764]/20 hover:-translate-y-0.5 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                             >
                               {submitting ? "Processing..." : (
                                 <>
-                                  Confirm <ShieldCheck size={16} />
+                                  Confirm Booking <ShieldCheck size={18} />
                                 </>
                               )}
                             </button>
@@ -610,53 +881,47 @@ export default function BookPage() {
                       </div>
                     </div>
 
-                    {/* What Happens Next Section - Positioned Below */}
                     <div className="bg-white/80 rounded-[2rem] p-6 border border-[#3F2965]/5 backdrop-blur-sm">
                       <h4 className="font-bold text-[#3F2965] mb-5 flex items-center gap-2 text-xs uppercase tracking-widest">
                         <Sparkles size={14} className="text-[#Dd1764]" /> What happens next?
                       </h4>
-                      <div className="space-y-4">
-                        {/* Step 1 */}
+                      <div className="space-y-5">
                         <div className="flex gap-4 group">
                           <div className="mt-0.5 w-6 h-6 rounded-full bg-[#F9F6FF] group-hover:bg-[#3F2965] transition-colors duration-300 flex items-center justify-center text-[#Dd1764] group-hover:text-white text-xs font-bold border border-[#3F2965]/10 shrink-0">
                             1
                           </div>
                           <div>
-                            <p className="text-sm font-bold text-[#3F2965] mb-0.5">Confirmation</p>
+                            <p className="text-sm font-bold text-[#3F2965] mb-0.5">Confirmation Review</p>
                             <p className="text-xs text-[#3F2965]/60 leading-relaxed">
-                              We'll review your slot and confirm it within 2 hours.
+                              Our admin reviews the slot availability. You'll receive a confirmation email within 2 hours.
                             </p>
                           </div>
                         </div>
 
-                        {/* Line */}
                         <div className="ml-3 w-px h-4 bg-[#3F2965]/10 -my-2"></div>
 
-                        {/* Step 2 */}
                         <div className="flex gap-4 group">
                            <div className="mt-0.5 w-6 h-6 rounded-full bg-[#F9F6FF] group-hover:bg-[#3F2965] transition-colors duration-300 flex items-center justify-center text-[#Dd1764] group-hover:text-white text-xs font-bold border border-[#3F2965]/10 shrink-0">
                             <Mail size={12} />
                           </div>
                           <div>
-                            <p className="text-sm font-bold text-[#3F2965] mb-0.5">Notification</p>
+                            <p className="text-sm font-bold text-[#3F2965] mb-0.5">Session Details</p>
                             <p className="text-xs text-[#3F2965]/60 leading-relaxed">
-                              You'll receive an email with payment details (if pending) & session link.
+                              Check your inbox for the Google Meet link (if online) or clinic location pin (if offline).
                             </p>
                           </div>
                         </div>
 
-                        {/* Line */}
                         <div className="ml-3 w-px h-4 bg-[#3F2965]/10 -my-2"></div>
 
-                        {/* Step 3 */}
                         <div className="flex gap-4 group">
                            <div className="mt-0.5 w-6 h-6 rounded-full bg-[#F9F6FF] group-hover:bg-[#3F2965] transition-colors duration-300 flex items-center justify-center text-[#Dd1764] group-hover:text-white text-xs font-bold border border-[#3F2965]/10 shrink-0">
                             <Bell size={12} />
                           </div>
                           <div>
-                            <p className="text-sm font-bold text-[#3F2965] mb-0.5">Session Time</p>
+                            <p className="text-sm font-bold text-[#3F2965] mb-0.5">Start Healing</p>
                             <p className="text-xs text-[#3F2965]/60 leading-relaxed">
-                              Join 5 minutes early. We'll be ready for you!
+                              Join 5 minutes early. Bring a notebook and an open mind. We are ready for you!
                             </p>
                           </div>
                         </div>
