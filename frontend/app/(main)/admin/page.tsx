@@ -11,17 +11,18 @@ import {
   Calendar, 
   Clock, 
   User, 
-  Mail, 
-  Phone, 
   CheckCircle, 
   XCircle, 
-  Filter, 
   LayoutDashboard,
   Award,
   Video,
   X,
   Link as LinkIcon,
-  ExternalLink
+  ExternalLink,
+  Settings,
+  ShieldAlert,
+  Phone,
+  Mail
 } from "lucide-react";
 
 // --- Types ---
@@ -33,6 +34,7 @@ type Booking = {
   reason?: string;
   meetingLink?: string;
   user: {
+    id: string; // Needed for blocking
     name?: string;
     email: string;
     phone?: string;
@@ -59,7 +61,6 @@ export default function AdminBookingsPage() {
   });
   const [manualLink, setManualLink] = useState("");
 
-  // ✨ Validation Helper
   const isValidLink = (link: string) => {
     try {
       const url = new URL(link);
@@ -93,6 +94,8 @@ export default function AdminBookingsPage() {
     return () => unsub();
   }, [router]);
 
+  // --- ACTIONS ---
+
   const handleConfirmClick = (booking: Booking) => {
     if (booking.slot.mode === "ONLINE") {
       setManualLink(""); 
@@ -104,13 +107,10 @@ export default function AdminBookingsPage() {
 
   const submitConfirmWithLink = async () => {
     if (!confirmModal.bookingId) return;
-    
-    // ✨ Double Check Validation before submitting
     if (!isValidLink(manualLink)) {
       toast.error("Please enter a valid URL (e.g., https://meet.google.com/...)");
       return;
     }
-
     await updateStatus(confirmModal.bookingId, "CONFIRMED", manualLink);
     setConfirmModal({ isOpen: false, bookingId: null });
   };
@@ -140,7 +140,6 @@ export default function AdminBookingsPage() {
 
     } catch (err) {
       toast.error("Failed to update.", { id: toastId });
-      // Revert Optimistic
       const refreshedToken = await auth.currentUser?.getIdToken();
       if(refreshedToken) await fetchBookings(refreshedToken);
     }
@@ -151,7 +150,6 @@ export default function AdminBookingsPage() {
     return b.status === filter;
   });
 
-  // Calculate stats safely
   const stats = {
     total: bookings.length,
     pending: bookings.filter(b => b.status === "PENDING").length,
@@ -163,7 +161,7 @@ export default function AdminBookingsPage() {
   return (
     <div className="min-h-screen bg-[#F9F6FF] pt-20 sm:pt-24 pb-8 sm:pb-12 px-4 sm:px-6 md:px-8">
       
-      {/* ✨ CONFIRMATION MODAL */}
+      {/* CONFIRMATION MODAL */}
       {confirmModal.isOpen && (
          <div className="fixed inset-0 bg-[#3F2965]/20 backdrop-blur-sm z-50 flex items-center justify-center p-4">
            <div className="bg-white rounded-[2rem] p-8 max-w-md w-full shadow-2xl border border-[#3F2965]/10 animate-in zoom-in-95">
@@ -178,7 +176,6 @@ export default function AdminBookingsPage() {
                Create a meeting link below, then copy-paste it here.
              </p>
 
-             {/* CREATE LINK BUTTON */}
              <a 
                href="https://meet.google.com/new" 
                target="_blank" 
@@ -205,7 +202,6 @@ export default function AdminBookingsPage() {
                />
              </div>
              
-             {/* Validation Error Message */}
              {manualLink && !isValidLink(manualLink) && (
                 <p className="text-xs text-red-500 font-bold mb-4 ml-1">
                   ⚠️ Please enter a valid URL (starting with http:// or https://)
@@ -216,7 +212,7 @@ export default function AdminBookingsPage() {
 
              <button 
                onClick={submitConfirmWithLink}
-               disabled={!manualLink || !isValidLink(manualLink)} // ✨ Disabled if invalid
+               disabled={!manualLink || !isValidLink(manualLink)}
                className="w-full py-3.5 bg-[#Dd1764] text-white rounded-xl font-bold hover:bg-[#b01350] transition-all shadow-lg shadow-[#Dd1764]/20 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
              >
                <CheckCircle size={18} /> Confirm & Send
@@ -225,43 +221,56 @@ export default function AdminBookingsPage() {
          </div>
       )}
         
-        {/* HEADER & ACTIONS */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+        {/* HEADER & NAV ACTIONS */}
+        <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-6 mb-10">
           <div>
             <h1 className="text-2xl md:text-3xl font-bold flex items-center gap-3">
               <LayoutDashboard className="text-[#Dd1764]" />
               Admin Dashboard
             </h1>
-            <p className="text-[#3F2965]/60 mt-1 text-sm md:text-base">Manage appointments and schedules</p>
+            <p className="text-[#3F2965]/60 mt-1 text-sm md:text-base">Manage appointments, users, and platform settings.</p>
           </div>
-          {/* ... (Actions Buttons kept same) ... */}
-           <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+          
+           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 w-full xl:w-auto">
+            {/* Clients */}
             <button
               onClick={() => router.push("/admin/clients")}
-              className="justify-center px-6 py-3 bg-white text-[#3F2965] border border-[#3F2965]/10 rounded-full font-bold shadow-sm hover:bg-[#F9F6FF] transition-all flex items-center gap-2"
+              className="justify-center px-4 py-3 bg-white text-[#3F2965] border border-[#3F2965]/10 rounded-full font-bold shadow-sm hover:bg-[#F9F6FF] transition-all flex items-center gap-2 text-xs md:text-sm"
             >
-              <User size={18} className="text-[#Dd1764]" />
+              <User size={16} className="text-[#Dd1764]" />
               Clients
             </button>
 
+            {/* Discounts */}
             <button
               onClick={() => router.push("/admin/discounts")}
-              className="justify-center px-6 py-3 bg-white text-[#3F2965] border border-[#3F2965]/10 rounded-full font-bold shadow-sm hover:bg-[#F9F6FF] transition-all flex items-center gap-2"
+              className="justify-center px-4 py-3 bg-white text-[#3F2965] border border-[#3F2965]/10 rounded-full font-bold shadow-sm hover:bg-[#F9F6FF] transition-all flex items-center gap-2 text-xs md:text-sm"
             >
-              <Award size={18} className="text-[#Dd1764]" />
+              <Award size={16} className="text-[#Dd1764]" />
               Discounts
             </button>
+
+            {/* Config / Settings */}
+            <button
+              onClick={() => router.push("/admin/settings")}
+              className="justify-center px-4 py-3 bg-white text-[#3F2965] border border-[#3F2965]/10 rounded-full font-bold shadow-sm hover:bg-[#F9F6FF] transition-all flex items-center gap-2 text-xs md:text-sm"
+            >
+              <Settings size={16} className="text-[#Dd1764]" />
+              Config
+            </button>
+
+            {/* Slots */}
             <button
               onClick={() => router.push("/admin/slots")}
-              className="justify-center px-6 py-3 bg-[#3F2965] text-white rounded-full font-bold shadow-lg hover:shadow-[#3F2965]/20 hover:scale-105 transition-all flex items-center gap-2"
+              className="justify-center px-4 py-3 bg-[#3F2965] text-white rounded-full font-bold shadow-lg hover:shadow-[#3F2965]/20 hover:scale-105 transition-all flex items-center gap-2 text-xs md:text-sm"
             >
-              <Calendar size={18} />
-              Manage Slots
+              <Calendar size={16} />
+              Slots
             </button>
           </div>
         </div>
 
-        {/* CIRCULAR STATS */}
+        {/* STATS */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-12 px-2 md:px-8">
           <StatCircle
             label="Total Requests"
@@ -321,7 +330,7 @@ export default function AdminBookingsPage() {
                 key={b.id} 
                 booking={b} 
                 onConfirm={handleConfirmClick}
-                onReject={(id) => updateStatus(id, "REJECTED")} 
+                onReject={(id) => updateStatus(id, "REJECTED")}
               />
             ))}
           </div>
@@ -330,12 +339,12 @@ export default function AdminBookingsPage() {
   );
 }
 
-// ---------------- SUB-COMPONENTS (With Types!) ---------------- //
+// ---------------- SUB-COMPONENTS ---------------- //
 
 type StatCircleProps = {
   label: string;
   value: number;
-  icon: any; // Lucide Icon Type
+  icon: any;
   color: string;
   bg: string;
   textColor: string;
@@ -359,7 +368,7 @@ type BookingCardProps = {
   onReject: (id: string) => void;
 };
 
-function BookingCard({ booking, onConfirm, onReject }: BookingCardProps) {
+function BookingCard({ booking, onConfirm, onReject}: BookingCardProps) {
   const date = new Date(booking.slot.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
   const time = `${new Date(booking.slot.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${new Date(booking.slot.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
 
@@ -396,9 +405,13 @@ function BookingCard({ booking, onConfirm, onReject }: BookingCardProps) {
               </div>
             </div>
 
-            <span className={`px-2 py-1 rounded-full text-[10px] font-bold ${booking.status === 'CONFIRMED' ? 'bg-green-100 text-green-700' : booking.status === 'REJECTED' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'}`}>
-              {booking.status}
-            </span>
+            <div className="flex items-center gap-2">
+                <span className={`px-2 py-1 rounded-full text-[10px] font-bold ${booking.status === 'CONFIRMED' ? 'bg-green-100 text-green-700' : booking.status === 'REJECTED' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                {booking.status}
+                </span>
+                
+               
+            </div>
           </div>
 
           <div className="bg-[#F9F6FF] p-3 rounded-lg border border-[#3F2965]/5">

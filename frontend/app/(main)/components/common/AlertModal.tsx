@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import { X, Lock, AlertTriangle, CheckCircle, AlertCircle } from "lucide-react";
+import { X, Lock, AlertTriangle, CheckCircle, AlertCircle, Ban } from "lucide-react";
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -11,7 +11,7 @@ interface AuthModalProps {
   page?: string; 
   
   // New Props for Generic Use
-  type?: "AUTH" | "CONFIRM" | "SUCCESS" | "ERROR";
+  type?: "AUTH" | "CONFIRM" | "SUCCESS" | "ERROR" | "BLOCKED";
   title?: string;
   message?: string;
   actionLabel?: string;
@@ -63,6 +63,14 @@ export default function AlertModal({
       btnColor: "bg-[#3F2965]",
       btnText: "Close",
       showCancel: false
+    },
+    BLOCKED: {
+      icon: <Ban className="w-8 h-8 text-red-600" />,
+      bg: "bg-red-50",
+      title: "Account Restricted",
+      btnColor: "bg-[#3F2965]",
+      btnText: "Contact Support",
+      showCancel: true
     }
   };
 
@@ -74,6 +82,13 @@ export default function AlertModal({
       return "To book a personalized session and track your healing journey, please log in to your MindSettler account.";
     }
     return "Please log in to continue accessing your dashboard.";
+  };
+
+  const renderMessage = () => {
+    if (message) return message;
+    if (type === "AUTH") return renderAuthMessage();
+    if (type === "BLOCKED") return "Your account has been temporarily restricted due to policy violations. Please contact support for assistance.";
+    return "";
   };
 
   return (
@@ -114,11 +129,11 @@ export default function AlertModal({
 
             {/* Text Content */}
             <h2 className="text-2xl font-bold text-[#3F2965] mb-3">
-              {type === "AUTH" ? currentConfig.title : title}
+              {type === "AUTH" ? currentConfig.title : title || currentConfig.title}
             </h2>
             
             <p className="text-[#3F2965]/70 mb-8 leading-relaxed whitespace-pre-line">
-              {type === "AUTH" ? renderAuthMessage() : message}
+              {renderMessage()}
             </p>
 
             {/* Action Buttons */}
@@ -127,6 +142,13 @@ export default function AlertModal({
                 // --- AUTH MODE BUTTONS ---
                 <Link href="/login" onClick={onClose}>
                   <button className={`w-full py-3.5 rounded-xl text-white font-bold text-lg shadow-lg hover:scale-[1.02] transition-transform ${currentConfig.btnColor}`}>
+                    {currentConfig.btnText}
+                  </button>
+                </Link>
+              ) : type === "BLOCKED" ? (
+                // --- BLOCKED MODE BUTTONS ---
+                <Link href="/contact" onClick={onClose}>
+                   <button className={`w-full py-3.5 rounded-xl text-white font-bold text-lg shadow-lg hover:scale-[1.02] transition-transform ${currentConfig.btnColor}`}>
                     {currentConfig.btnText}
                   </button>
                 </Link>
@@ -154,7 +176,7 @@ export default function AlertModal({
                   onClick={onClose}
                   className="w-full py-3.5 rounded-xl border-2 border-gray-100 text-gray-500 font-semibold hover:border-gray-200 hover:text-gray-700 transition-colors"
                 >
-                  Cancel
+                  {type === "BLOCKED" ? "Go Back" : "Cancel"}
                 </button>
               )}
             </div>

@@ -84,3 +84,10 @@ model CorporateInquiry {
   message     String
   createdAt   DateTime @default(now())
 }
+model GlobalSettings {
+  id                String   @id @default(uuid())
+  priceFirst        Int      @default(1499)
+  priceFollowUp     Int      @default(999)
+  cancellationHours Int      @default(24)
+  updatedAt         DateTime @updatedAt
+}

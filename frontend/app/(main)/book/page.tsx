@@ -10,7 +10,7 @@ import {
   Calendar, Clock, CheckCircle, AlertCircle, ShieldCheck, 
   Sparkles, ArrowRight, Wallet, Banknote, BrainCircuit,
   Monitor, Building2, CalendarDays, Receipt, Mail, Bell, Lock,
-  Copy, Check, Smartphone, Tag, Loader2
+  Copy, Check, Smartphone, Tag, Loader2, Ban
 } from "lucide-react";
 import { motion } from "framer-motion";
 import AlertModal from "../components/common/AlertModal";
@@ -34,15 +34,9 @@ type BookingHistory = {
   createdAt: string;
 };
 
-// Backend Discount Type
 type ApplicableDiscount = {
     label: string;
     discountPercent: number;
-};
-
-const PRICING = {
-  FIRST: 1499,
-  FOLLOW_UP: 999
 };
 
 const UPI_ID = "mindsettler@upi"; 
@@ -52,6 +46,13 @@ export default function BookPage() {
   
   const [user, setUser] = useState<User | null>(null);
   const [authChecking, setAuthChecking] = useState(true);
+  const [isBlocked, setIsBlocked] = useState(false); // ✨ New State
+  
+  // ✨ Dynamic Pricing State
+  const [pricing, setPricing] = useState({
+    FIRST: 1499,
+    FOLLOW_UP: 999
+  });
   
   // Data State
   const [slots, setSlots] = useState<Slot[]>([]);
@@ -82,19 +83,50 @@ export default function BookPage() {
 
   // 1. Initial Auth & Data Fetch
   useEffect(() => {
+    // ✨ Fetch Dynamic Pricing from Admin Settings
+    fetch(`${API_URL}/api/settings`)
+      .then(res => res.json())
+      .then(data => {
+         // Only update if valid numbers exist
+         if(data.priceFirst && data.priceFollowUp) {
+             setPricing({ 
+               FIRST: Number(data.priceFirst), 
+               FOLLOW_UP: Number(data.priceFollowUp) 
+             });
+         }
+      })
+      .catch(err => console.error("Failed to load pricing:", err));
+
     const unsub = onAuthStateChanged(auth, async (currentUser) => {
-      setUser(currentUser);
-      setAuthChecking(false);
       
       if (currentUser) {
+        setUser(currentUser);
+        
+        // ✨ Check Block Status Immediately
+        try {
+            const token = await currentUser.getIdToken();
+            const res = await fetch(`${API_URL}/api/auth/me`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            if (res.status === 403) {
+                const data = await res.json();
+                if (data.error === "ACCOUNT_BLOCKED") setIsBlocked(true);
+            }
+        } catch (err) {
+            console.error("Status check failed", err);
+        }
+
         const urlParams = new URLSearchParams(window.location.search);
         const therapy = urlParams.get('therapy');
         if (therapy) setTherapyType(decodeURIComponent(therapy));
 
-        // Fetch user data
         fetchBookingHistory(currentUser);
         fetchApplicableDiscount(currentUser);
+      } else {
+        setUser(null);
       }
+      
+      setAuthChecking(false);
     });
     
     return () => unsub();
@@ -102,8 +134,8 @@ export default function BookPage() {
 
   // 2. Fetch Slots
   useEffect(() => {
-    if (user) fetchSlots();
-  }, [therapyType, user]);
+    if (user && !isBlocked) fetchSlots();
+  }, [therapyType, user, isBlocked]);
 
   // 3. Dynamic Session Logic
   useEffect(() => {
@@ -125,7 +157,6 @@ export default function BookPage() {
       setType("FIRST");
     }
 
-    // Filter Logic
     if (therapyType) {
       const selectedTherapy = therapyApproaches.find(t => t.title === therapyType);
       if (selectedTherapy) {
@@ -144,7 +175,6 @@ export default function BookPage() {
   }, [bookingHistory, therapyType, user, therapyApproaches]);
 
   // --- API CALLS ---
-
   const fetchApplicableDiscount = async (currentUser: User) => {
     try {
         setCheckingDiscount(true);
@@ -155,7 +185,6 @@ export default function BookPage() {
         
         if (res.ok) {
             const data = await res.json();
-            // Backend returns { discount: { label, discountPercent } | null }
             setDiscount(data.discount); 
         }
     } catch (err) {
@@ -182,7 +211,6 @@ export default function BookPage() {
 
   const fetchSlots = async () => {
     if (!user) return;
-    
     try {
       setLoading(true);
       const url = therapyType 
@@ -191,9 +219,7 @@ export default function BookPage() {
       
       const token = await user.getIdToken();
       const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
-      
       if (!res.ok) throw new Error("Failed to fetch slots");
-      
       const data = await res.json();
       setSlots(data || []); 
     } catch (err) {
@@ -220,12 +246,10 @@ export default function BookPage() {
   }, {} as Record<string, Slot[]>);
 
   // --- CALCULATIONS ---
-
   const calculateTotal = () => {
-    const basePrice = type === "FIRST" ? PRICING.FIRST : PRICING.FOLLOW_UP;
-    if (!discount) return basePrice;
+    const basePrice = type === "FIRST" ? pricing.FIRST : pricing.FOLLOW_UP;
     
-    // Calculate percentage discount
+    if (!discount) return basePrice;
     const discountAmount = (basePrice * discount.discountPercent) / 100;
     return Math.max(0, Math.ceil(basePrice - discountAmount));
   };
@@ -242,7 +266,6 @@ export default function BookPage() {
 
   const upiDeepLink = `upi://pay?pa=${UPI_ID}&pn=MindSettler&am=${finalPrice}&cu=INR`;
   const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(upiDeepLink)}`;
-
 
   const handleSubmit = async () => {
     if (!selectedSlot) { 
@@ -276,11 +299,12 @@ export default function BookPage() {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      // Append Discount info to reason for Admin Visibility
       let finalReason = reason;
       if (discount) {
         finalReason += ` | [${discount.label}: ${discount.discountPercent}% OFF APPLIED]`;
       }
+      // Add price info to reason for admin reference
+      finalReason += ` | [System Price: ₹${finalPrice}]`;
 
       const res = await fetch(`${API_URL}/api/bookings`, {
         method: "POST",
@@ -298,10 +322,7 @@ export default function BookPage() {
       });
 
       const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || "Booking failed");
-      }
+      if (!res.ok) throw new Error(data.error || "Booking failed");
 
       toast.success("Session Booked Successfully! 🎉", { id: toastId });
       setSlots((prev) => prev.filter((s) => s.id !== selectedSlot.id));
@@ -356,7 +377,24 @@ export default function BookPage() {
                   
           <div className="relative z-10 text-[#3F2965] h-full">
 
-            {bookingSuccess ? (
+            {isBlocked ? (
+              <div className="h-full flex flex-col items-center justify-center text-center animate-in fade-in zoom-in duration-500 p-12">
+                <div className="w-24 h-24 bg-red-50 border-4 border-red-100 rounded-full flex items-center justify-center mb-6 shadow-sm">
+                  <Ban size={48} className="text-red-600" />
+                </div>
+                <h2 className="text-3xl md:text-4xl font-bold mb-4 text-[#3F2965]">Account Restricted</h2>
+                <p className="text-[#3F2965]/70 text-lg max-w-md mb-8 leading-relaxed">
+                  Your account has been temporarily restricted from making new bookings due to policy violations (e.g., repeated cancellations).
+                </p>
+                <Link 
+                  href="/contact"
+                  className="w-full max-w-sm py-4 rounded-xl bg-[#3F2965] text-white font-bold shadow-lg hover:shadow-[#3F2965]/20 hover:-translate-y-1 transition-all flex items-center justify-center gap-2"
+                >
+                  Contact Support <ArrowRight size={20} />
+                </Link>
+              </div>
+
+            ) : bookingSuccess ? (
               <div className="h-full flex flex-col items-center justify-center text-center animate-in fade-in zoom-in duration-500 p-12 overflow-y-auto">
                 <div className="w-24 h-24 bg-yellow-50 border-4 border-yellow-100 rounded-full flex items-center justify-center mb-6 shadow-sm">
                   <Clock size={48} className="text-yellow-600" />
@@ -399,9 +437,7 @@ export default function BookPage() {
                             <h2 className="text-xl font-bold">Choose Therapy</h2>
                         </div>
 
-                        <div className="bg-white/60 rounded-2xl p-6 border border-[#3F2965]/5 relative overflow-hidden group">
-                             <div className="absolute top-0 right-0 w-32 h-32 bg-[#Dd1764]/5 rounded-full -mr-10 -mt-10 blur-2xl group-hover:bg-[#Dd1764]/10 transition-colors"></div>
-                            
+                        <div className="bg-white/60 rounded-2xl p-6 border border-[#3F2965]/5 relative overflow-hidden group">                            
                             <div className="space-y-4 relative z-10">
                                 <div className="flex items-start gap-4 mb-2">
                                     <div className="w-12 h-12 rounded-2xl bg-[#F9F6FF] flex items-center justify-center shadow-sm shrink-0">
@@ -480,7 +516,7 @@ export default function BookPage() {
                                             ? "bg-[#Dd1764]/10 text-[#Dd1764] border-[#Dd1764]/20" 
                                             : "bg-[#F9F6FF] text-[#3F2965] border-[#3F2965]/5"
                                     }`}>
-                                        ₹{PRICING.FIRST}
+                                        ₹{pricing.FIRST}
                                     </span>
                                 </div>
                                 {!isFirstSessionAllowed && (
@@ -525,7 +561,7 @@ export default function BookPage() {
                                             ? "bg-[#Dd1764]/10 text-[#Dd1764] border-[#Dd1764]/20" 
                                             : "bg-[#F9F6FF] text-[#3F2965] border-[#3F2965]/5"
                                     }`}>
-                                        ₹{PRICING.FOLLOW_UP}
+                                        ₹{pricing.FOLLOW_UP}
                                     </span>
                                 </div>
                                 {isFirstSessionAllowed && (
@@ -730,7 +766,7 @@ export default function BookPage() {
                                 <div className="text-right">
                                   {discount && (
                                      <span className="block text-xs text-gray-400 line-through decoration-red-400 decoration-2 mr-1">
-                                       ₹{type === "FIRST" ? PRICING.FIRST : PRICING.FOLLOW_UP}
+                                       ₹{type === "FIRST" ? pricing.FIRST : pricing.FOLLOW_UP}
                                      </span>
                                   )}
                                   <span className="text-2xl font-black text-[#3F2965]">

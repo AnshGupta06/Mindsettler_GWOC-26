@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../../../lib/firebase";
 import { checkDiscountEligibility } from "@/app/lib/discountApi";
-import { Sparkles, X, PartyPopper } from "lucide-react";
+import { Sparkles, X, PartyPopper, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 type Discount = {
@@ -47,8 +47,17 @@ export default function DiscountBanner() {
         return () => unsub();
     }, []);
 
-    // Don't render anything if loading, no discount, or user dismissed it
-    if (loading || !discount || !isVisible) return null;
+    // ✨ NEW: Loading State
+    if (loading) {
+        return (
+            <div className="mb-8 p-5 bg-white/50 border border-[#3F2965]/5 rounded-2xl flex items-center justify-center gap-3 animate-pulse">
+                 <Loader2 className="w-5 h-5 text-[#Dd1764] animate-spin" />
+                 <p className="text-sm font-bold text-[#3F2965]/60">Checking available discounts...</p>
+            </div>
+        );
+    }
+
+    if (!discount || !isVisible) return null;
 
     return (
         <AnimatePresence>

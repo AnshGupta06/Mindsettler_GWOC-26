@@ -53,7 +53,7 @@ export default function ProfilePage() {
   // Modal State
   const [modalState, setModalState] = useState<{
     isOpen: boolean;
-    type: "AUTH" | "CONFIRM" | "SUCCESS" | "ERROR";
+    type: "AUTH" | "CONFIRM" | "SUCCESS" | "ERROR" | "BLOCKED";
     title?: string;
     message?: string;
     actionLabel?: string;
@@ -94,11 +94,19 @@ export default function ProfilePage() {
       ]);
 
       const userData = await userRes.json();
+      
+      // ✨ Handle Blocked User with Modal
       if (userRes.status === 403 && userData.error === "ACCOUNT_BLOCKED") {
-      toast.error("Your account is restricted. Contact support.", { duration: 5000 });
-      router.push("/"); // Redirect away from private pages
-      return;
-    }
+        setModalState({
+          isOpen: true,
+          type: "BLOCKED",
+          title: "Account Restricted",
+          message: "Your account has been temporarily restricted. Please contact support for assistance."
+        });
+        setLoading(false); // Stop loading to show modal
+        return;
+      }
+
       setDbUser(userData);
       
       // Initialize Edit State
@@ -138,7 +146,7 @@ export default function ProfilePage() {
   };
 
   const closeModal = () => {
-    if (modalState.type === "AUTH") router.push("/"); 
+    if (modalState.type === "AUTH" || modalState.type === "BLOCKED") router.push("/"); 
     setModalState(prev => ({ ...prev, isOpen: false }));
   };
 
@@ -201,10 +209,15 @@ export default function ProfilePage() {
   };
 
   // ✨ FIX: Filter Logic Updated
-  // Upcoming = Sessions that end in the future (includes currently active sessions)
-  // History = Sessions that have completely ended
-  const upcomingBookings = bookings.filter(b => new Date(b.slot.endTime) >= new Date()).sort((a,b) => new Date(a.slot.startTime).getTime() - new Date(b.slot.startTime).getTime());
-  const historyBookings = bookings.filter(b => new Date(b.slot.endTime) < new Date()).sort((a,b) => new Date(b.slot.startTime).getTime() - new Date(a.slot.startTime).getTime());
+  // Upcoming: Future dates AND Not Rejected
+  const upcomingBookings = bookings
+    .filter(b => new Date(b.slot.endTime) >= new Date() && b.status !== "REJECTED")
+    .sort((a,b) => new Date(a.slot.startTime).getTime() - new Date(b.slot.startTime).getTime());
+  
+  // History: Past dates OR Rejected (moved here)
+  const historyBookings = bookings
+    .filter(b => new Date(b.slot.endTime) < new Date() || b.status === "REJECTED")
+    .sort((a,b) => new Date(b.slot.startTime).getTime() - new Date(a.slot.startTime).getTime());
   
   const displayBookings = activeTab === "UPCOMING" ? upcomingBookings : historyBookings;
 
@@ -225,7 +238,7 @@ export default function ProfilePage() {
         page="profile" 
       />
 
-      <div className="max-w-[1280px] mx-auto flex flex-col lg:flex-row gap-8 relative z-10">
+      <div className={`max-w-[1280px] mx-auto flex flex-col lg:flex-row gap-8 relative z-10 ${modalState.isOpen && modalState.type === 'BLOCKED' ? 'blur-md pointer-events-none opacity-50' : ''}`}>
         
         {/* LEFT SIDEBAR: PROFILE CARD */}
         <motion.div 
@@ -400,13 +413,13 @@ export default function ProfilePage() {
                       > 
                         <div className="flex flex-col md:flex-row gap-6 md:gap-8 items-start">
                             
-                            {/* Calendar Leaf Widget */}
-                            <div className="flex-shrink-0 w-full md:w-auto flex flex-row md:flex-col items-center justify-between md:justify-center bg-white rounded-2xl border border-[#3F2965]/10 overflow-hidden shadow-sm">
-                                <div className="w-full bg-[#3F2965] py-1.5 px-6 text-center">
+                            {/* Calendar Leaf Widget - Mobile Optimized */}
+                            <div className="flex-shrink-0 w-full md:w-auto flex flex-row md:flex-col items-stretch justify-between md:justify-center bg-white rounded-2xl border border-[#3F2965]/10 overflow-hidden shadow-sm h-auto">
+                                <div className="md:w-full w-auto bg-[#3F2965] py-2 px-6 md:py-1.5 md:px-6 flex items-center justify-center">
                                     <p className="text-[10px] font-bold text-white uppercase tracking-widest">{startTime.toLocaleString('default', { month: 'short' })}</p>
                                 </div>
-                                <div className="p-4 md:py-6 text-center">
-                                    <p className="text-3xl font-black text-[#3F2965] leading-none">{startTime.getDate()}</p>
+                                <div className="flex-1 p-3 md:p-4 md:py-6 text-center flex flex-col items-center justify-center">
+                                    <p className="text-2xl md:text-3xl font-black text-[#3F2965] leading-none">{startTime.getDate()}</p>
                                     <p className="text-[10px] font-bold text-[#3F2965]/40 uppercase mt-1">{startTime.toLocaleString('default', { weekday: 'short' })}</p>
                                 </div>
                             </div>
@@ -480,7 +493,7 @@ export default function ProfilePage() {
                                         </a>
                                     )}
                                     
-                                    {!isSessionOver && (
+                                    {!isSessionOver && booking.status !== "REJECTED" && (
                                         <button onClick={() => initiateCancel(booking)} className="flex-1 py-2.5 bg-white border border-red-100 text-red-500 rounded-xl text-xs font-bold flex items-center justify-center gap-2 hover:bg-red-50 transition-all" title="Cancel">
                                             Cancel
                                         </button>

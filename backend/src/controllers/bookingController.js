@@ -1,5 +1,11 @@
 import prisma from "../config/prisma.js";
-import { sendEmail } from "../services/emailService.js";
+import { 
+  sendNewBookingAdminEmail, 
+  sendBookingCancelledEmail, 
+  sendRefundRequestedEmail,
+  sendAdminRefundAlert
+} from "../services/emailService.js";
+import { getSettings } from "../services/globalSettingsService.js";
 import "dotenv/config";
 
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
@@ -9,41 +15,7 @@ const BOOKING_COOLDOWN_MS = 2 * 60 * 1000; // 2 minutes
 const MAX_ACTIVE_BOOKINGS = 3;
 
 /* -------------------------------------------------------------------------- */
-/* EMAIL TEMPLATES                              */
-/* -------------------------------------------------------------------------- */
-const newBookingAdminTemplate = ({ userName, userEmail, type, therapyType, reason }) => `
-<!DOCTYPE html>
-<html>
-  <body style="margin:0;padding:0;background:#f4f4f7;font-family:Arial,Helvetica,sans-serif;">
-    <div style="background:#ffffff;max-width:600px;margin:auto;padding:20px;border-radius:10px;">
-      <h2 style="color:#3F2965;">New Booking Request</h2>
-      <p><strong>User:</strong> ${userName}</p>
-      <p><strong>Email:</strong> ${userEmail}</p>
-      <p><strong>Type:</strong> ${type}</p>
-      ${therapyType ? `<p><strong>Therapy:</strong> ${therapyType}</p>` : ''}
-      <p><strong>Reason:</strong> ${reason || "—"}</p>
-    </div>
-  </body>
-</html>
-`;
-
-const refundAlertTemplate = ({ userName, userEmail, sessionDate, status }) => `
-<!DOCTYPE html>
-<html>
-  <body style="margin:0;padding:0;background:#f4f4f7;font-family:Arial,Helvetica,sans-serif;">
-    <div style="background:#ffffff;max-width:600px;margin:auto;padding:20px;border-radius:10px;border:1px solid #92400e;">
-      <h2 style="color:#92400e;">Refund Action Required</h2>
-      <p><strong>User:</strong> ${userName}</p>
-      <p><strong>Email:</strong> ${userEmail}</p>
-      <p><strong>Date:</strong> ${sessionDate}</p>
-      <p><strong>Previous Status:</strong> ${status}</p>
-    </div>
-  </body>
-</html>
-`;
-
-/* -------------------------------------------------------------------------- */
-/* CONTROLLERS                               */
+/* CONTROLLERS                                                                */
 /* -------------------------------------------------------------------------- */
 
 export const getSlots = async (req, res) => {
@@ -146,7 +118,6 @@ export const createBooking = async (req, res) => {
       if (slot.isBooked) throw new Error("Slot unavailable");
 
       // ✨ CRITICAL FIX: Handle Unique Constraint on slotId
-      // If a 'REJECTED' booking exists on this slot, delete it so we can create a new one.
       const existingBooking = await tx.booking.findUnique({ where: { slotId } });
       
       if (existingBooking) {
@@ -154,7 +125,7 @@ export const createBooking = async (req, res) => {
           // It's safe to overwrite a rejected booking
           await tx.booking.delete({ where: { id: existingBooking.id } });
         } else {
-          // This slot is occupied by a valid booking (should be caught by slot.isBooked, but double safety)
+          // This slot is occupied by a valid booking
           throw new Error("Slot is already tied to an active booking.");
         }
       }
@@ -180,17 +151,14 @@ export const createBooking = async (req, res) => {
 
     res.json(booking);
 
-    sendEmail(
-      ADMIN_EMAIL,
-      "🔔 New MindSettler Booking Request",
-      newBookingAdminTemplate({
+    // Send Admin Notification via Service
+    sendNewBookingAdminEmail(ADMIN_EMAIL, {
         userName: user.name,
         userEmail: user.email,
         type,
         therapyType,
         reason,
-      })
-    );
+    }).catch(err => console.error("❌ Admin email failed:", err));
 
   } catch (err) {
     console.error("❌ Create booking error:", err);
@@ -224,44 +192,62 @@ export const getMyBookings = async (req, res) => {
 export const cancelBooking = async (req, res) => {
   try {
     const { id } = req.params;
-
-    const user = await prisma.user.findUnique({
-      where: { firebaseUid: req.user.uid },
-    });
-
-    const booking = await prisma.booking.findUnique({
-      where: { id },
-      include: { slot: true },
-    });
+    const user = await prisma.user.findUnique({ where: { firebaseUid: req.user.uid } });
+    const booking = await prisma.booking.findUnique({ where: { id }, include: { slot: true } });
 
     if (!booking || booking.userId !== user.id) {
-      return res.status(404).json({ error: "Unauthorized" });
+      return res.status(404).json({ error: "Booking not found or unauthorized" });
     }
 
+    // 🔒 CANCELLATION POLICY CHECK
+    const settings = await getSettings(); 
+    
+    const sessionTime = new Date(booking.slot.startTime);
+    const now = new Date();
+    const msUntilSession = sessionTime - now;
+    const hoursUntilSession = msUntilSession / (1000 * 60 * 60);
+
+    if (hoursUntilSession < settings.cancellationHours) {
+        return res.status(400).json({ 
+            error: `Policy Violation: Cancellations are not allowed within ${settings.cancellationHours} hours of the session. Please contact support.` 
+        });
+    }
+
+    // Capture details before deletion for emails
+    const dateObj = new Date(booking.slot.startTime);
+    const dateStr = dateObj.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+    const timeStr = dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    const isConfirmed = booking.status === "CONFIRMED";
+
+    // Proceed with cancellation
     await prisma.$transaction([
-      prisma.sessionSlot.update({
-        where: { id: booking.slotId },
-        data: { isBooked: false },
-      }),
+      prisma.sessionSlot.update({ where: { id: booking.slotId }, data: { isBooked: false } }),
       prisma.booking.delete({ where: { id } }),
     ]);
 
-    if (booking.status === "CONFIRMED") {
-      sendEmail(
-        ADMIN_EMAIL,
-        "💰 Refund Required: Booking Cancelled",
-        refundAlertTemplate({
-          userName: user.name || "User",
-          userEmail: user.email,
-          sessionDate: new Date(booking.slot.startTime).toLocaleString("en-IN"),
-          status: booking.status,
-        })
-      );
+    // ✨ SEND RELEVANT EMAILS
+    if (isConfirmed) {
+      // 1. Notify User of Refund Request
+      sendRefundRequestedEmail(user.email, user.name, dateStr, timeStr)
+        .catch(err => console.error("Refund email failed:", err));
+      
+      // 2. Alert Admin to Process Refund
+      sendAdminRefundAlert(ADMIN_EMAIL, {
+        userName: user.name,
+        userEmail: user.email,
+        date: dateStr,
+        time: timeStr
+      }).catch(err => console.error("Admin refund alert failed:", err));
+
+    } else {
+      // 1. Notify User of Cancellation (Pending/Rejected)
+      sendBookingCancelledEmail(user.email, user.name, dateStr, timeStr)
+        .catch(err => console.error("Cancel email failed:", err));
     }
 
     res.json({ success: true });
   } catch (err) {
     console.error("❌ Cancel booking error:", err);
-    res.status(500).json({ error: "Failed to cancel booking" });
+    res.status(500).json({ error: err.message || "Failed to cancel booking" });
   }
 };

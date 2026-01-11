@@ -3,7 +3,7 @@ import { requireAuth } from "../middlewares/requireAuth.js";
 import { requireAdmin } from "../middlewares/requireAdmin.js";
 import {
   getAllBookings,
-  updateBookingStatus,
+  updateBookingStatus 
 } from "../controllers/adminBookingController.js";
 
 const router = express.Router();

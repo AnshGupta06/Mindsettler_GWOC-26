@@ -1,4 +1,5 @@
 import prisma from "../config/prisma.js";
+import { sendUserBlockedEmail } from "../services/emailService.js";
 
 // 1. Get All Clients (with full Booking History)
 export const getAllClients = async (req, res) => {
@@ -28,7 +29,7 @@ export const getAllClients = async (req, res) => {
         isBlocked: user.isBlocked || false,
         totalBookings,
         lastSession: lastBooking ? lastBooking.slot.startTime : null,
-        bookings: bookings, // 👈 Sending full history now
+        bookings: bookings,
       };
     });
 
@@ -39,7 +40,7 @@ export const getAllClients = async (req, res) => {
   }
 };
 
-// 2. Update Client (Notes or Block Status) - Same as before
+// 2. Update Client (Notes or Block Status)
 export const updateClient = async (req, res) => {
   const { id } = req.params;
   const { adminNotes, isBlocked } = req.body;
@@ -53,6 +54,14 @@ export const updateClient = async (req, res) => {
       where: { id },
       data: updateData,
     });
+
+    // ✨ FIX: Trigger email if user is being blocked
+    if (isBlocked === true) {
+      console.log(`🔒 Blocking user ${updatedUser.email}, sending email...`);
+      sendUserBlockedEmail(updatedUser.email, updatedUser.name || "User")
+        .catch(err => console.error("❌ Failed to send block email:", err));
+    }
+
     res.json(updatedUser);
   } catch (err) {
     console.error("❌ Update Client Error:", err);

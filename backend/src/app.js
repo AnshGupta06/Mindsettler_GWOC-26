@@ -6,12 +6,12 @@ import adminSlotRoutes from "./routes/adminSlotRoutes.js";
 import adminBookingRoutes from "./routes/adminBookingRoutes.js";
 import discountRoutes from "./routes/discountRoutes.js";
 import adminClientRoutes from "./routes/adminClientRoutes.js";
+import settingsRoutes from "./routes/settingsRoutes.js";
+import healthRoutes from "./routes/healthRoutes.js"; // Import health routes
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import hpp from 'hpp';
 import xss from 'xss-clean';
-
-// Removed: import contactRoutes from "./routes/contactRoutes.js";
 
 const app = express();
 
@@ -52,24 +52,28 @@ app.use(xss());
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
-  message: 'Too many requests from this IP, please try again in 15 minutes',
+  message: { 
+    error: 'Too many requests from this IP, please try again in 15 minutes' 
+  },
   standardHeaders: true, 
   legacyHeaders: false, 
 });
 app.use('/api', limiter);
 
 app.use(express.json());
+
+// Routes
 app.use("/api/admin/", adminBookingRoutes);
+app.use("/api/settings", settingsRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/bookings", bookingRoutes);
 app.use("/api/discounts", discountRoutes);
 app.use("/api/admin/slots", adminSlotRoutes);
 app.use("/api/admin/clients", adminClientRoutes);
+app.use("/api/health", healthRoutes); 
 
 app.get("/", (req, res) => {
   res.json({ message: "MindSettler backend running" });
 });
-
-// Removed: app.use("/api/contact", contactRoutes);
 
 export default app;
