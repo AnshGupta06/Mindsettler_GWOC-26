@@ -144,7 +144,6 @@ export default function AboutPreview() {
               </p>
             </SlideUp>
 
-            {/* Desktop Grid */}
             <div className="w-full max-w-5xl mx-auto mb-10">
               <StaggerContainer className="grid grid-cols-4 gap-6 justify-items-center">
                 {features.map((item, i) => (
