@@ -164,7 +164,7 @@ export const sendNewBookingAdminEmail = async (adminEmail, { userName, userEmail
      <p><strong>Type:</strong> ${type}</p>
      ${therapyType ? `<p><strong>Therapy:</strong> ${therapyType}</p>` : ''}
      <p><strong>Reason:</strong> ${reason || "—"}</p>`,
-    `${process.env.NEXT_PUBLIC_APP_URL}/admin/bookings`,
+    `${process.env.NEXT_PUBLIC_APP_URL}/admin`,
     "Manage Bookings"
   );
   await sendHtmlEmail(adminEmail, "New Booking Request", html);
