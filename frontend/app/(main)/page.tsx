@@ -1,51 +1,11 @@
-"use client";
+import { Metadata } from "next";
+import HomeClient from "./HomeClient";
 
-import HeroSection from "./components/home/HeroSection";
-import AboutPreview from "./components/home/AboutPreview";
-import JourneySection from "./components/home/JourneySection";
-import Differentiators from "./components/home/Differentiators";
-import PersonalPathSection from "./components/home/PersonalPath";
-import WorkplaceWellnessSection from "./components/home/Workplace";
-import HowItWorks from "./components/home/HowItWorks";
-import FAQSection from "./components/home/FAQSection";
-import SectionDivider from "./components/common/SectionDivider"; // Import the new divider
+export const metadata: Metadata = {
+  title: "Mindsettler | Your Journey to Mental Wellness", // Overrides the template for the homepage
+  description: "Begin your personalized journey to healing. We bridge the gap between professional therapy and self-understanding.",
+};
 
 export default function HomePage() {
-  return (
-    <>
-      <main className="min-h-screen bg-[#F9F6FF]"> {/* Ensure global bg matches */}
-        
-        <HeroSection />
-        
-        <SectionDivider /> {/* Aesthetic Break */}
-        
-        <AboutPreview />
-        
-        <SectionDivider />
-        
-        <HowItWorks />
-        
-        <SectionDivider />
-        
-        <JourneySection />
-        
-        <SectionDivider />
-        
-        <Differentiators />
-        
-        <SectionDivider />
-        
-        <PersonalPathSection />
-        
-        <SectionDivider />
-        
-        <WorkplaceWellnessSection />
-        
-        <SectionDivider />
-        
-        <FAQSection />
-        
-      </main>
-    </>
-  );
+  return <HomeClient />;
 }

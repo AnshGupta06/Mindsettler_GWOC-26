@@ -200,6 +200,7 @@ export default function DifferentiatorsSection() {
 
         </div>
 
+
         {/* ================= MOBILE/TABLET VIEW (Vertical Tree) ================= */}
         <div className="lg:hidden max-w-xl mx-auto pl-4">
           <div className="relative ml-4 md:ml-8 py-4">
