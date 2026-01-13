@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { Metadata } from "next";
 import { awarenessContent } from "./awarenessData";
 import { CharReveal, SlideUp, StaggerContainer, StaggerItem, ImageWipeReveal } from "../../components/common/RevealComponent";
 import { 
@@ -12,7 +13,34 @@ import {
   CalendarCheck,
   Sparkles
 } from "lucide-react";
+// Add this function to generate SEO tags based on the slug
+export async function generateMetadata({ params }: AwarenessPageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const content = awarenessContent[slug as keyof typeof awarenessContent];
 
+  if (!content) {
+    return {
+      title: "Topic Not Found",
+    };
+  }
+
+  return {
+    title: content.title, // Becomes "Anxiety | Mindsettler" thanks to template
+    description: content.intro.slice(0, 160), // Search engines prefer < 160 chars
+    openGraph: {
+      title: `${content.title} - Mental Health Awareness`,
+      description: content.intro,
+      images: [
+        {
+          url: content.heroImage, // Uses the specific image for this topic
+          width: 1200,
+          height: 630,
+          alt: content.title,
+        },
+      ],
+    },
+  };
+}
 interface AwarenessPageProps {
   params: Promise<{
     slug: string;
