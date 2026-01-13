@@ -66,8 +66,15 @@ export const updateBookingStatus = async (req, res) => {
       const dateStr = dateObj.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
       const timeStr = dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
       
-      // Updated call matching the new signature: (email, name, date, time, link)
-      sendBookingConfirmedEmail(updated.user.email, updated.user.name, dateStr, timeStr, meetingLink)
+      // ✨ FIXED: Passes date, time, link, AND mode correctly
+      sendBookingConfirmedEmail(
+          updated.user.email, 
+          updated.user.name, 
+          dateStr, 
+          timeStr, 
+          meetingLink, 
+          updated.slot.mode // <--- Essential for "Online" vs "In-Person" logic
+        )
         .catch(err => console.error("Email failed:", err));
 
       return res.json(updated);
@@ -86,6 +93,9 @@ export const deleteBooking = async (req, res) => {
     const booking = await prisma.booking.findUnique({ where: { id } });
     
     if (!booking) return res.status(404).json({ error: "Booking not found" });
+
+    // If the booking held a slot (CONFIRMED or PENDING), free it before deleting
+    // If it was REJECTED, the slot is likely already freed, but we check specifically for non-REJECTED statuses to be safe
     if (booking.status !== "REJECTED") {
        await prisma.sessionSlot.update({
          where: { id: booking.slotId },
