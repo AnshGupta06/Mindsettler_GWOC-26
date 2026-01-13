@@ -22,6 +22,10 @@ export const metadata: Metadata = {
   // 3. Keywords
   keywords: ["Mental Health", "Therapy", "Healing", "Psychology", "Mindfulness", "Trauma Recovery"],
   
+  verification: {
+    google: "BOgPVkaVqQRx3eiwW7UEw9Gw0mcVfdN6yg4n-xLngFA",
+  },
+
   // 4. Open Graph (Facebook, LinkedIn, Discord)
   openGraph: {
     title: "Mindsettler | Heal Your Mind and Soul",
