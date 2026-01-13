@@ -8,7 +8,7 @@ import { API_URL } from "@/app/lib/api";
 import { 
   Users, Search, Mail, Phone, Calendar, 
   Edit2, Ban, CheckCircle, Save, X, ShieldAlert, Check, 
-  ChevronDown, ChevronUp, Clock, MapPin, Filter
+  ChevronDown, ChevronUp, Clock, MapPin, Filter, Send
 } from "lucide-react";
 import Loader from "../../components/common/Loader";
 import { motion, AnimatePresence } from "framer-motion";
@@ -54,6 +54,8 @@ export default function AdminClientsPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editNotes, setEditNotes] = useState("");
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [reportModal, setReportModal] = useState<{isOpen: boolean, client: Client | null}>({isOpen: false, client: null});
+  const [reportContent, setReportContent] = useState("");
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (user) => {
@@ -107,6 +109,35 @@ export default function AdminClientsPage() {
       setClients(prev => prev.map(c => c.id === client.id ? { ...c, isBlocked: !client.isBlocked } : c));
       toast.success(client.isBlocked ? "Unblocked" : "Blocked");
     } catch (err) { toast.error("Failed to update status"); }
+  };
+
+  const sendReport = async (clientId: string) => {
+    if (!reportContent.trim()) {
+      toast.error("Please enter report content");
+      return;
+    }
+    
+    const token = await auth.currentUser?.getIdToken();
+    if (!token) {
+      toast.error("Authentication failed");
+      return;
+    }
+    
+    const toastId = toast.loading("Sending report...");
+    try {
+      await fetch(`${API_URL}/api/admin/clients/${clientId}/send-report`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ reportContent, adminName: "Admin" }),
+      });
+      toast.success("Report sent successfully!", { id: toastId });
+      setReportModal({isOpen: false, client: null});
+      setReportContent("");
+      // Refresh clients to update notes
+      fetchClients(token);
+    } catch (err) { 
+      toast.error("Failed to send report", { id: toastId }); 
+    }
   };
 
   const handleBookingStatus = async (bookingId: string, status: "CONFIRMED" | "REJECTED") => {
@@ -293,6 +324,13 @@ export default function AdminClientsPage() {
                     >
                         {client.isBlocked ? <><CheckCircle size={14}/> Unblock</> : <><Ban size={14}/> Block User</>}
                     </button>
+
+                    <button 
+                        onClick={() => setReportModal({isOpen: true, client})}
+                        className="w-full py-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-2 bg-blue-100 text-blue-700 hover:bg-blue-200 border border-blue-200"
+                    >
+                        <Send size={14}/> Send Report
+                    </button>
                     
                     <button 
                         onClick={() => setExpandedId(expandedId === client.id ? null : client.id)}
@@ -361,6 +399,36 @@ export default function AdminClientsPage() {
           )}
         </div>
       </div>
+
+      {/* Report Modal */}
+      {reportModal.isOpen && reportModal.client && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6">
+            <h3 className="text-lg font-bold text-[#3F2965] mb-4">Send Report to {reportModal.client.name}</h3>
+            <textarea
+              className="w-full p-3 border border-gray-200 rounded-xl resize-none focus:border-[#3F2965] focus:outline-none"
+              rows={6}
+              placeholder="Write your report here..."
+              value={reportContent}
+              onChange={(e) => setReportContent(e.target.value)}
+            />
+            <div className="flex gap-3 mt-4">
+              <button
+                onClick={() => setReportModal({isOpen: false, client: null})}
+                className="flex-1 py-2 px-4 bg-gray-100 text-gray-600 rounded-xl font-bold hover:bg-gray-200"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => reportModal.client && sendReport(reportModal.client.id)}
+                className="flex-1 py-2 px-4 bg-[#3F2965] text-white rounded-xl font-bold hover:bg-[#2a1b45]"
+              >
+                Send Report
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

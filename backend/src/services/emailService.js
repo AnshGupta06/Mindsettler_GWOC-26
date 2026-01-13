@@ -213,4 +213,22 @@ export const sendAdminRefundAlert = async (adminEmail, { userName, userEmail, da
   await sendHtmlEmail(adminEmail, "Refund Action Required", html);
 };
 
-export const sendEmail = sendHtmlEmail;
+// 10. ✨ User: Admin Report
+export const sendAdminReportEmail = async (email, name, reportContent, adminName = "Admin") => {
+  const html = createEmailTemplate(
+    "Important Update from Your Therapist 📋",
+    `<p>Hi ${name},</p>
+     <p>Your therapist has prepared an important report for you. This contains valuable insights, progress notes, and recommendations based on your sessions.</p>
+     
+     <div style="background:#F9F6FF; padding:20px; border-radius:12px; border-left:4px solid #3F2965; margin:25px 0;">
+       <h3 style="color:#3F2965; margin-top:0; font-size:18px;">📋 Therapist Report</h3>
+       <div style="color:#333; line-height:1.6; white-space:pre-line;">${reportContent.replace(/\n/g, '<br>')}</div>
+     </div>
+     
+     <p>If you have any questions about this report or would like to discuss it further, please don't hesitate to reach out.</p>
+     <p>Remember, your mental health journey is unique, and we're here to support you every step of the way.</p>`,
+    `${process.env.NEXT_PUBLIC_APP_URL}/contact`,
+    "Contact Your Therapist"
+  );
+  await sendHtmlEmail(email, "Therapist Report & Update", html);
+};
