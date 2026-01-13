@@ -73,12 +73,6 @@ export default function HeroSection() {
         {/* Mobile: order-1 (Top), Desktop: order-2 (Right) */}
         <div className="order-1 lg:order-2 flex flex-col items-center lg:items-start text-center lg:text-left">
           
-          <Reveal>
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-[#3F2965]/10 text-[#3F2965] font-bold text-xs uppercase tracking-widest mb-6 hover:border-[#3F2965]/20 transition-all cursor-default">
-              <span className="w-2 h-2 rounded-full bg-[#Dd1764] animate-pulse" />
-              <span>Mental Well-Being & Psycho-Education</span>
-            </div>
-          </Reveal>
 
           <div className="text-3xl sm:text-5xl md:text-6xl lg:text-[4.5rem] leading-[1.1] font-extrabold text-[#3F2965] tracking-tight mb-6 sm:mb-8">
             <div className="mb-1">

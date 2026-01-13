@@ -287,7 +287,9 @@ export default function AdminSlotsPage() {
                       onClick={() => setMode(m as any)}
                       className={`py-3 rounded-xl text-sm font-bold border transition-all ${
                         mode === m
-                          ? "bg-[#3F2965] text-white border-[#3F2965]"
+                          ? m === "ONLINE" 
+                            ? "bg-green-600 text-white border-green-600"
+                            : "bg-blue-600 text-white border-blue-600"
                           : "bg-white text-[#3F2965]/60 border-[#3F2965]/10 hover:bg-[#F9F6FF]"
                       }`}
                     >

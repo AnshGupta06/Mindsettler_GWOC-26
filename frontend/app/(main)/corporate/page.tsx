@@ -403,7 +403,7 @@ export default function CorporatePage() {
         <div className="container mx-auto px-4">
           <FastScrollReveal>
             <div className="text-center mb-12">
-              <h2 className="font-headline text-4xl font-bold tracking-tight sm:text-5xl flex items-center justify-center" style={{ color: '#3f2965' }}>
+              <h2 className="font-headline text-4xl font-bold tracking-tight sm:text-5xl" style={{ color: '#3f2965' }}>
                 Our <span style={{ color: '#de206a' }}> Workshop </span> Offerings 
               </h2>
               <p className="mt-4 max-w-2xl mx-auto text-lg leading-8" style={{ color: '#766693' }}>
