@@ -65,7 +65,7 @@ export default function BookPage() {
   const [type, setType] = useState<"FIRST" | "FOLLOW_UP">("FIRST");
   const [paymentMethod, setPaymentMethod] = useState<"UPI" | "CASH">("UPI");
   const [reason, setReason] = useState("");
-  const [therapyType, setTherapyType] = useState<string>("");
+  const [therapyType, setTherapyType] = useState<string>("general");
   const [slotModeFilter, setSlotModeFilter] = useState<"ONLINE" | "OFFLINE" | "BOTH">("BOTH");
   
   // UI State
@@ -213,7 +213,7 @@ export default function BookPage() {
     if (!user) return;
     try {
       setLoading(true);
-      const url = therapyType 
+      const url = therapyType && therapyType !== "general"
         ? `${API_URL}/api/bookings/slots?therapyType=${encodeURIComponent(therapyType)}`
         : `${API_URL}/api/bookings/slots`;
       
@@ -275,10 +275,6 @@ export default function BookPage() {
     if (!agreed) { 
       toast.error("Please agree to the Confidentiality Policy.");
       return; 
-    }
-    if (!therapyType) {
-        toast.error("Please select a therapy type first.");
-        return;
     }
 
     setSubmitting(true);
@@ -457,7 +453,7 @@ export default function BookPage() {
                                     onChange={(e) => setTherapyType(e.target.value)}
                                     className="w-full bg-white border-2 border-[#F9F6FF] hover:border-[#Dd1764]/30 focus:border-[#Dd1764] rounded-xl p-4 pr-10 text-base font-medium focus:outline-none focus:ring-4 focus:ring-[#Dd1764]/5 transition-all cursor-pointer shadow-sm"
                                     >
-                                    <option value="" className="text-[#3F2965]/60">Select a therapy approach...</option>
+                                    <option value="general" className="text-[#3F2965]/60">General Session</option>
                                     {therapyApproaches.map((therapy) => (
                                         <option key={therapy.id} value={therapy.title} className="text-[#3F2965] py-2">
                                         {therapy.title}
@@ -468,6 +464,10 @@ export default function BookPage() {
                                         <ArrowRight size={16} className="rotate-90" />
                                     </div>
                                 </div>
+
+                                <p className="text-xs text-[#3F2965]/50 italic leading-relaxed">
+                                    💡 Not sure which therapy to choose? Start with a <strong>General Session</strong> - our therapist will help guide you to the right approach.
+                                </p>
                             </div>
                         </div>
                         </section>
@@ -605,7 +605,7 @@ export default function BookPage() {
                                 slotModeFilter === "OFFLINE" ? "bg-blue-600 text-white shadow-md" : "bg-white text-blue-700 border border-blue-100"
                                 }`}
                             >
-                                <Building2 size={14} /> In-Person
+                                <Building2 size={14} /> Offline
                             </button>
                             </div>
                         </div>
@@ -718,7 +718,7 @@ export default function BookPage() {
                                 <div className="flex justify-between items-center">
                                   <span className="text-xs font-medium text-gray-500">Therapy</span>
                                   <span className="text-xs font-bold text-[#3F2965] max-w-[150px] text-right truncate">
-                                    {therapyType || "Not Selected"}
+                                    {therapyType || "General Session"}
                                   </span>
                                 </div>
                                 <div className="flex justify-between items-center">
