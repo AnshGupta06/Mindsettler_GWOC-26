@@ -54,6 +54,7 @@ export default function AboutPreview() {
             </div>
           </div>
 
+
           {/* 2. Main Content Body */}
           <div className="mb-8">
              <Reveal delay={0.1}>
