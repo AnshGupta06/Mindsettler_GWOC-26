@@ -232,3 +232,44 @@ export const sendAdminReportEmail = async (email, name, reportContent, adminName
   );
   await sendHtmlEmail(email, "Therapist Report & Update", html);
 };
+
+// 11. ✨ User: Session Notes (Public)
+export const sendSessionNotesToUser = async (email, name, notes) => {
+  const html = createEmailTemplate(
+    "Your Session Notes 📝",
+    `<p>Hi ${name},</p>
+     <p>Thank you for your session with us. Here are the key notes and insights from your meeting:</p>
+     
+     <div style="background:#F0F9FF; padding:20px; border-radius:12px; border-left:4px solid #0369A1; margin:25px 0;">
+       <h3 style="color:#0369A1; margin-top:0; font-size:18px;">📝 Session Notes</h3>
+       <div style="color:#333; line-height:1.6; white-space:pre-line;">${notes.replace(/\n/g, '<br>')}</div>
+     </div>
+     
+     <p>These notes are designed to help you reflect on your progress and prepare for future sessions. If you have any questions or need clarification, please feel free to reach out.</p>
+     <p>We're here to support your mental health journey.</p>`,
+    `${process.env.NEXT_PUBLIC_APP_URL}/contact`,
+    "Contact Us"
+  );
+  await sendHtmlEmail(email, "Your Session Notes", html);
+};
+
+// 12. ✨ Admin: Therapist Notes (Private)
+export const sendTherapistNotesToAdmin = async (adminEmail, userName, userEmail, therapistNotes) => {
+  if (!adminEmail) return;
+  
+  const html = createEmailTemplate(
+    "Therapist Notes for Session 📋",
+    `<p>A therapist has submitted private notes for a recent session.</p>
+     <p><strong>Client:</strong> ${userName} (${userEmail})</p>
+     
+     <div style="background:#FEF3C7; padding:20px; border-radius:12px; border-left:4px solid #D97706; margin:25px 0;">
+       <h3 style="color:#D97706; margin-top:0; font-size:18px;">🔒 Therapist Notes (Private)</h3>
+       <div style="color:#333; line-height:1.6; white-space:pre-line;">${therapistNotes.replace(/\n/g, '<br>')}</div>
+     </div>
+     
+     <p>These notes contain confidential therapist observations and should be handled appropriately.</p>`,
+    `${process.env.NEXT_PUBLIC_APP_URL}/admin/bookings`,
+    "View Bookings"
+  );
+  await sendHtmlEmail(adminEmail, "Therapist Notes Submitted", html);
+};

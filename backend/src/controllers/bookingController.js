@@ -3,7 +3,9 @@ import {
   sendNewBookingAdminEmail, 
   sendBookingCancelledEmail, 
   sendRefundRequestedEmail,
-  sendAdminRefundAlert
+  sendAdminRefundAlert,
+  sendSessionNotesToUser,
+  sendTherapistNotesToAdmin
 } from "../services/emailService.js";
 import { getSettings } from "../services/globalSettingsService.js";
 import "dotenv/config";
@@ -249,5 +251,188 @@ export const cancelBooking = async (req, res) => {
   } catch (err) {
     console.error("❌ Cancel booking error:", err);
     res.status(500).json({ error: err.message || "Failed to cancel booking" });
+  }
+};
+
+// --- MEETING NOTES FUNCTIONS ---
+
+export const startMeeting = async (req, res) => {
+  const { bookingId } = req.params;
+
+  try {
+    const booking = await prisma.booking.findUnique({
+      where: { id: bookingId },
+      include: { slot: true, user: true }
+    });
+
+    if (!booking) {
+      return res.status(404).json({ error: "Booking not found" });
+    }
+
+    if (booking.slot.mode !== "ONLINE") {
+      return res.status(400).json({ error: "Only online meetings can be started" });
+    }
+
+    const now = new Date();
+    
+    // Create or update meeting notes
+    const meetingNotes = await prisma.meetingNotes.upsert({
+      where: { bookingId },
+      update: { 
+        meetingStartedAt: now,
+        updatedAt: now
+      },
+      create: {
+        bookingId,
+        meetingStartedAt: now,
+        createdBy: req.user.uid
+      }
+    });
+
+    res.json({ 
+      success: true, 
+      meetingNotes,
+      message: "Meeting started successfully" 
+    });
+  } catch (err) {
+    console.error("❌ Start meeting error:", err);
+    res.status(500).json({ error: "Failed to start meeting" });
+  }
+};
+
+export const endMeeting = async (req, res) => {
+  const { bookingId } = req.params;
+
+  try {
+    const meetingNotes = await prisma.meetingNotes.findUnique({
+      where: { bookingId }
+    });
+
+    if (!meetingNotes || !meetingNotes.meetingStartedAt) {
+      return res.status(400).json({ error: "Meeting not started" });
+    }
+
+    const now = new Date();
+    const duration = Math.round((now - meetingNotes.meetingStartedAt) / (1000 * 60)); // in minutes
+
+    await prisma.meetingNotes.update({
+      where: { bookingId },
+      data: {
+        meetingEndedAt: now,
+        meetingDuration: duration,
+        updatedAt: now
+      }
+    });
+
+    res.json({ 
+      success: true, 
+      duration,
+      message: "Meeting ended successfully" 
+    });
+  } catch (err) {
+    console.error("❌ End meeting error:", err);
+    res.status(500).json({ error: "Failed to end meeting" });
+  }
+};
+
+export const updateMeetingNotes = async (req, res) => {
+  const { bookingId } = req.params;
+  const { 
+    sessionSummary,
+    clientProgress,
+    keyInsights,
+    followUpPlan,
+    additionalNotes,
+    therapistNotes
+  } = req.body;
+
+  try {
+    const meetingNotes = await prisma.meetingNotes.upsert({
+      where: { bookingId },
+      update: {
+        sessionSummary,
+        clientProgress,
+        keyInsights,
+        followUpPlan,
+        additionalNotes,
+        therapistNotes,
+        updatedAt: new Date()
+      },
+      create: {
+        bookingId,
+        sessionSummary,
+        clientProgress,
+        keyInsights,
+        followUpPlan,
+        additionalNotes,
+        therapistNotes,
+        createdBy: req.user.uid
+      }
+    });
+
+    // Fetch booking details for email
+    const booking = await prisma.booking.findUnique({
+      where: { id: bookingId },
+      include: { user: true, slot: true }
+    });
+
+    if (booking) {
+      // Compile public notes for user
+      const publicNotes = [
+        sessionSummary && `Session Summary:\n${sessionSummary}`,
+        clientProgress && `Client Progress:\n${clientProgress}`,
+        keyInsights && `Key Insights:\n${keyInsights}`,
+        followUpPlan && `Follow-up Plan:\n${followUpPlan}`,
+        additionalNotes && `Additional Notes:\n${additionalNotes}`
+      ].filter(Boolean).join('\n\n');
+
+      // Send public notes to user if any exist
+      if (publicNotes.trim()) {
+        sendSessionNotesToUser(booking.user.email, booking.user.name || "Valued Client", publicNotes)
+          .catch(err => console.error("Failed to send session notes to user:", err));
+      }
+
+      // Send therapist notes to admin if provided
+      if (therapistNotes && therapistNotes.trim()) {
+        sendTherapistNotesToAdmin(ADMIN_EMAIL, booking.user.name || "Client", booking.user.email, therapistNotes)
+          .catch(err => console.error("Failed to send therapist notes to admin:", err));
+      }
+    }
+
+    res.json({ 
+      success: true, 
+      meetingNotes,
+      message: "Meeting notes updated successfully" 
+    });
+  } catch (err) {
+    console.error("❌ Update meeting notes error:", err);
+    res.status(500).json({ error: "Failed to update meeting notes" });
+  }
+};
+
+export const getMeetingNotes = async (req, res) => {
+  const { bookingId } = req.params;
+
+  try {
+    const meetingNotes = await prisma.meetingNotes.findUnique({
+      where: { bookingId },
+      include: {
+        booking: {
+          include: {
+            user: true,
+            slot: true
+          }
+        }
+      }
+    });
+
+    if (!meetingNotes) {
+      return res.status(404).json({ error: "Meeting notes not found" });
+    }
+
+    res.json(meetingNotes);
+  } catch (err) {
+    console.error("❌ Get meeting notes error:", err);
+    res.status(500).json({ error: "Failed to fetch meeting notes" });
   }
 };

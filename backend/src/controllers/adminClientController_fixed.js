@@ -23,7 +23,7 @@ export const getAllClients = async (req, res) => {
       const bookings = user.bookings || [];
       const totalBookings = bookings.length;
       const lastBooking = bookings.length > 0 ? bookings[0] : null;
-      
+
       return {
         id: user.id,
         name: user.name || "N/A",

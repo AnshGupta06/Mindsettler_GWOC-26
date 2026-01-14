@@ -1,9 +1,46 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Reveal from "../common/Reveal";
 import { SlideUp, StaggerContainer, StaggerItem } from "../common/RevealComponent";
 import Image from "next/image";
 import Link from "next/link";
+
+// --- NEW COMPONENT: Handles Loading SVG on Reveal ---
+const RevealOnScrollImage = ({ src, alt, className, ...props }: any) => {
+  const [isVisible, setIsVisible] = useState(false);
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect(); // Run once so it doesn't reload when scrolling back up
+        }
+      },
+      { threshold: 0.2 } // Trigger when 20% of the item is visible
+    );
+
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div ref={containerRef} className={`relative w-full h-full ${className || ''}`}>
+      {isVisible && (
+        <Image
+          src={src}
+          alt={alt}
+          className="animate-in fade-in duration-700 slide-in-from-bottom-4 w-full h-auto object-contain drop-shadow-md"
+          {...props}
+        />
+      )}
+    </div>
+  );
+};
 
 export default function AboutPreview() {
   const [flippedIndices, setFlippedIndices] = useState<number[]>([]);
@@ -225,24 +262,22 @@ function Card({ item, i, flippedIndices, handleFlip }: { item: any, i: number, f
 
 function PeaceOfMindIllustration() {
   return (
-    <Image
+    <RevealOnScrollImage
       src="/assets/about1.svg"
       alt="Peace of Mind"
       width={400}
       height={400}
-      className="w-full h-auto object-contain drop-shadow-md"
     />
   );
 }
 
 function MindIllustration() {
   return (
-    <Image
+    <RevealOnScrollImage
       src="/assets/about2.svg"
       alt="Mind Awareness"
       width={400}
       height={400}
-      className="w-full h-auto object-contain drop-shadow-md"
     />
   );
 }

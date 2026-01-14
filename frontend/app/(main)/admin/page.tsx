@@ -22,7 +22,11 @@ import {
   Settings,
   ShieldAlert,
   Phone,
-  Mail
+  Mail,
+  Play,
+  Square,
+  FileText,
+  Save
 } from "lucide-react";
 
 // --- Types ---
@@ -45,6 +49,20 @@ type Booking = {
     endTime: string;
     mode: "ONLINE" | "OFFLINE";
   };
+  meetingNotes?: MeetingNotes;
+};
+
+type MeetingNotes = {
+  id: string;
+  meetingStartedAt?: string;
+  meetingEndedAt?: string;
+  meetingDuration?: number;
+  sessionSummary?: string;
+  clientProgress?: string;
+  keyInsights?: string;
+  followUpPlan?: string;
+  additionalNotes?: string;
+  therapistNotes?: string;
 };
 
 export default function AdminBookingsPage() {
@@ -60,6 +78,21 @@ export default function AdminBookingsPage() {
     bookingId: null
   });
   const [manualLink, setManualLink] = useState("");
+
+  // Meeting Notes Modal State
+  const [notesModal, setNotesModal] = useState<{ isOpen: boolean; booking: Booking | null }>({
+    isOpen: false,
+    booking: null
+  });
+  const [meetingNotes, setMeetingNotes] = useState<MeetingNotes | null>(null);
+  const [notesForm, setNotesForm] = useState({
+    sessionSummary: "",
+    clientProgress: "",
+    keyInsights: "",
+    followUpPlan: "",
+    additionalNotes: "",
+    therapistNotes: ""
+  });
 
   const isValidLink = (link: string) => {
     try {
@@ -145,6 +178,123 @@ export default function AdminBookingsPage() {
     }
   };
 
+  // --- MEETING MANAGEMENT ---
+
+  const startMeeting = async (bookingId: string) => {
+    const token = await auth.currentUser?.getIdToken();
+    const toastId = toast.loading("Starting meeting...");
+
+    try {
+      const res = await fetch(`${API_URL}/api/bookings/${bookingId}/start-meeting`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!res.ok) throw new Error("Failed to start meeting");
+
+      toast.success("Meeting started!", { id: toastId });
+      
+      // Refresh bookings to update meeting status
+      const refreshedToken = await auth.currentUser?.getIdToken();
+      if(refreshedToken) await fetchBookings(refreshedToken);
+
+    } catch (err: any) {
+      toast.error(err.message || "Failed to start meeting", { id: toastId });
+    }
+  };
+
+  const endMeeting = async (bookingId: string) => {
+    const token = await auth.currentUser?.getIdToken();
+    const toastId = toast.loading("Ending meeting...");
+
+    try {
+      const res = await fetch(`${API_URL}/api/bookings/${bookingId}/end-meeting`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!res.ok) throw new Error("Failed to end meeting");
+
+      const data = await res.json();
+      toast.success(`Meeting ended! Duration: ${data.duration} minutes`, { id: toastId });
+      
+      // Refresh bookings to update meeting status
+      const refreshedToken = await auth.currentUser?.getIdToken();
+      if(refreshedToken) await fetchBookings(refreshedToken);
+
+    } catch (err: any) {
+      toast.error(err.message || "Failed to end meeting", { id: toastId });
+    }
+  };
+
+  const openNotesModal = async (booking: Booking) => {
+    setNotesModal({ isOpen: true, booking });
+    
+    // Fetch existing notes
+    try {
+      const token = await auth.currentUser?.getIdToken();
+      const res = await fetch(`${API_URL}/api/bookings/${booking.id}/meeting-notes`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (res.ok) {
+        const notes = await res.json();
+        setMeetingNotes(notes);
+        setNotesForm({
+          sessionSummary: notes.sessionSummary || "",
+          clientProgress: notes.clientProgress || "",
+          keyInsights: notes.keyInsights || "",
+          followUpPlan: notes.followUpPlan || "",
+          additionalNotes: notes.additionalNotes || "",
+          therapistNotes: notes.therapistNotes || ""
+        });
+      } else {
+        // No existing notes
+        setMeetingNotes(null);
+        setNotesForm({
+          sessionSummary: "",
+          clientProgress: "",
+          keyInsights: "",
+          followUpPlan: "",
+          additionalNotes: "",
+          therapistNotes: ""
+        });
+      }
+    } catch (err) {
+      console.error("Failed to fetch meeting notes:", err);
+    }
+  };
+
+  const saveMeetingNotes = async () => {
+    if (!notesModal.booking) return;
+
+    const token = await auth.currentUser?.getIdToken();
+    const toastId = toast.loading("Saving notes...");
+
+    try {
+      const res = await fetch(`${API_URL}/api/bookings/${notesModal.booking.id}/meeting-notes`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(notesForm),
+      });
+
+      if (!res.ok) throw new Error("Failed to save notes");
+
+      toast.success("Notes saved successfully!", { id: toastId });
+      setNotesModal({ isOpen: false, booking: null });
+      
+      // Refresh bookings to update notes
+      const refreshedToken = await auth.currentUser?.getIdToken();
+      if(refreshedToken) await fetchBookings(refreshedToken);
+
+    } catch (err: any) {
+      toast.error(err.message || "Failed to save notes", { id: toastId });
+    }
+  };
+
   const filteredBookings = bookings.filter(b => {
     if (filter === "ALL") return true;
     return b.status === filter;
@@ -220,6 +370,122 @@ export default function AdminBookingsPage() {
            </div>
          </div>
       )}
+        
+        {/* MEETING NOTES MODAL */}
+        {notesModal.isOpen && (
+          <div className="fixed inset-0 bg-[#3F2965]/20 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-[2rem] p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-[#3F2965]/10 animate-in zoom-in-95">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-xl font-bold text-[#3F2965]">Session Notes</h3>
+                <button onClick={() => setNotesModal({isOpen: false, booking: null})} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                  <X size={20} className="text-[#3F2965]/60" />
+                </button>
+              </div>
+              
+              {notesModal.booking && (
+                <div className="mb-6 p-4 bg-[#F9F6FF] rounded-xl border border-[#3F2965]/10">
+                  <div className="flex items-center gap-3 mb-2">
+                    <User size={16} className="text-[#Dd1764]" />
+                    <span className="font-bold text-[#3F2965]">{notesModal.booking.user.name}</span>
+                    <span className="text-xs text-[#3F2965]/60">
+                      {new Date(notesModal.booking.slot.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })} • 
+                      {new Date(notesModal.booking.slot.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - 
+                      {new Date(notesModal.booking.slot.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  </div>
+                  {notesModal.booking.meetingNotes?.meetingStartedAt && (
+                    <p className="text-xs text-[#3F2965]/60">
+                      Meeting Duration: {notesModal.booking.meetingNotes.meetingDuration} minutes
+                    </p>
+                  )}
+                </div>
+              )}
+
+              <div className="space-y-6">
+                <div>
+                  <label className="block text-sm font-bold text-[#3F2965] mb-2">Session Summary</label>
+                  <textarea
+                    value={notesForm.sessionSummary}
+                    onChange={(e) => setNotesForm(prev => ({ ...prev, sessionSummary: e.target.value }))}
+                    placeholder="Brief overview of what was discussed and accomplished in this session..."
+                    className="w-full p-3 bg-[#F9F6FF] rounded-xl border border-[#3F2965]/10 focus:border-[#Dd1764] focus:ring-4 focus:ring-[#Dd1764]/5 outline-none resize-none"
+                    rows={3}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-bold text-[#3F2965] mb-2">Client Progress</label>
+                  <textarea
+                    value={notesForm.clientProgress}
+                    onChange={(e) => setNotesForm(prev => ({ ...prev, clientProgress: e.target.value }))}
+                    placeholder="Notable progress, insights, or changes observed in the client's mental health..."
+                    className="w-full p-3 bg-[#F9F6FF] rounded-xl border border-[#3F2965]/10 focus:border-[#Dd1764] focus:ring-4 focus:ring-[#Dd1764]/5 outline-none resize-none"
+                    rows={3}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-bold text-[#3F2965] mb-2">Key Insights</label>
+                  <textarea
+                    value={notesForm.keyInsights}
+                    onChange={(e) => setNotesForm(prev => ({ ...prev, keyInsights: e.target.value }))}
+                    placeholder="Important realizations, patterns, or breakthroughs from this session..."
+                    className="w-full p-3 bg-[#F9F6FF] rounded-xl border border-[#3F2965]/10 focus:border-[#Dd1764] focus:ring-4 focus:ring-[#Dd1764]/5 outline-none resize-none"
+                    rows={3}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-bold text-[#3F2965] mb-2">Follow-up Plan</label>
+                  <textarea
+                    value={notesForm.followUpPlan}
+                    onChange={(e) => setNotesForm(prev => ({ ...prev, followUpPlan: e.target.value }))}
+                    placeholder="Plan for future sessions, frequency, or therapeutic approach adjustments..."
+                    className="w-full p-3 bg-[#F9F6FF] rounded-xl border border-[#3F2965]/10 focus:border-[#Dd1764] focus:ring-4 focus:ring-[#Dd1764]/5 outline-none resize-none"
+                    rows={3}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-bold text-[#3F2965] mb-2">Additional Notes</label>
+                  <textarea
+                    value={notesForm.additionalNotes}
+                    onChange={(e) => setNotesForm(prev => ({ ...prev, additionalNotes: e.target.value }))}
+                    placeholder="Any other observations, concerns, or notes not covered above..."
+                    className="w-full p-3 bg-[#F9F6FF] rounded-xl border border-[#3F2965]/10 focus:border-[#Dd1764] focus:ring-4 focus:ring-[#Dd1764]/5 outline-none resize-none"
+                    rows={3}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-bold text-[#3F2965] mb-2">Therapist Notes (Private)</label>
+                  <textarea
+                    value={notesForm.therapistNotes}
+                    onChange={(e) => setNotesForm(prev => ({ ...prev, therapistNotes: e.target.value }))}
+                    placeholder="Private notes for therapist reference only (not shared with client)..."
+                    className="w-full p-3 bg-[#F9F6FF] rounded-xl border border-[#3F2965]/10 focus:border-[#Dd1764] focus:ring-4 focus:ring-[#Dd1764]/5 outline-none resize-none"
+                    rows={3}
+                  />
+                </div>
+              </div>
+
+              <div className="flex gap-3 mt-8">
+                <button 
+                  onClick={() => setNotesModal({isOpen: false, booking: null})}
+                  className="flex-1 py-3 bg-gray-100 text-gray-600 rounded-xl font-bold hover:bg-gray-200 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button 
+                  onClick={saveMeetingNotes}
+                  className="flex-1 py-3 bg-[#Dd1764] text-white rounded-xl font-bold hover:bg-[#b01350] transition-all shadow-lg shadow-[#Dd1764]/20 flex items-center justify-center gap-2"
+                >
+                  <Save size={18} /> Save Notes
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
         
         {/* HEADER & NAV ACTIONS */}
         <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-6 mb-10">
@@ -331,6 +597,9 @@ export default function AdminBookingsPage() {
                 booking={b} 
                 onConfirm={handleConfirmClick}
                 onReject={(id) => updateStatus(id, "REJECTED")}
+                onStartMeeting={startMeeting}
+                onEndMeeting={endMeeting}
+                onOpenNotes={openNotesModal}
               />
             ))}
           </div>
@@ -366,9 +635,12 @@ type BookingCardProps = {
   booking: Booking;
   onConfirm: (booking: Booking) => void;
   onReject: (id: string) => void;
+  onStartMeeting?: (id: string) => void;
+  onEndMeeting?: (id: string) => void;
+  onOpenNotes?: (booking: Booking) => void;
 };
 
-function BookingCard({ booking, onConfirm, onReject}: BookingCardProps) {
+function BookingCard({ booking, onConfirm, onReject, onStartMeeting, onEndMeeting, onOpenNotes }: BookingCardProps) {
   const date = new Date(booking.slot.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
   const time = `${new Date(booking.slot.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${new Date(booking.slot.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
 
@@ -436,6 +708,27 @@ function BookingCard({ booking, onConfirm, onReject}: BookingCardProps) {
                 <a href={booking.meetingLink} target="_blank" rel="noopener noreferrer" className="text-xs text-green-700 font-bold underline truncate max-w-[200px]">
                     {booking.meetingLink}
                 </a>
+            </div>
+          )}
+
+          {/* MEETING CONTROLS - Only for confirmed online sessions */}
+          {booking.status === "CONFIRMED" && booking.slot.mode === "ONLINE" && (
+            <div>
+              <div className="flex gap-2 flex-wrap">
+                <button 
+                  onClick={() => onOpenNotes?.(booking)}
+                  className="flex items-center gap-1 px-3 py-1 bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold rounded-lg transition-colors"
+                >
+                  <FileText size={12} /> Notes
+                </button>
+              </div>
+              
+              {booking.meetingNotes?.meetingStartedAt && (
+                <p className="text-xs text-blue-600 mt-2">
+                  Started: {new Date(booking.meetingNotes.meetingStartedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  {booking.meetingNotes.meetingEndedAt && ` • Duration: ${booking.meetingNotes.meetingDuration}min`}
+                </p>
+              )}
             </div>
           )}
         </div>

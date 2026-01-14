@@ -11,6 +11,43 @@ import SectionDivider from '../components/common/SectionDivider';
 import therapyApproachesData from '../../../data/therapyApproaches.json';
 import testimonialsData from '../../../data/testimonials.json';
 
+// --- NEW COMPONENT: Handles Loading SVG on Reveal ---
+const RevealOnScrollImage = ({ src, alt, className, ...props }: any) => {
+  const [isVisible, setIsVisible] = useState(false);
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect(); // Run once so it doesn't reload when scrolling back up
+        }
+      },
+      { threshold: 0.2 } // Trigger when 20% of the item is visible
+    );
+
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div ref={containerRef} className="relative w-full h-full">
+      {isVisible && (
+        <Image
+          src={src}
+          alt={alt}
+          className={`${className} animate-in fade-in duration-700 slide-in-from-bottom-4`}
+          {...props}
+        />
+      )}
+    </div>
+  );
+};
+
 export default function ServicesPage() {
   // Use imported JSON data
   const therapyApproaches = therapyApproachesData;
@@ -312,12 +349,13 @@ export default function ServicesPage() {
             <div className="hidden lg:flex justify-center items-center order-1 lg:col-span-3">
               <SlideUp delay={baseDelay + 0.2}>
                 <div className="relative w-52 h-52 xl:w-72 xl:h-72">
-                   <Image 
+                    {/* MODIFIED: Uses RevealOnScrollImage to load SVG on view */}
+                    <RevealOnScrollImage 
                       src="/assets/services1.svg" 
                       alt="Mental Health Illustration Left" 
                       fill 
                       className="object-contain" 
-                   />
+                    />
                 </div>
               </SlideUp>
             </div>
@@ -344,12 +382,13 @@ export default function ServicesPage() {
             <div className="hidden lg:flex justify-center items-center order-3 lg:col-span-3">
               <SlideUp delay={baseDelay + 0.3}>
                 <div className="relative w-52 h-52 xl:w-72 xl:h-72">
-                   <Image 
+                    {/* MODIFIED: Uses RevealOnScrollImage to load SVG on view */}
+                    <RevealOnScrollImage 
                       src="/assets/services2.svg" 
                       alt="Mental Health Illustration Right" 
                       fill 
                       className="object-contain" 
-                   />
+                    />
                  </div>
               </SlideUp>
             </div>
@@ -479,7 +518,8 @@ export default function ServicesPage() {
             <div className="hidden lg:flex justify-center items-center order-1 lg:col-span-4">
               <SlideUp delay={baseDelay + 0.1}>
                 <div className="relative w-64 h-64 xl:w-80 xl:h-80">
-                  <Image
+                  {/* MODIFIED: Uses RevealOnScrollImage to load SVG on view */}
+                  <RevealOnScrollImage
                     src="/assets/peace-of-mind-animate.svg"
                     alt="Peace of Mind Illustration"
                     fill

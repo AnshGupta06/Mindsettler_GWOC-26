@@ -28,6 +28,13 @@ type Booking = {
   };
 };
 
+type AdminNote = {
+  id: string;
+  note: string;
+  createdAt: string;
+  createdBy: string;
+};
+
 type Client = {
   id: string;
   email: string;
@@ -35,7 +42,7 @@ type Client = {
   phone: string;
   totalBookings: number;
   lastSession: string | null;
-  adminNotes: string;
+  adminNotes: AdminNote[];
   isBlocked: boolean;
   bookings: Booking[];
 };
@@ -86,12 +93,13 @@ export default function AdminClientsPage() {
     const token = await auth.currentUser?.getIdToken();
     const toastId = toast.loading("Saving note...");
     try {
-      await fetch(`${API_URL}/api/admin/clients/${id}`, {
+      const res = await fetch(`${API_URL}/api/admin/clients/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ adminNotes: editNotes }),
       });
-      setClients(prev => prev.map(c => c.id === id ? { ...c, adminNotes: editNotes } : c));
+      const data = await res.json();
+      setClients(prev => prev.map(c => c.id === id ? data.user : c));
       setEditingId(null);
       toast.success("Note saved!", { id: toastId });
     } catch (err) { toast.error("Failed to save", { id: toastId }); }
@@ -123,20 +131,20 @@ export default function AdminClientsPage() {
       return;
     }
     
-    const toastId = toast.loading("Sending report...");
+    const toastId = toast.loading("Sending message...");
     try {
       await fetch(`${API_URL}/api/admin/clients/${clientId}/send-report`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ reportContent, adminName: "Admin" }),
       });
-      toast.success("Report sent successfully!", { id: toastId });
+      toast.success("Message sent successfully!", { id: toastId });
       setReportModal({isOpen: false, client: null});
       setReportContent("");
       // Refresh clients to update notes
       fetchClients(token);
     } catch (err) { 
-      toast.error("Failed to send report", { id: toastId }); 
+      toast.error("Failed to send message", { id: toastId }); 
     }
   };
 
@@ -301,7 +309,7 @@ export default function AdminClientsPage() {
                                 <button onClick={() => handleSaveNotes(client.id)} className="p-1 hover:bg-white rounded text-green-600"><Check size={14}/></button>
                             </div>
                         ) : (
-                            <button onClick={() => { setEditingId(client.id); setEditNotes(client.adminNotes || ""); }} className="p-1 hover:bg-white rounded opacity-0 group-hover:opacity-100 text-gray-400 hover:text-[#3F2965]">
+                            <button onClick={() => { setEditingId(client.id); setEditNotes(""); }} className="p-1 hover:bg-white rounded opacity-0 group-hover:opacity-100 text-gray-400 hover:text-[#3F2965]">
                                 <Edit2 size={14} />
                             </button>
                         )}
@@ -310,9 +318,25 @@ export default function AdminClientsPage() {
                         <textarea 
                             className="w-full flex-1 bg-white p-2 rounded-xl text-sm border focus:border-[#3F2965]/30 focus:outline-none resize-none"
                             rows={3} value={editNotes} onChange={(e) => setEditNotes(e.target.value)} autoFocus
+                            placeholder="Add a new note..."
                         />
                     ) : (
-                        <p className="text-sm text-[#3F2965]/70 italic whitespace-pre-wrap">{client.adminNotes || "No notes."}</p>
+                        <div className="flex-1 overflow-y-auto max-h-32">
+                            {client.adminNotes && client.adminNotes.length > 0 ? (
+                                <div className="space-y-2">
+                                    {client.adminNotes.map((note) => (
+                                        <div key={note.id} className="bg-white p-2 rounded-lg border border-gray-100">
+                                            <p className="text-sm text-[#3F2965]/80 whitespace-pre-wrap">{note.note}</p>
+                                            <p className="text-xs text-gray-400 mt-1">
+                                                {new Date(note.createdAt).toLocaleString()}
+                                            </p>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <p className="text-sm text-[#3F2965]/70 italic">No notes.</p>
+                            )}
+                        </div>
                     )}
                 </div>
 
@@ -329,7 +353,7 @@ export default function AdminClientsPage() {
                         onClick={() => setReportModal({isOpen: true, client})}
                         className="w-full py-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-2 bg-blue-100 text-blue-700 hover:bg-blue-200 border border-blue-200"
                     >
-                        <Send size={14}/> Send Report
+                        <Send size={14}/> Send Message
                     </button>
                     
                     <button 
@@ -404,7 +428,7 @@ export default function AdminClientsPage() {
       {reportModal.isOpen && reportModal.client && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl max-w-md w-full p-6">
-            <h3 className="text-lg font-bold text-[#3F2965] mb-4">Send Report to {reportModal.client.name}</h3>
+            <h3 className="text-lg font-bold text-[#3F2965] mb-4">Send Message to {reportModal.client.name}</h3>
             <textarea
               className="w-full p-3 border border-gray-200 rounded-xl resize-none focus:border-[#3F2965] focus:outline-none"
               rows={6}
@@ -423,7 +447,7 @@ export default function AdminClientsPage() {
                 onClick={() => reportModal.client && sendReport(reportModal.client.id)}
                 className="flex-1 py-2 px-4 bg-[#3F2965] text-white rounded-xl font-bold hover:bg-[#2a1b45]"
               >
-                Send Report
+                Send Message
               </button>
             </div>
           </div>
