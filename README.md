@@ -1,18 +1,11 @@
-# MindSettler - GWOC'26
-
-![MindSettler Logo](https://via.placeholder.com/800x200?text=MindSettler+Banner)
+# MindSettler
 
 <div align="center">
+<Image src="frontend/public/assets/white-logo.png" alt="Mindsettler Logo" width={100} height={100}  />
 
-### Empowering Mental Wellness with AI & Community
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
-[![Frontend](https://img.shields.io/badge/Frontend-Next.js_16-black)](https://nextjs.org/)
-[![Backend](https://img.shields.io/badge/Backend-Express.js-green)](https://expressjs.com/)
-[![Database](https://img.shields.io/badge/Database-PostgreSQL-blue)](https://www.postgresql.org/)
-[![AI](https://img.shields.io/badge/AI-Google_Gemini-orange)](https://deepmind.google/technologies/gemini/)
-
-[View Demo](http://localhost:3000) • [Report Bug](https://github.com/yourusername/mindsettler/issues) • [Request Feature](https://github.com/yourusername/mindsettler/issues)
+[![Live Demo](https://img.shields.io/badge/🌐_Live_Demo-mindsettler--bypb.vercel.app-orange?style=for-the-badge)](https://mindsettler-bypb.vercel.app/)
+[![License](https://img.shields.io/badge/📄_License-MIT-blue?style=for-the-badge)](./LICENSE)
 
 </div>
 
@@ -20,180 +13,266 @@
 
 ## 🌟 Overview
 
-**MindSettler** is a comprehensive mental wellness platform designed to bridge the gap between professional therapy, self-care, and community support. Built for the **GirlScript Winter of Code (GWOC) 2026**, it leverages advanced AI and a robust tech stack to provide users with a safe, engaging, and personalized environment for their mental health journey.
+**MindSettler** is an online psycho-education and mental well-being platform that helps individuals understand their mental health and navigate life challenges through structured 
+online/offline sessions. Built with a modern **Next.js** frontend and a robust **Express.js** backend.
 
-## 🎯 Mission
-
-To democratize access to mental health resources, providing a safe digital space where users can heal, learn, and grow through AI-driven insights, professional guidance, and community connection.
+---
 
 ## ✨ Key Features
 
-### 🤖 AI-Powered Companion
-- **GenAI Chatbot**: A compassionate, always-available AI companion powered by **Google Gemini** and **Genkit** to listen and provide immediate support.
-- **Personalized Insights**: AI-driven analysis of user mood and progress to suggest relevant content.
+### 🤖 **AI-Powered Chatbot**
+- **Personalized Insights**: Leveraging **Gemini AI** to analyze user inputs and offer tailored wellness advice.
+- **Resource Recommendation**: Context-aware suggestions for articles, exercises, and professional help.
 
-### 🛣️ Wellness Journeys
-- **Personal Path**: Tailored resources and milestones for individual growth.
-- **Workplace Wellness**: Specialized modules for managing work-related stress and burnout.
-- **Mental Awareness**: Dedicated section for education and reducing stigma (`/awareness`).
+### 🛡️ **Secure & Private**
+- **Authentication**: Enterprise-grade security using **Firebase Auth** for reliable identity management.
+- **Role-Based Access**: Distinct portals for Users, Therapists, and Admins.
 
-### 📚 Resource Hub
-- **Digital Library**: Curated collection of books, academic papers, and articles.
-- **Multimedia Content**: Video resources and guided meditations.
-- **Buy & Access**: Direct integration for purchasing recommended books (Amazon) or accessing free papers.
+### 👥 **Community & Connection**
+- **Interactive Resources**: Engaging content powered by **Framer Motion** and **GSAP** animations for a calming user experience.
+- **Real-time Awareness**: Dynamic educational sections to spread mental health literacy.
+- **Contact & Support**: Integrated **EmailJs** and **Brevo** for seamless communication with support teams or professionals.
 
-### 📅 Professional Booking System
-- **Expert Connection**: seamless booking with mental health professionals.
-- **Slot Management**: Robust admin dashboard for therapists to manage availability.
-- **Session Modes**: Support for both Online (Google Meet) and Offline sessions.
+### ⚡ **Modern Performance**
+- **Responsive Design**: Mobile-first architecture using **Tailwind CSS**.
+- **Optimized Routing**: Next.js App Router for server-side rendering and fast page loads.
+- **Type Safety**: Full **TypeScript** integration across the stack for reliability.
 
-### 🏢 Corporate & Institutional
-- **Corporate Programs**: Bespoke solutions for organizations to support their employees.
-- **Discount Management**: System for handling corporate or seasonal discounts.
+---
 
 ## 🚀 Technology Stack
 
-### Frontend
-- **Framework**: [Next.js 16](https://nextjs.org/) (App Router)
+### **Frontend**
+- **Framework**: Next.js 16 (App Router)
 - **Language**: TypeScript
-- **Styling**: [Tailwind CSS 4](https://tailwindcss.com/)
-- **Animations**: [Framer Motion](https://www.framer.com/motion/), [GSAP](https://greensock.com/gsap)
-- **UI Components**: Radix UI, Lucide React
-- **Forms**: React Hook Form + Zod
+- **Styling**: Tailwind CSS 4, Radix UI Primitives
+- **Animations**: Framer Motion 12, GSAP 3
+- **State/Forms**: React Hook Form, Zod Validation
+- **Icons**: Lucide React
 
-### Backend
-- **Runtime**: Node.js
-- **Framework**: [Express.js 5](https://expressjs.com/)
-- **Database**: PostgreSQL (via [Supabase](https://supabase.com/))
-- **ORM**: [Prisma](https://www.prisma.io/)
-- **Authentication**: Firebase Admin SDK
-- **AI Integration**: Google Genkit, Gemini API
-- **Scheduled Tasks**: Node-cron
+### **Backend**
+- **Runtime**: Node.js & Express 5
+- **Database**: PostgreSQL (via Prisma ORM)
+- **AI Chatbot**: Gemini AI
+- **Services**: Firebase Admin (Auth), Brevo & EmailJs (Email) , Supabase ( Database)
+- **Security**: Helmet, Rate-Limit, CORS
 
-### DevOps & Tools
-- **Version Control**: Git
-- **Package Manager**: npm
-- **Linting**: ESLint
+## 👥 Team FrostByte
 
-## 📊 System Architecture
+Built by a team of developers who love **Coding and Web Development** .
+Each member brings unique skills to make MindSettler fast, smart, and reliable.
 
-The project follows a modern **PERN** stack (PostgreSQL, Express, React/Next.js, Node.js) with a microservices-inspired approach for AI and Authentication.
+| 👨‍💻 Developer | 🔗 Profile |
+|---------------|-----------|
+| **Siddharth Shah** | [GitHub](https://github.com/siddharth251206) |
+| **Ansh Gupta** | [GitHub](https://github.com/AnshGupta06) |
+| **Suraj Shah** | [GitHub](https://github.com/Suraj31shah) |
+| **Pratham Patadiya** | [GitHub](https://github.com/Pratham722007) |
 
-- **Client**: Next.js application handling UI, routing (`app/`), and client-side logic.
-- **Server**: Express.js server providing RESTful APIs (`routes/`, `controllers/`).
-- **Database**: Supabase PostgreSQL instance managed via Prisma Schema.
-- **Auth**: Firebase Authentication for secure user management.
+
+## 🧠 Core Components breakdown
+
+1.  **Frontend (Presentation Layer)**
+    *   Built with **Next.js 16**, serving as the primary interaction point.
+    *   Handles client-side routing, UI rendering, and state management.
+    *   Communicates with the backend APIs securely using JWT tokens managed by Firebase.
+
+2.  **Backend (Application Layer)**
+    *   **Express.js** server acting as a RESTful API.
+    *   **Middleware**: Handles request validation (Zod), authentication checks (Firebase Admin), and rate limiting.
+    *   **AI Service**: A dedicated module integrating `@genkit-ai/google-genai` to process natural language requests and generate wellness insights.
+
+3.  **Database (Persistence Layer)**
+    *   **Prisma ORM** provides a type-safe interface to the SQL database.
+    *   Manages schemas for Users, Appointments , Admin Notes and Discount Booking.
+
+---
+
+
 
 ## 🛠️ Installation & Setup
 
-### Prerequisites
+Follow these steps to set up the project locally.
+
+### **Prerequisites**
 - Node.js (v18 or higher)
-- PostgreSQL (or Supabase account)
-- Firebase Project
+- Supabase Project (Database & API credentials)
+- Firebase Project Credentials
 - Google Gemini API Key
 
-### Environment Variables
+### **Environment Config**
 
 Create `.env` files in both `frontend` and `backend` directories.
 
-**Frontend (.env)**
+**Frontend (`frontend/.env`)**
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:5000/api
 NEXT_PUBLIC_FIREBASE_API_KEY=your_key
-NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
-NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
-# ...other firebase config
+NEXT_PUBLIC_GEMINI_KEY=your_key
 ```
 
-**Backend (.env)**
+**Backend (`backend/.env`)**
 ```env
 PORT=5000
-DATABASE_URL="postgresql://user:password@host:5432/db?schema=public"
-FIREBASE_SERVICE_ACCOUNT_KEY=path/to/serviceAccountKey.json
-GEMINI_API_KEY=your_gemini_key
-JWT_SECRET=your_super_secret
+DATABASE_URL="postgresql://user:pass@localhost:5432/mindsettler"
+GEMINI_API_KEY=your_key
+FIREBASE_SERVICE_ACCOUNT=path/to/cert.json
+RESEND_API_KEY=your_key
 ```
 
-### Installation Steps
+### **Step-by-Step Installation**
 
-1. **Clone the Repository**
-   ```bash
-   git clone https://github.com/yourusername/Mindsettler_GWOC-26.git
-   cd Mindsettler_GWOC-26
-   ```
+1.  **Clone the Repository**
+    ```bash
+    git clone https://github.com/your-username/mindsettler.git
+    cd mindsettler
+    ```
 
-2. **Backend Setup**
-   ```bash
-   cd backend
-   npm install
-   # Run migrations
-   npx prisma migrate dev
-   # Start server
-   npm run dev
-   ```
+2.  **Install Dependencies**
+    Install packages for both frontend and backend.
+    ```bash
+    # Install Backend
+    cd backend
+    npm install
 
-3. **Frontend Setup**
-   ```bash
-   cd frontend
-   npm install
-   npm run dev
-   ```
+    # Install Frontend
+    cd ../frontend
+    npm install
+    ```
 
-4. **Access the Application**
-   - Frontend: `http://localhost:3000`
-   - Backend API: `http://localhost:5000`
+3.  **Database Setup**
+    Initialize the Prisma schema.
+    ```bash
+    cd backend
+    npx prisma generate
+    npx prisma migrate dev --name init
+    npm run seed
+    ```
 
-## 🧪 API Documentation
+4.  **Start Development Servers**
+    Open two terminal windows:
 
-### Authentication
-- `POST /api/auth/register` - Register a new user
-- `POST /api/auth/login` - User login
+    **Terminal 1 (Backend)**:
+    ```bash
+    cd backend
+    npm run dev
+    ```
 
-### Bookings
-- `GET /api/booking/get-slots` - Fetch available slots
-- `POST /api/booking` - Book a session
-- `GET /api/booking/my-bookings` - User's booking history
+    **Terminal 2 (Frontend)**:
+    ```bash
+    cd frontend
+    npm run dev
+    ```
 
-### Resources
-- `GET /api/resources` - Get all resources
-- `GET /api/resources/:id` - Get specific resource details
+5.  **Access the App**
+    Visit `http://localhost:3000` to view the application.
 
-### AI Features
-- `POST /api/ai/chat` - Interact with the AI companion
+---
+
+
 
 ## 🎨 Design System
 
-**MindSettler** features a "Clean, Professional, yet Dynamic" aesthetic.
+**MindSettler** utilizes a carefully curated design language to promote calmness and clarity.
 
-- **Colors**: A calming palette of soft purples, whites, and vibrant accent gradients.
-- **Typography**: Modern, sans-serif fonts optimized for readability and comfort.
-- **Visuals**:
-    - **Glassmorphism**: Translucent cards and overlays for depth.
-    - **Floating Animations**: Subtle "breathing" motions for a soothing effect.
-    - **Interactive Elements**: Responsive hover states and smooth page transitions.
+### **Color Palette**
+| Color | Hex | Usage |
+|-------|-----|-------|
+| **Primary** | `#3F2965` | Brand identity, headers, primary actions (Deep Purple) |
+| **Accent** | `#DD1764` | Calls to action, highlights, active states (Vibrant Pink) |
+| **Soft Pink** | `#F7C6D6` | Background accents, subtle highlights |
+| **Soft Purple** | `#C7BEDA` | Secondary elements, borders |
+| **Background** | `#FFFFFF` | Clean, distraction-free interface |
+
+### **Typography**
+- **Font Family**: `Plus Jakarta Sans`, `Inter`, sans-serif.
+- **Scale**: Responsive dynamic scaling (14px base on mobile, 16px on desktop).
+
+### **UI Components**
+- **Glassmorphism**: Subtle blur effects for cards and overlays.
+- **Rounded Corners**: Generous `0.75rem` radius for a friendly, approachable feel.
+- **Animations**: Smooth transitions powered by `Framer Motion` for a seamless flow.
+
+---
+
+## 🚀 Deployment Guide
+
+### **Frontend (Vercel)**
+1.  Push your code to **GitHub**.
+2.  Import the repository into **Vercel**.
+3.  Vercel will auto-detect **Next.js**.
+4.  Add Environment Variables (`NEXT_PUBLIC_API_URL`, etc.).
+5.  Click **Deploy**.
+
+### **Backend (Render / Railway)**
+1.  Create a new **Web Service** on Render.
+2.  Connect your GitHub repository.
+3.  **Build Command**: `npm install`
+4.  **Start Command**: `npm start`
+5.  Add Environment Variables (`DATABASE_URL`, `GEMINI_API_KEY`, etc.).
+
+
 
 ## 🤝 Contributing
 
-We welcome contributions! Please follow these steps:
+We welcome contributions! 
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+1.  **Fork** the repository.
+2.  Create a **Feature Branch** (`git checkout -b feature/NewFeature`).
+3.  **Commit** your changes (`git commit -m 'Add NewFeature'`).
+4.  **Push** to the branch (`git push origin feature/NewFeature`).
+5.  Open a **Pull Request**.
 
-## 📄 License
+---
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+
+
+## 📂 Project Structure
+
+```text
+mindsettler/
+├── frontend/                 # Next.js 16 Application
+│   ├── app/                 # App Router (Pages & Layouts)
+│   ├── components/          # Reusable UI Components
+│   ├── lib/                 # Utilities & Libraries
+│   ├── public/              # Static Assets (Images, Icons)
+│   ├── hooks/               # Custom React Hooks
+│   ├── config/              # Configuration Files
+│   └── next.config.ts       # Next.js Configuration
+├── backend/                  # Express.js Server
+│   ├── src/
+│   │   ├── controllers/     # Route Controllers
+│   │   ├── middleware/      # Auth & Validation Middleware
+│   │   ├── routes/          # API Endpoints
+│   │   ├── services/        # Business Logic & AI Integration
+│   │   └── utils/           # Helper Functions
+│   ├── prisma/              # Database Schema & Migrations
+│   ├── config/              # Server Configuration
+│   └── package.json         # Backend Dependencies
+└── README.md                # Project Documentation
+```
+
+---
+
 
 ## 🙏 Acknowledgments
 
-- **GirlScript Winter of Code** for the opportunity.
-- **Google DeepMind** for Gemini and Genkit technologies.
-- All contributors who have helped shape MindSettler.
+### Technologies & Libraries
+*   **React Team** for the amazing frontend framework
+*   **Google** for Gemini AI technologies
+*   **Vercel & Render** for seamless deployment platforms
+
+### Special Thanks
+*   Therapists who validated our wellness features
+*   Community moderators who keep the platform safe
+*   Users who shared their journey with us
 
 ---
 
 <div align="center">
-Made with ❤️ by the MindSettler Team
+
+**Made with ❤️ by FrostByte**
+
+[![GitHub Stars](https://img.shields.io/github/stars/AnshGupta06/Mindsettler_GWOC-26?style=social)](https://github.com/AnshGupta06/Mindsettler_GWOC-26)
+
 </div>

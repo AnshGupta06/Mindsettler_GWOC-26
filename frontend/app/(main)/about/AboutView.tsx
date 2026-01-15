@@ -119,7 +119,7 @@ export default function AboutPage() {
                     {/* IMAGE / VISUAL */}
                     <div className="order-1 lg:order-2 relative flex justify-center lg:justify-end">
                         <ImageWipeReveal delay={0.2} className="w-full max-w-xl">
-                            <div className="relative aspect-[4/4] w-full rounded-tl-[100px] rounded-br-[100px] rounded-tr-3xl rounded-bl-3xl overflow-hidden shadow-2xl">
+                            <div className="relative aspect-[4/4] w-full rounded-tl-[100px] rounded-tr-3xl  overflow-hidden shadow-2xl">
                                 <Image
                                     src="/assets/aboutus_hero.jpeg"
                                     alt="About Mindsettler"
@@ -127,7 +127,7 @@ export default function AboutPage() {
                                     className="object-cover hover:scale-105 transition-transform duration-700 ease-out"
                                     priority
                                 />
-                                <div className="absolute inset-0 ring-1 ring-black/5 rounded-tl-[100px] rounded-br-[100px] rounded-tr-3xl rounded-bl-3xl pointer-events-none" />
+                                <div className="absolute inset-0 ring-1 ring-black/5 rounded-tl-[100px] rounded-tr-3xl pointer-events-none" />
                             </div>
                             <div className="absolute -bottom-8 -left-8 w-24 h-24 bg-[#f3ecff] rounded-full -z-10 blur-xl opacity-80" />
                             <div className="absolute -top-8 -right-8 w-32 h-32 bg-[#Dd1764]/5 rounded-full -z-10 blur-2xl" />
@@ -138,7 +138,7 @@ export default function AboutPage() {
             </section>
 
             {/* --- VISION SECTION --- */}
-            <section className="py-26 px-4 sm:px-6 relative overflow-hidden bg-white">
+            <section className="py-10 px-4 sm:px-6 relative overflow-hidden bg-white">
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full text-center pointer-events-none opacity-[0.03] select-none">
                     <h2 className="text-[15rem] font-black text-[#3F2965]">VISION</h2>
                 </div>

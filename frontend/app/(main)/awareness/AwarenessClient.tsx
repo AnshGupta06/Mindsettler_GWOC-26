@@ -59,18 +59,24 @@ export default function AwarenessPage() {
               <div className="mt-10 flex flex-col sm:flex-row justify-center gap-4 sm:gap-6 relative z-10">
                 <SlideUp delay={0.4}>
                   <Link href="/resource" className="w-full sm:w-auto">
-                    <button className="w-full sm:w-auto relative px-8 py-4 rounded-full bg-[#Dd1764] text-white font-bold text-sm sm:text-base tracking-wide overflow-hidden group transition-all duration-300 hover:shadow-lg hover:shadow-[#Dd1764]/30 hover:-translate-y-1 flex items-center justify-center gap-2">
-                      <span className="absolute top-0 left-[-25%] w-[80%] h-full bg-[#3F2965]/20 -skew-x-12 -translate-x-full group-hover:translate-x-[200%] transition-transform duration-700 ease-in-out" />
-                      Explore Resources <ArrowRight size={18} />
-                    </button>
+
+                      <button className="w-full sm:w-auto relative px-8 py-4 rounded-full bg-[#Dd1764] text-white text-lg font-bold tracking-wide overflow-hidden group transition-all duration-300 hover:shadow-lg hover:shadow-[#3F2965]/20 hover:-translate-y-0.5">
+                    <span className="absolute top-0 left-[-25%] w-[80%] h-full bg-gradient-to-r from-[#3F2965] to-[#513681] -skew-x-12 -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-left" />
+                    <span className="absolute top-0 right-[-25%] w-[80%] h-full bg-gradient-to-l from-[#3F2965] to-[#513681] -skew-x-12 translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-right" />
+                              
+                    <span className="relative z-10 group-hover:text-white">Explore Resources</span>
+                  </button>
                   </Link>
                 </SlideUp>
 
                 <SlideUp delay={0.5}>
                   <Link href="/services" className="w-full sm:w-auto">
-                    <button className="w-full sm:w-auto relative px-8 py-4 rounded-full border-2 border-[#3F2965]/10 bg-white text-[#3F2965] font-bold text-sm sm:text-base tracking-wide overflow-hidden group transition-all duration-300 hover:border-[#3F2965] hover:text-[#3F2965] hover:-translate-y-1">
-                      Our Programs
-                    </button>
+                    <button className="w-full sm:w-auto relative px-8 py-4 rounded-full bg-white text-[#3F2965] border-2 border-[#3F2965]/10 text-lg font-bold tracking-wide overflow-hidden group transition-all duration-300 hover:shadow-lg hover:shadow-[#3F2965]/20 hover:-translate-y-0.5">
+                    <span className="absolute top-0 left-[-25%] w-[80%] h-full bg-gradient-to-r from-[#3F2965] to-[#513681] -skew-x-12 -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-left" />
+                    <span className="absolute top-0 right-[-25%] w-[80%] h-full bg-gradient-to-l from-[#3F2965] to-[#513681] -skew-x-12 translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-right" />
+                              
+                    <span className="relative z-10 group-hover:text-white">Our Programs</span>
+                  </button>
                   </Link>
                 </SlideUp>
               </div>
