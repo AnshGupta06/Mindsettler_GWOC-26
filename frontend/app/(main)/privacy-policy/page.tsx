@@ -105,7 +105,7 @@ export default function PrivacyPolicyPage() {
           </div>
 
           <div className="mt-10 text-center">
-            <Card className="border border-primary/10 shadow-xl bg-gradient-to-r from-primary/5 to-accent/5 hover:shadow-2xl transition-all duration-300">
+            <Card className="border border-primary/10 shadow-xl hover:shadow-2xl transition-all duration-300">
               <CardContent className="pt-6">
                 <p className="text-muted-foreground mb-4">
                   If you have any questions about this Privacy Policy, please don't hesitate to reach out.

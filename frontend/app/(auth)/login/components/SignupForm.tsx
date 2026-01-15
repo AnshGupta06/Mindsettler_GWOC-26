@@ -4,204 +4,208 @@ import { useState } from "react";
 import { createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
 import { auth } from "../../../lib/firebase";
 import GoogleButton from "./GoogleButton";
-import Link from "next/link"; 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { User, Mail, Lock, Phone, Loader2, ArrowLeft, CheckCircle2 } from "lucide-react"; 
+import { Loader2, ArrowLeft, Mail, AlertCircle } from "lucide-react";
 import { API_URL } from "@/app/lib/api";
 import toast from "react-hot-toast";
+// 🟢 Import Reveal Components
+import { CharReveal, StaggerContainer, StaggerItem, SlideUp} from "../../../(main)/components/common/RevealComponent";
 
 export default function SignupForm() {
   const router = useRouter();
-
+  
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  
   const [loading, setLoading] = useState(false);
-  const [info, setInfo] = useState("");
+  const [info, setInfo] = useState(false);
+  const [errors, setErrors] = useState<{ email?: string; password?: string; general?: string }>({});
 
-  const handleSignup = async () => {
-    setInfo("");
+  const validatePassword = (pwd: string) => {
+    const checks = [
+      { regex: /.{6,}/, label: "At least 6 characters" },
+      { regex: /[a-z]/, label: "Lowercase letter" },
+      { regex: /[0-9]/, label: "Number" },
+      { regex: /[^a-zA-Z0-9]/, label: "Special character" },
+    ];
+    const missing = checks.filter((c) => !c.regex.test(pwd)).map((c) => c.label);
+    return missing;
+  };
 
+  const handleSignup = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrors({});
     if (!firstName || !lastName || !email || !password || !confirmPassword) {
-      toast.error("Please fill in all required fields.");
+      setErrors((prev) => ({ ...prev, general: "Please fill in all required fields." }));
+      return;
+    }
+    const missingRequirements = validatePassword(password);
+    if (missingRequirements.length > 0) {
+      setErrors((prev) => ({ ...prev, password: `Missing: ${missingRequirements.join(", ")}` }));
       return;
     }
     if (password !== confirmPassword) {
-      toast.error("Passwords do not match.");
+      setErrors((prev) => ({ ...prev, password: "Passwords do not match." }));
       return;
     }
 
     setLoading(true);
-    const toastId = toast.loading("Creating your account...");
+    const toastId = toast.loading("Creating account...");
 
     try {
       const cred = await createUserWithEmailAndPassword(auth, email, password);
       await sendEmailVerification(cred.user);
-      
-      setInfo("Verification email sent! Please check your inbox.");
-      toast.success("Account created successfully!", { id: toastId });
+      toast.success("Account created!", { id: toastId });
+      setInfo(true);
 
-      // Polling for email verification
       const interval = setInterval(async () => {
-        await cred.user.reload();
-        if (cred.user.emailVerified) {
-          clearInterval(interval);
-          const token = await cred.user.getIdToken();
-
-          await fetch(`${API_URL}/api/auth/sync-user`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({
-              name: `${firstName} ${lastName}`,
-              phone,
-            }),
-          });
-          router.push("/");
-        }
+        try {
+          await cred.user.reload();
+          if (cred.user.emailVerified) {
+            clearInterval(interval);
+            const token = await cred.user.getIdToken();
+            try {
+                await fetch(`${API_URL}/api/auth/sync-user`, {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+                  body: JSON.stringify({ name: `${firstName} ${lastName}`, phone, email }),
+                });
+            } catch (syncErr) { console.error("Sync failed:", syncErr); }
+            toast.success("Verified! Logging in...");
+            router.push("/");
+          }
+        } catch (e) { console.error("Verification poll error", e); }
       }, 3000);
+
     } catch (err: any) {
-      console.error(err);
-      toast.error(err.message || "Signup failed.", { id: toastId });
       setLoading(false);
+      toast.dismiss(toastId);
+      if (err.code === "auth/email-already-in-use") {
+        setErrors((prev) => ({ ...prev, email: "This email is already registered." }));
+      } else if (err.code === "auth/weak-password") {
+        setErrors((prev) => ({ ...prev, password: "Password does not meet requirements." }));
+      } else if (err.code === "auth/invalid-email") {
+        setErrors((prev) => ({ ...prev, email: "Invalid email address format." }));
+      } else {
+        setErrors((prev) => ({ ...prev, general: err.message || "Something went wrong." }));
+      }
     }
   };
 
   if (info) {
     return (
-      <div className="bg-white/90 backdrop-blur-xl p-10 rounded-[2.5rem] shadow-2xl border border-white/50 text-center animate-in fade-in zoom-in duration-300 relative max-w-md w-full">
-        <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner">
-          <Mail className="w-10 h-10 text-green-600" />
+      <SlideUp className="text-center w-full py-8">
+        <div className="w-20 h-20 bg-[#3F2965]/5 text-[#3F2965] rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm border border-[#3F2965]/10">
+          <Mail size={36} />
         </div>
-        <h3 className="text-2xl font-bold text-[#3F2965] mb-2">Verify your Email</h3>
-        <p className="text-[#3F2965]/60 mb-8 leading-relaxed">
-          We've sent a verification link to <br/><span className="font-bold text-[#3F2965]">{email}</span>.
+        <h3 className="text-2xl font-black text-[#3F2965] mb-4 tracking-tight">Verify your Email</h3>
+        <p className="text-gray-500 mb-2 leading-relaxed text-sm">
+          We've sent a secure link to <br/>
+          <span className="font-bold text-[#3F2965] text-base">{email}</span>
         </p>
-        <div className="flex items-center justify-center gap-3 text-sm font-bold text-[#3F2965] bg-[#F9F6FF] p-4 rounded-2xl border border-[#3F2965]/5">
-          <Loader2 className="w-5 h-5 animate-spin text-[#Dd1764]" /> 
+        <p className="text-xs text-gray-400 font-medium mb-8">
+          (Check your <span className="text-[#Dd1764]">Spam</span> or <span className="text-[#Dd1764]">Junk</span> folder)
+        </p>
+        <div className="flex items-center justify-center gap-3 text-xs font-bold text-[#3F2965] bg-[#3F2965]/5 p-4 rounded-xl border border-[#3F2965]/10">
+          <Loader2 className="w-4 h-4 animate-spin text-[#Dd1764]" /> 
           Waiting for verification...
         </div>
-      </div>
+        <button onClick={() => window.location.reload()} className="mt-6 text-[10px] font-bold text-gray-400 hover:text-[#3F2965] uppercase tracking-widest transition-colors">
+          Incorrect Email?
+        </button>
+      </SlideUp>
     );
   }
 
   return (
-    <div className="bg-white/80 backdrop-blur-xl p-8 md:p-10 rounded-[2.5rem] shadow-2xl border border-white/50 relative overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-700 w-full">
-      
-      {/* Header */}
-      <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-[#3F2965]">Create Account</h1>
-        <p className="text-[#3F2965]/60 mt-2 text-sm">Begin your journey to better mental health</p>
+    <StaggerContainer className="w-full" delay={0.2}>
+      <StaggerItem className="flex justify-start mb-4">
+        <Link href="/login" className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-[#3F2965] transition-colors">
+          <ArrowLeft size={14} /> Back to Login
+        </Link>
+      </StaggerItem>
+
+      <div className="mb-6 text-center">
+        <h2 className="text-2xl font-black text-[#3F2965] tracking-tight">
+          <CharReveal delay={0.4}>Create Account</CharReveal>
+        </h2>
+        <SlideUp delay={0.6}>
+          <p className="text-gray-400 text-xs font-bold uppercase tracking-widest mt-1">Begin your professional wellness journey</p>
+        </SlideUp>
       </div>
 
-      <div className="space-y-4">
-        {/* Name Fields */}
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-1.5">
-            <div className="relative group">
-              <User className="absolute left-4 top-1/2 -translate-y-1/2 text-[#3F2965]/30 group-focus-within:text-[#Dd1764] transition-colors" size={18} />
-              <input
-                placeholder="First Name"
-                className="w-full pl-10 pr-3 py-3.5 bg-[#F9F6FF] border border-[#3F2965]/5 rounded-xl outline-none focus:bg-white focus:border-[#Dd1764]/20 focus:ring-4 focus:ring-[#Dd1764]/5 transition-all font-medium text-[#3F2965]"
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-              />
+      <form onSubmit={handleSignup} className="space-y-3">
+        {errors.general && (
+          <SlideUp>
+            <div className="p-3 rounded-lg bg-red-50 border border-red-100 flex items-center gap-2 text-xs font-bold text-red-600 mb-2">
+              <AlertCircle size={14} /> {errors.general}
             </div>
-          </div>
-          <div className="space-y-1.5">
-            <div className="relative group">
-              <input
-                placeholder="Last Name"
-                className="w-full px-4 py-3.5 bg-[#F9F6FF] border border-[#3F2965]/5 rounded-xl outline-none focus:bg-white focus:border-[#Dd1764]/20 focus:ring-4 focus:ring-[#Dd1764]/5 transition-all font-medium text-[#3F2965]"
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-              />
-            </div>
-          </div>
-        </div>
+          </SlideUp>
+        )}
 
-        {/* Contact Fields */}
-        <div className="relative group">
-          <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-[#3F2965]/30 group-focus-within:text-[#Dd1764] transition-colors" size={20} />
-          <input
-            placeholder="Phone Number (Optional)"
-            className="w-full pl-12 pr-4 py-3.5 bg-[#F9F6FF] border border-[#3F2965]/5 rounded-xl outline-none focus:bg-white focus:border-[#Dd1764]/20 focus:ring-4 focus:ring-[#Dd1764]/5 transition-all font-medium text-[#3F2965]"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-          />
-        </div>
+        <StaggerItem className="grid grid-cols-2 gap-3">
+           <div className="space-y-1 text-left">
+             <label className="text-[9px] font-bold text-gray-400 uppercase tracking-wider ml-1">First Name</label>
+             <input value={firstName} onChange={(e) => setFirstName(e.target.value)} className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:bg-white focus:border-[#Dd1764] transition-all text-sm font-bold text-[#3F2965]" placeholder="First Name" />
+           </div>
+           <div className="space-y-1 text-left">
+             <label className="text-[9px] font-bold text-gray-400 uppercase tracking-wider ml-1">Last Name</label>
+             <input value={lastName} onChange={(e) => setLastName(e.target.value)} className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:bg-white focus:border-[#Dd1764] transition-all text-sm font-bold text-[#3F2965]" placeholder="Last Name" />
+           </div>
+        </StaggerItem>
 
-        <div className="relative group">
-          <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-[#3F2965]/30 group-focus-within:text-[#Dd1764] transition-colors" size={20} />
-          <input
-            type="email"
-            placeholder="Email Address"
-            className="w-full pl-12 pr-4 py-3.5 bg-[#F9F6FF] border border-[#3F2965]/5 rounded-xl outline-none focus:bg-white focus:border-[#Dd1764]/20 focus:ring-4 focus:ring-[#Dd1764]/5 transition-all font-medium text-[#3F2965]"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </div>
+        <StaggerItem className="space-y-1 text-left">
+           <label className="text-[9px] font-bold text-gray-400 uppercase tracking-wider ml-1">Phone (Optional)</label>
+           <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:bg-white focus:border-[#Dd1764] transition-all text-sm font-bold text-[#3F2965]" placeholder="Phone Number" />
+        </StaggerItem>
 
-        {/* Password Fields */}
-        <div className="grid grid-cols-2 gap-4">
-          <div className="relative group">
-            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-[#3F2965]/30 group-focus-within:text-[#Dd1764] transition-colors" size={18} />
-            <input
-              type="password"
-              placeholder="Password"
-              className="w-full pl-10 pr-3 py-3.5 bg-[#F9F6FF] border border-[#3F2965]/5 rounded-xl outline-none focus:bg-white focus:border-[#Dd1764]/20 focus:ring-4 focus:ring-[#Dd1764]/5 transition-all font-medium text-[#3F2965]"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </div>
-          <div className="relative group">
-            <CheckCircle2 className="absolute left-4 top-1/2 -translate-y-1/2 text-[#3F2965]/30 group-focus-within:text-[#Dd1764] transition-colors" size={18} />
-            <input
-              type="password"
-              placeholder="Confirm"
-              className="w-full pl-10 pr-3 py-3.5 bg-[#F9F6FF] border border-[#3F2965]/5 rounded-xl outline-none focus:bg-white focus:border-[#Dd1764]/20 focus:ring-4 focus:ring-[#Dd1764]/5 transition-all font-medium text-[#3F2965]"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-            />
-          </div>
-        </div>
+        <StaggerItem className="space-y-1 text-left">
+           <label className="text-[9px] font-bold text-gray-400 uppercase tracking-wider ml-1">Email Address</label>
+           <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className={`w-full px-3 py-2.5 bg-gray-50 border rounded-lg outline-none focus:bg-white transition-all text-sm font-bold text-[#3F2965] ${errors.email ? 'border-red-300 focus:border-red-500 bg-red-50/50' : 'border-gray-200 focus:border-[#Dd1764]'}`} placeholder="Email Address" />
+           {errors.email && <p className="text-[10px] font-bold text-red-500 ml-1 mt-1 flex items-center gap-1"><AlertCircle size={10} /> {errors.email}</p>}
+        </StaggerItem>
 
-        {/* Submit Button */}
-        <button
-          onClick={handleSignup}
-          disabled={loading}
-          className="w-full relative py-4 rounded-xl bg-[#Dd1764] text-white font-bold text-lg tracking-wide overflow-hidden group transition-all duration-300 hover:shadow-xl hover:shadow-[#Dd1764]/20 hover:-translate-y-1 disabled:opacity-70 disabled:cursor-not-allowed mt-2"
-        >
-          <span className="absolute top-0 left-[-25%] w-[75%] h-full bg-gradient-to-r from-[#3F2965] to-[#513681] -skew-x-12 -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-left" />
-          <span className="absolute top-0 right-[-25%] w-[75%] h-full bg-gradient-to-l from-[#3F2965] to-[#513681] -skew-x-12 translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-right" />
-          <span className="relative z-10 flex items-center justify-center gap-2">
-            {loading ? <><Loader2 className="w-5 h-5 animate-spin" /> Creating Account...</> : "Create Account"}
-          </span>
-        </button>
-      </div>
+        <StaggerItem className="grid grid-cols-2 gap-3">
+           <div className="space-y-1 text-left">
+             <label className="text-[9px] font-bold text-gray-400 uppercase tracking-wider ml-1">Password</label>
+             <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className={`w-full px-3 py-2.5 bg-gray-50 border rounded-lg outline-none focus:bg-white transition-all text-sm font-bold text-[#3F2965] ${errors.password ? 'border-red-300 focus:border-red-500 bg-red-50/50' : 'border-gray-200 focus:border-[#Dd1764]'}`} placeholder="••••••••" />
+           </div>
+           <div className="space-y-1 text-left">
+             <label className="text-[9px] font-bold text-gray-400 uppercase tracking-wider ml-1">Confirm</label>
+             <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:bg-white focus:border-[#Dd1764] transition-all text-sm font-bold text-[#3F2965]" placeholder="••••••••" />
+           </div>
+        </StaggerItem>
+        
+        {errors.password && (
+            <StaggerItem>
+              <p className="text-[10px] font-bold text-red-500 ml-1 mt-0 flex items-start gap-1 leading-snug">
+                  <AlertCircle size={10} className="mt-0.5 shrink-0" /> {errors.password}
+              </p>
+            </StaggerItem>
+        )}
 
-      <div className="relative my-6">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-[#3F2965]/10"></div>
-        </div>
-        <div className="relative flex justify-center text-sm">
-          <span className="px-4 bg-[#Fdfcff] text-[#3F2965]/40 font-bold uppercase text-xs tracking-wider">Or sign up with</span>
-        </div>
-      </div>
+        <StaggerItem>
+          <button type="submit" disabled={loading} className="w-full py-3 rounded-lg bg-[#Dd1764] text-white font-bold text-xs uppercase tracking-widest hover:bg-[#b01350] transition-all shadow-md shadow-[#Dd1764]/20 mt-2 disabled:opacity-70 disabled:cursor-not-allowed">
+            {loading ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : "Create Account"}
+          </button>
+        </StaggerItem>
+      </form>
 
-      <GoogleButton />
-      
-      <div className="mt-6 text-center">
-         <p className="text-[#3F2965]/60 text-sm mb-2">Already have an account?</p>
-         <Link href="/login" className="inline-flex items-center gap-2 text-sm font-bold text-[#Dd1764] hover:text-[#b01350] transition-colors">
-            <ArrowLeft size={16} /> Back to Login
-         </Link>
-      </div>
-    </div>
+      <StaggerItem className="relative my-4">
+        <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-gray-100"></div></div>
+        <div className="relative flex justify-center text-[9px] uppercase tracking-widest text-gray-300 font-bold">
+          <span className="bg-white px-2">Or continue with</span>
+        </div>
+      </StaggerItem>
+
+      <StaggerItem>
+        <GoogleButton />
+      </StaggerItem>
+    </StaggerContainer>
   );
 }

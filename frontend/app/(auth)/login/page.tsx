@@ -5,8 +5,24 @@ import { useRouter } from "next/navigation";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../../lib/firebase";
 import LoginForm from "./components/LoginForm";
-import Link from "next/link";
 import { isUserAdmin } from "@/app/lib/admin";
+import { Quote, Activity, Lock } from "lucide-react";
+import { CharReveal, SlideUp, ImageWipeReveal } from "../../(main)/components/common/RevealComponent";
+
+const imagesColumn1 = [ 
+  "/login_images/mental_health13.png", 
+  "/login_images/mental_health14.png", 
+  "/login_images/mental_health15.png", 
+];
+
+const imagesColumn2 = [
+   "/login_images/mental_health7.jpg",
+  "/login_images/mental_health.png", 
+  "/login_images/mental_health2.png", 
+  "/login_images/mental_health3.png", 
+];
+
+
 
 export default function LoginPage() {
   const router = useRouter();
@@ -14,30 +30,101 @@ export default function LoginPage() {
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (user) => {
       if (user) {
-        // 🚀 Auto-redirect based on role if they visit /login
-        if (isUserAdmin(user.email)) {
-          router.replace("/admin");
-        } else {
-          router.replace("/profile");
-        }
+        if (isUserAdmin(user.email)) router.replace("/admin");
+        else router.replace("/profile");
       }
     });
     return () => unsub();
   }, [router]);
 
-  return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-[#F9F6FF] relative overflow-hidden">
-      <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-[#3F2965]/10 rounded-full blur-3xl" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-[#Dd1764]/10 rounded-full blur-3xl" />
+  const quadColumn1 = [...imagesColumn1, ...imagesColumn1, ...imagesColumn1, ...imagesColumn1];
+  const quadColumn2 = [...imagesColumn2, ...imagesColumn2, ...imagesColumn2, ...imagesColumn2];
 
-      <div className="w-full max-w-md z-10 px-4">
-        <LoginForm />
-        <p className="mt-6 text-center text-[#3F2965]/60 text-sm">
-          Don't have an account?{" "}
-          <Link href="/login/signup" className="text-[#Dd1764] font-semibold hover:underline">
-            Create one now
-          </Link>
-        </p>
+  return (
+    <div className="h-screen w-full bg-[#F2F4F8] p-4 lg:p-6 flex items-center justify-center overflow-hidden font-sans">
+      
+      <style jsx global>{`
+        @keyframes scroll-vertical-25 {
+          0% { transform: translateY(0); }
+          100% { transform: translateY(-25%); }
+        }
+        @keyframes scroll-vertical-reverse-25 {
+          0% { transform: translateY(-25%); }
+          100% { transform: translateY(0); }
+        }
+        .animate-scroll-up {
+          animation: scroll-vertical-25 40s linear infinite;
+          will-change: transform;
+        }
+        .animate-scroll-down {
+          animation: scroll-vertical-reverse-25 40s linear infinite;
+          will-change: transform;
+        }
+        .bg-grid-pattern {
+          background-image: radial-gradient(#3F2965 1px, transparent 1px);
+          background-size: 24px 24px;
+        }
+      `}</style>
+
+      <div className="w-full h-full max-w-[1600px] bg-white rounded-[30px] shadow-2xl overflow-hidden flex flex-col lg:flex-row relative ring-1 ring-black/5">
+
+        {/* 🟢 LEFT FORM PANEL (55%) */}
+        <div className="flex-1 h-full bg-white flex flex-col bg-grid-pattern relative order-2 lg:order-1 overflow-hidden">
+           
+           <SlideUp delay={0.2} className="absolute top-0 left-0 flex justify-between items-start w-full z-30 p-6 lg:px-8 lg:pt-8 pointer-events-none">
+               <img 
+                src="/assets/Mindsettler-logo.png" 
+                alt="Mindsettler" 
+                className="h-9 w-auto object-contain pointer-events-auto"
+              />
+            
+           </SlideUp>
+
+           <div className="flex-1 flex items-center justify-center relative w-full z-20 px-6 pb-6">
+               <div className="absolute top-[-5%] left-[-5%] text-[#3F2965]/5 rotate-45 animate-pulse pointer-events-none"><Activity size={200} /></div>
+               <div className="absolute bottom-10 right-10 text-[#Dd1764]/5 rotate-12 pointer-events-none"><Quote size={120} /></div>
+
+               <div className="w-full max-w-[440px] bg-white p-8 lg:p-10 rounded-[32px] border-2 border-[#3F2965] shadow-[0_0_0_5px_rgba(221,23,100,0.15)] relative z-20">
+                  <LoginForm />
+               </div>
+           </div>
+        </div>
+
+        {/* 🟣 RIGHT VISUAL PANEL (45%) */}
+        {/* ✅ FIXED: Wrapped the ENTIRE right panel in ImageWipeReveal instead of individual images */}
+        <ImageWipeReveal className="hidden lg:flex w-[45%] h-full relative bg-[#3F2965] overflow-hidden flex-row gap-3 p-3 order-1 lg:order-2">
+           <div className="absolute inset-0 z-20 bg-gradient-to-b from-[#3F2965]/90 via-transparent to-[#3F2965]/90 pointer-events-none" />
+
+           <div className="w-1/2 relative h-full overflow-hidden">
+             <div className="flex flex-col animate-scroll-down w-full">
+                {quadColumn1.map((img, i) => (
+                  // ✅ FIXED: Standard div with unique key, no reveal here
+                  <div key={i} className="w-full aspect-[3/4] rounded-xl bg-cover bg-center shrink-0 shadow-sm mb-3" style={{backgroundImage: `url(${img})`}} />
+                ))}
+             </div>
+           </div>
+
+           <div className="w-1/2 relative h-full overflow-hidden">
+             <div className="flex flex-col animate-scroll-up w-full">
+                {quadColumn2.map((img, i) => (
+                  // ✅ FIXED: Standard div with unique key, no reveal here
+                  <div key={i} className="w-full aspect-[3/4] rounded-xl bg-cover bg-center shrink-0 shadow-sm mb-3" style={{backgroundImage: `url(${img})`}} />
+                ))}
+             </div>
+           </div>
+
+           <div className="absolute top-10 right-10 z-30 text-right">
+              <h2 className="text-4xl font-bold text-white leading-[1.1]">
+                 <CharReveal delay={0.8}>Focus on what matters most.</CharReveal>
+              </h2>
+              <SlideUp delay={1.2}>
+                <p className="text-white/80 text-sm font-medium mt-4 max-w-[260px] ml-auto leading-relaxed">
+                   Access your personalized therapy sessions and track your mental wellness journey in one secure space.
+                </p>
+              </SlideUp>
+           </div>
+        </ImageWipeReveal>
+
       </div>
     </div>
   );

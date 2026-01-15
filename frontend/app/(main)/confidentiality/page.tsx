@@ -102,7 +102,7 @@ export default function ConfidentialityPage() {
           </div>
 
           <div className="mt-10 text-center">
-            <Card className="border border-primary/10 shadow-xl bg-gradient-to-r from-primary/5 to-accent/5 hover:shadow-2xl transition-all duration-300">
+            <Card className="border border-primary/10 shadow-xl  hover:shadow-2xl transition-all duration-300">
               <CardContent className="pt-6">
                 <div className="flex items-center justify-center gap-3 mb-4">
                   <Mail className="h-6 w-6 text-primary" />

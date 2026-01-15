@@ -227,3 +227,14 @@ button {
     transform: rotateY(180deg);
   }
 }
+.bg-grain {
+  position: relative;
+}
+.bg-grain::after {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  opacity: 0.04;
+  pointer-events: none;
+  background-image: url('https://grainy-gradients.vercel.app/noise.svg');
+}

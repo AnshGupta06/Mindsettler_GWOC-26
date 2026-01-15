@@ -460,9 +460,6 @@ export default function BookPage() {
                                         </option>
                                     ))}
                                     </select>
-                                    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-[#3F2965]/40">
-                                        <ArrowRight size={16} className="rotate-90" />
-                                    </div>
                                 </div>
 
                                 <p className="text-xs text-[#3F2965]/50 italic leading-relaxed">
@@ -890,7 +887,7 @@ export default function BookPage() {
                                 <CheckCircle size={10} className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white opacity-0 peer-checked:opacity-100" />
                               </div>
                               <span className="text-[10px] text-[#3F2965]/70 leading-tight">
-                                I agree to the <Link href="/confidentiality" className="underline font-bold text-[#3F2965]">Confidentiality Policy</Link>.
+                                I agree to the <Link href="/confidentiality" target="_blank" className="underline font-bold text-[#3F2965]">Confidentiality Policy</Link>.
                               </span>
                             </label>
 
