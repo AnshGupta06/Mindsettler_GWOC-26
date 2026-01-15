@@ -273,6 +273,6 @@ mindsettler/
 
 **Made with ❤️ by FrostByte**
 
-[![GitHub Stars](https://img.shields.io/github/stars/your-username/sportshub?style=social)](https://github.com/AnshGupta06/Mindsettler_GWOC-26)
+[![GitHub Stars](https://img.shields.io/github/stars/AnshGupta06/Mindsettler_GWOC-26?style=social)](https://github.com/AnshGupta06/Mindsettler_GWOC-26)
 
 </div>
