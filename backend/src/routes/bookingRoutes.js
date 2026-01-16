@@ -20,7 +20,7 @@ router.get("/my", requireAuth, getMyBookings);
 router.get("/slots", getSlots);
 router.delete("/:id", requireAuth, cancelBooking);
 
-// Meeting notes routes (Admin only)
+
 router.post("/:bookingId/start-meeting", requireAuth, requireAdmin, startMeeting);
 router.post("/:bookingId/end-meeting", requireAuth, requireAdmin, endMeeting);
 router.get("/:bookingId/meeting-notes", requireAuth, requireAdmin, getMeetingNotes);

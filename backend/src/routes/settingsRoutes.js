@@ -5,10 +5,10 @@ import { requireAdmin } from "../middlewares/requireAdmin.js";
 
 const router = express.Router();
 
-// Public: Get Settings (for Booking Page pricing)
+
 router.get("/", getSettings);
 
-// Admin: Update Settings
+
 router.post("/", requireAuth, requireAdmin, updateSettings);
 
 export default router;

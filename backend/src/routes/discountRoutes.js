@@ -5,10 +5,10 @@ import { requireAdmin } from "../middlewares/requireAdmin.js";
 
 const router = express.Router();
 
-// User Routes
+
 router.get("/check", requireAuth, discountController.checkDiscount);
 
-// Admin Routes
+
 router.get("/status", requireAuth, requireAdmin, discountController.getStatus);
 router.post("/toggle", requireAuth, requireAdmin, discountController.toggleStatus);
 router.get("/rules", requireAuth, requireAdmin, discountController.getRules);

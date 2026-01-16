@@ -1,6 +1,6 @@
 import prisma from "../config/prisma.js";
 
-// Create a new slot
+
 export async function createSlot(req, res) {
   try {
     const { date, startTime, endTime, mode, therapyType } = req.body;
@@ -31,7 +31,7 @@ export async function getAllSlots(req, res) {
     const slots = await prisma.sessionSlot.findMany({
       orderBy: { startTime: "desc" },
       include: { 
-        // We include the booking status so the frontend knows if it's REJECTED/CONFIRMED
+        
         booking: {
           select: { status: true } 
         } 
@@ -45,12 +45,12 @@ export async function getAllSlots(req, res) {
   }
 }
 
-// 👇 FIXED DELETE FUNCTION
+
 export async function deleteSlot(req, res) {
   try {
     const { id } = req.params;
 
-    // 1. Find the slot AND its attached booking (if any)
+    
     const slot = await prisma.sessionSlot.findUnique({
       where: { id },
       include: { booking: true }, 
@@ -60,17 +60,17 @@ export async function deleteSlot(req, res) {
       return res.status(404).json({ error: "Slot not found" });
     }
 
-    // 2. Logic to handle the Foreign Key Constraint
+    
     if (slot.booking) {
-      // ✅ Case A: The booking is REJECTED. 
-      // It's safe to delete this "history" record so we can free up the slot.
+      
+      
       if (slot.booking.status === "REJECTED") {
         await prisma.booking.delete({
           where: { id: slot.booking.id }
         });
       } 
-      // ❌ Case B: The booking is CONFIRMED or PENDING.
-      // We block deletion to prevent accidental data loss.
+      
+      
       else {
         return res.status(400).json({ 
           error: `Cannot delete slot because it has a ${slot.booking.status} booking. Please cancel/reject the booking first.` 
@@ -78,7 +78,7 @@ export async function deleteSlot(req, res) {
       }
     }
 
-    // 3. Now that the booking is gone (or never existed), delete the slot
+    
     await prisma.sessionSlot.delete({ where: { id } });
     
     res.json({ success: true });

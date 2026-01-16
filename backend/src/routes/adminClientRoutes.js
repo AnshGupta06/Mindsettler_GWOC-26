@@ -5,7 +5,7 @@ import { requireAdmin } from "../middlewares/requireAdmin.js";
 
 const router = express.Router();
 
-// All routes require Admin Auth
+
 router.use(requireAuth, requireAdmin);
 
 router.get("/", getAllClients);

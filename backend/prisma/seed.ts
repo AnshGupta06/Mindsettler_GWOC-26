@@ -11,7 +11,7 @@ async function main() {
     return d;
   }
 
-  // Create test users
+  
   console.log("📝 Creating test users...");
   const testUsers = [
     {
@@ -45,7 +45,7 @@ async function main() {
   );
   console.log(`✅ Created ${users.length} test users`);
 
-  // Create therapy slots
+  
   console.log("📅 Creating therapy slots...");
   const slots: Prisma.SessionSlotCreateManyInput[] = [];
 
@@ -87,7 +87,7 @@ async function main() {
   });
   console.log(`✅ Created ${slots.length} therapy slots`);
 
-  // Update existing slots with wrong names
+  
   await prisma.sessionSlot.updateMany({
     where: { therapyType: "Cognitive Behavioral Therapy" },
     data: { therapyType: "Cognitive Behavioural Therapy (CBT)" },
@@ -101,7 +101,7 @@ async function main() {
     data: { therapyType: "Client-Centred Therapy" },
   });
 
-  // Create test bookings
+  
   console.log("📌 Creating test bookings...");
   const allSlots = await prisma.sessionSlot.findMany({
     take: 3,

@@ -10,7 +10,7 @@ export const createBookingSchema = z.object({
       errorMap: () => ({ message: "Type must be 'FIRST' or 'FOLLOW_UP'" }) 
     }),
 
-    // Add this to allow therapyType to reach the controller
+    
     therapyType: z.string().optional(),
 
     reason: z.string().max(500).optional(),

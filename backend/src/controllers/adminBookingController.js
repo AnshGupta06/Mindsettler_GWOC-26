@@ -5,13 +5,13 @@ import {
 } from "../services/emailService.js";
 import "dotenv/config";
 
-// 1. GET ALL BOOKINGS
+
 export const getAllBookings = async (req, res) => {
   try {
     const bookings = await prisma.booking.findMany({
       orderBy: { createdAt: "desc" },
       include: {
-        user: true, // Includes isBlocked status
+        user: true, 
         slot: true,
       },
     });
@@ -22,7 +22,7 @@ export const getAllBookings = async (req, res) => {
   }
 };
 
-// 2. UPDATE BOOKING STATUS (Confirm/Reject)
+
 export const updateBookingStatus = async (req, res) => {
   try {
     const { id } = req.params;
@@ -35,25 +35,25 @@ export const updateBookingStatus = async (req, res) => {
 
     if (!booking) return res.status(404).json({ error: "Booking not found" });
 
-    // --- REJECT FLOW ---
+    
     if (status === "REJECTED") {
       await prisma.$transaction([
-        // Update booking status
+        
         prisma.booking.update({ where: { id }, data: { status } }),
-        // Free up the slot
+        
         prisma.sessionSlot.update({ where: { id: booking.slotId }, data: { isBooked: false } }),
       ]);
 
-      // Send Professional Rejection Email
+      
       const dateStr = new Date(booking.slot.startTime).toLocaleDateString();
-      // Run in background to prevent blocking response
+      
       sendBookingRejectedEmail(booking.user.email, booking.user.name, dateStr, "Slot unavailable or admin cancelled.")
         .catch(err => console.error("Email failed:", err));
 
       return res.json({ status: "REJECTED" });
     }
 
-    // --- CONFIRM FLOW ---
+    
     if (status === "CONFIRMED") {
       const updated = await prisma.booking.update({
         where: { id },
@@ -61,19 +61,19 @@ export const updateBookingStatus = async (req, res) => {
         include: { user: true, slot: true },
       });
 
-      // Send Professional Confirmation Email
+      
       const dateObj = new Date(updated.slot.startTime);
       const dateStr = dateObj.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
       const timeStr = dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
       
-      // ✨ FIXED: Passes date, time, link, AND mode correctly
+      
       sendBookingConfirmedEmail(
           updated.user.email, 
           updated.user.name, 
           dateStr, 
           timeStr, 
           meetingLink, 
-          updated.slot.mode // <--- Essential for "Online" vs "In-Person" logic
+          updated.slot.mode 
         )
         .catch(err => console.error("Email failed:", err));
 
@@ -86,7 +86,7 @@ export const updateBookingStatus = async (req, res) => {
   }
 };
 
-// 3. DELETE BOOKING (Permanently Remove)
+
 export const deleteBooking = async (req, res) => {
   const { id } = req.params;
   try {
@@ -94,8 +94,8 @@ export const deleteBooking = async (req, res) => {
     
     if (!booking) return res.status(404).json({ error: "Booking not found" });
 
-    // If the booking held a slot (CONFIRMED or PENDING), free it before deleting
-    // If it was REJECTED, the slot is likely already freed, but we check specifically for non-REJECTED statuses to be safe
+    
+    
     if (booking.status !== "REJECTED") {
        await prisma.sessionSlot.update({
          where: { id: booking.slotId },
