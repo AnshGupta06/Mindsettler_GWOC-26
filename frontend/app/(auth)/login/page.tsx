@@ -10,16 +10,16 @@ import { Quote, Activity, Lock } from "lucide-react";
 import { CharReveal, SlideUp, ImageWipeReveal } from "../../(main)/components/common/RevealComponent";
 
 const imagesColumn1 = [ 
-  "/login_images/mental_health13.png", 
-  "/login_images/mental_health14.png", 
-  "/login_images/mental_health15.png", 
+  "/login_images/mental_health13.webp", 
+  "/login_images/mental_health14.webp", 
+  "/login_images/mental_health15.webp", 
 ];
 
 const imagesColumn2 = [
-   "/login_images/mental_health7.jpg",
-  "/login_images/mental_health.png", 
-  "/login_images/mental_health2.png", 
-  "/login_images/mental_health3.png", 
+   "/login_images/mental_health7.webp",
+  "/login_images/mental_health.webp", 
+  "/login_images/mental_health2.webp", 
+  "/login_images/mental_health3.webp", 
 ];
 
 
@@ -73,8 +73,10 @@ export default function LoginPage() {
            
            <SlideUp delay={0.2} className="absolute top-0 left-0 flex justify-between items-start w-full z-30 p-6 lg:px-8 lg:pt-8 pointer-events-none">
                <img 
-                src="/assets/Mindsettler-logo.png" 
+                src="/assets/Mindsettler-logo.webp" 
                 alt="Mindsettler" 
+                fetchPriority="high"
+                decoding="async"
                 className="h-9 w-auto object-contain pointer-events-auto"
               />
             

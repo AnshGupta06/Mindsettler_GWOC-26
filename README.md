@@ -1,7 +1,7 @@
 # MindSettler
 
 <div align="center">
-<Image src="frontend/public/assets/white-logo.png" alt="Mindsettler Logo" width={100} height={100}  />
+<Image src="frontend/public/assets/white-logo.webp" alt="Mindsettler Logo" width={100} height={100}  />
 
 
 [![Live Demo](https://img.shields.io/badge/🌐_Live_Demo-mindsettler--bypb.vercel.app-orange?style=for-the-badge)](https://mindsettler-bypb.vercel.app/)

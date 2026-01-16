@@ -41,7 +41,7 @@ export default function Loader({ fullScreen = true, message = "Loading..." }: Lo
           className="relative z-10 w-16 h-16 flex items-center justify-center"
         >
           <Image 
-            src="/assets/logo.png" 
+            src="/assets/logo.webp" 
             alt="Loading..." 
             width={64} 
             height={64} 

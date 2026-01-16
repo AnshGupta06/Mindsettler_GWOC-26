@@ -18,7 +18,7 @@ export default function PersonalPathSection() {
                   <div className="relative rounded-xl sm:rounded-2xl md:rounded-[2.5rem] overflow-hidden shadow-2xl shadow-[#3F2965]/10 h-[350px] sm:h-[400px] md:h-[450px] lg:h-[500px] w-full border-4 border-[#F9F6FF]">
 
                     <Image
-                      src="/assets/new_journey.jpeg" 
+                      src="/assets/new_journey.webp" 
                       alt="Person walking on a peaceful path"
                       fill
                       className="object-cover transition-transform duration-700 group-hover:scale-105"

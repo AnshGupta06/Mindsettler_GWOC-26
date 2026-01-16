@@ -5,17 +5,17 @@ import { Brain, Heart, Sparkles, ShieldCheck } from "lucide-react";
 import { CharReveal, SlideUp, ImageWipeReveal } from "../../../(main)/components/common/RevealComponent";
 
 const imagesColumn1 = [
-    "/login_images/mental_health6.jpg", 
-  "/login_images/mental_health5.jpg", 
-  "/login_images/mental_health4.jpg",  
-  "/login_images/mental_health8.jpg",  
+    "/login_images/mental_health6.webp", 
+  "/login_images/mental_health5.webp", 
+  "/login_images/mental_health4.webp",  
+  "/login_images/mental_health8.webp",  
 ];
 
 const imagesColumn2 = [
-  "/login_images/mental_health9.png",
-  "/login_images/mental_health10.png",
-  "/login_images/mental_health11.png",
-  "/login_images/mental_health12.png",
+  "/login_images/mental_health9.webp",
+  "/login_images/mental_health10.webp",
+  "/login_images/mental_health11.webp",
+  "/login_images/mental_health12.webp",
 ];
 
 export default function SignupPage() {
@@ -89,8 +89,10 @@ export default function SignupPage() {
         <div className="flex-1 h-full bg-white flex flex-col bg-grid-pattern relative overflow-hidden">
            <SlideUp delay={0.2} className="absolute top-0 left-0 flex justify-between items-center w-full px-4 pt-4 z-30 pointer-events-none">
               <img 
-                src="/assets/Mindsettler-logo.png" 
+                src="/assets/Mindsettler-logo.webp" 
                 alt="Mindsettler" 
+                fetchPriority="high"
+                decoding="async"
                 className="h-10 w-auto object-contain pointer-events-auto"
               />
         

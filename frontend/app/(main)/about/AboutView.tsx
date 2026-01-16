@@ -121,7 +121,7 @@ export default function AboutPage() {
                         <ImageWipeReveal delay={0.2} className="w-full max-w-xl">
                             <div className="relative aspect-[4/4] w-full rounded-tl-[100px] rounded-tr-3xl  overflow-hidden shadow-2xl">
                                 <Image
-                                    src="/assets/aboutus_hero.jpeg"
+                                    src="/assets/aboutus_hero.webp"
                                     alt="About Mindsettler"
                                     fill
                                     className="object-cover hover:scale-105 transition-transform duration-700 ease-out"
@@ -196,7 +196,7 @@ export default function AboutPage() {
                                 <div className="flex items-center gap-6 mb-8">
                                     <div className="w-24 h-24 rounded-full bg-[#f3ecff] border-2 border-[#Dd1764] overflow-hidden flex-shrink-0">
                                         <Image
-                                            src="/assets/aboutus_founder.jpeg"
+                                            src="/assets/aboutus_founder.webp"
                                             alt="Founder Avatar"
                                             width={96}
                                             height={96}
@@ -235,7 +235,7 @@ export default function AboutPage() {
                                     playsInline 
                                     muted={false} 
                                     className="w-full h-full object-cover"
-                                    poster="/assets/aboutus_videointro.jpeg"
+                                    poster="/assets/aboutus_videointro.webp"
                                     onEnded={handleVideoEnd} 
                                     onPause={() => setIsPlaying(false)}
                                     onPlay={() => setIsPlaying(true)}

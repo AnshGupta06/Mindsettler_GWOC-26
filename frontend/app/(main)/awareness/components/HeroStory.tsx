@@ -8,27 +8,27 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const slides = [
   {
-    image: "/awareness_hero/brain-1.jpeg",
+    image: "/awareness_hero/brain-1.webp",
     title: "It’s okay to feel tired, sad, or anxious.",
     highlight: "It’s human.",
   },
   {
-    image: "/awareness_hero/brain-2.jpeg",
+    image: "/awareness_hero/brain-2.webp",
     title: "Mental well-being begins with awareness.",
     highlight: "Not judgment.",
   },
   {
-    image: "/awareness_hero/brain-3.jpeg",
+    image: "/awareness_hero/brain-3.webp",
     title: "Support is not weakness.",
     highlight: "It’s self-care.",
   },
   {
-    image: "/awareness_hero/brain-4.jpeg",
+    image: "/awareness_hero/brain-4.webp",
     title: "Healing doesn’t follow a straight line.",
     highlight: "Take your time.",
   },
   {
-    image: "/awareness_hero/brain-5.jpeg",
+    image: "/awareness_hero/brain-5.webp",
     title: "Asking for help shows strength.",
     highlight: "Never weakness.",
   },

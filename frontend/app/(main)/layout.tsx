@@ -36,7 +36,7 @@ export const metadata: Metadata = {
     type: 'website',
     images: [
       {
-        url: '/assets/Mindsettler.png', 
+        url: '/assets/Mindsettler.webp', 
         width: 1200,
         height: 630,
         alt: 'Mindsettler Preview',
@@ -49,7 +49,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: "Mindsettler | Heal Your Mind and Soul",
     description: "A personalized journey designed for your healing and growth.",
-    images: ['/og-image.jpg'],
+    images: ['/og-image.webp'],
   },
 
   
@@ -83,7 +83,7 @@ export default function RootLayout({
     "@type": "MedicalOrganization",
     "name": "Mindsettler",
     "url": "https://mindsettler-bypb.vercel.app", 
-    "logo": "https://www.mindsettler.com/logo.png", 
+    "logo": "https://www.mindsettler.com/logo.webp", 
     "sameAs": [
       "https://instagram.com/yourprofile", 
       "https://linkedin.com/company/yourprofile"
@@ -98,7 +98,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       {}
-      <body className={`${jakarta.variable} font-sans antialiased bg-slate-50 text-slate-900`}>
+      <body className={`${jakarta.variable} font-sans antialiased bg-[#F9F6FF] text-slate-900`}>
         <Navbar />
         <script
           type="application/ld+json"

@@ -82,7 +82,7 @@ export default async function AwarenessDetailPage(props: AwarenessPageProps) {
       {}
       <section className="relative pt-24 pb-12 md:pt-32 md:pb-24 overflow-hidden bg-[#F9F6FF]">
         {}
-        <div className="absolute inset-0 opacity-[0.03] bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]" />
+        <div className="absolute inset-0 opacity-[0.03] bg-[url('https://www.transparenttextures.com/patterns/cubes.webp')]" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
           <div className="grid lg:grid-cols-2 gap-8 md:gap-12 lg:gap-20 items-center">
@@ -244,8 +244,7 @@ export default async function AwarenessDetailPage(props: AwarenessPageProps) {
       {}
       {content.causes && content.causes.length > 0 && (
         <section className="py-16 md:py-24 bg-[#3F2965] text-white relative overflow-hidden">
-          <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
-          
+          <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.webp')]"></div>
           <div className="max-w-6xl mx-auto px-4 sm:px-6 relative z-10 text-center">
             <div className="mb-10 md:mb-16 space-y-4">
               {}

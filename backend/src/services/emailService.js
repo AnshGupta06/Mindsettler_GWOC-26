@@ -13,10 +13,6 @@ const apiInstance = new brevo.TransactionalEmailsApi();
 const apiKey = apiInstance.authentications["apiKey"];
 apiKey.apiKey = process.env.BREVO_API_KEY;
 
-
-
-
-
 const createEmailTemplate = (title, bodyContent, ctaLink = null, ctaText = null) => `
 <!DOCTYPE html>
 <html>
@@ -30,6 +26,10 @@ const createEmailTemplate = (title, bodyContent, ctaLink = null, ctaText = null)
     .cta-button { display: inline-block; background-color: #Dd1764; color: #ffffff !important; padding: 14px 28px; border-radius: 50px; text-decoration: none; font-weight: bold; margin-top: 20px; font-size: 16px; box-shadow: 0 4px 10px rgba(221, 23, 100, 0.3); }
     .footer { background-color: #f4f4f7; padding: 20px; text-align: center; font-size: 12px; color: #888888; }
     .highlight { color: #3F2965; font-weight: bold; }
+    .info-table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 14px; }
+    .info-table td { padding: 10px; border-bottom: 1px solid #eee; }
+    .info-table td:first-child { font-weight: bold; color: #3F2965; width: 40%; }
+    .info-table td:last-child { color: #555; }
   </style>
 </head>
 <body>
@@ -151,8 +151,8 @@ export const sendBookingConfirmedEmail = async (email, name, date, time, link, m
   await sendHtmlEmail(email, "Booking Confirmed ✅", html);
 };
 
-
-export const sendNewBookingAdminEmail = async (adminEmail, { userName, userEmail, type, therapyType, reason }) => {
+// --- UPDATED ADMIN EMAIL FUNCTION ---
+export const sendNewBookingAdminEmail = async (adminEmail, { userName, userEmail, phone, attendees, status, type, therapyType, reason }) => {
   if (!adminEmail) {
     console.error("❌ Admin email failed: No admin email address provided (Check env.ADMIN_EMAIL)");
     return;
@@ -160,12 +160,45 @@ export const sendNewBookingAdminEmail = async (adminEmail, { userName, userEmail
   
   const html = createEmailTemplate(
     "New Booking Request 🔔",
-    `<p><strong>User:</strong> ${userName} (${userEmail})</p>
-     <p><strong>Type:</strong> ${type}</p>
-     ${therapyType ? `<p><strong>Therapy:</strong> ${therapyType}</p>` : ''}
-     <p><strong>Reason:</strong> ${reason || "—"}</p>`,
+    `<p>A new booking request has been received. Please review the details below:</p>
+     
+     <table class="info-table">
+        <tr>
+            <td>Client Name:</td>
+            <td>${userName}</td>
+        </tr>
+        <tr>
+            <td>Email:</td>
+            <td>${userEmail}</td>
+        </tr>
+        <tr>
+            <td>Phone:</td>
+            <td>${phone || "Not provided"}</td>
+        </tr>
+        <tr>
+            <td>Session Type:</td>
+            <td><span style="background:#F3E8FF; color:#3F2965; padding:2px 8px; border-radius:4px; font-weight:bold;">${type}</span></td>
+        </tr>
+        <tr>
+            <td>Therapy Mode:</td>
+            <td>${therapyType || "General"}</td>
+        </tr>
+        <tr>
+            <td>Attendees:</td>
+            <td>${attendees} Person(s)</td>
+        </tr>
+        <tr>
+            <td>Marital Status:</td>
+            <td>${status || "N/A"}</td>
+        </tr>
+     </table>
+
+     <div style="background:#FFF; border:1px solid #eee; padding:15px; border-radius:8px; margin-top:10px;">
+        <strong>Reason / Notes:</strong><br/>
+        <i style="color:#555;">"${reason || "No notes provided"}"</i>
+     </div>`,
     `${process.env.NEXT_PUBLIC_APP_URL}/admin`,
-    "Manage Bookings"
+    "Open Admin Dashboard"
   );
   await sendHtmlEmail(adminEmail, "New Booking Request", html);
 };

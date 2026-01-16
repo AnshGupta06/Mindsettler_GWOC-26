@@ -8,7 +8,7 @@
       "Improve problem-solving in everyday life",
       "Structured, goal-oriented approach"
     ],
-    "image": "/images/therapy/cbt-new.png",
+    "image": "/images/therapy/cbt-new.webp",
     "availableOnline": true,
     "availableOffline": true
   },
@@ -21,7 +21,7 @@
       "Improve interpersonal effectiveness",
       "Practice mindfulness in daily life"
     ],
-    "image": "/images/therapy/dbt-new.png",
+    "image": "/images/therapy/dbt-new.webp",
     "availableOnline": true,
     "availableOffline": true
   },
@@ -34,7 +34,7 @@
       "Commit to values-aligned actions",
       "Focus on meaningful living"
     ],
-    "image": "/images/therapy/act.png",
+    "image": "/images/therapy/act.webp",
     "availableOnline": true,
     "availableOffline": true
   },
@@ -47,7 +47,7 @@
       "Create healthier ways of thinking and relating",
       "Address core emotional needs"
     ],
-    "image": "/images/therapy/st.png",
+    "image": "/images/therapy/st.webp",
     "availableOnline": false,
     "availableOffline": true
   },
@@ -60,7 +60,7 @@
       "Develop healthier responses to challenges",
       "Create lasting emotional change"
     ],
-    "image": "/images/therapy/eft.png",
+    "image": "/images/therapy/eft.webp",
     "availableOnline": true,
     "availableOffline": true
   },
@@ -73,7 +73,7 @@
       "Create secure, supportive relationships",
       "Structured, research-based approach"
     ],
-    "image": "/images/therapy/efct.png",
+    "image": "/images/therapy/efct.webp",
     "availableOnline": false,
     "availableOffline": true
   },
@@ -86,7 +86,7 @@
       "Reduce emotional reactivity",
       "Promote mental balance and clarity"
     ],
-    "image": "/images/therapy/mbct.png",
+    "image": "/images/therapy/mbct.webp",
     "availableOnline": true,
     "availableOffline": true
   },
@@ -99,7 +99,7 @@
       "Self-exploration at your own pace",
       "Non-directive, compassionate approach"
     ],
-    "image": "/images/therapy/cct.png",
+    "image": "/images/therapy/cct.webp",
     "availableOnline": true,
     "availableOffline": false
   },
@@ -113,7 +113,7 @@
       "Continuous adaptation to your progress",
       "Holistic integration of mind, body, and spirit"
     ],
-    "image": "/images/therapy/ctp.png",
+    "image": "/images/therapy/ctp.webp",
     "availableOnline": true,
     "availableOffline": true,
     "isCustom": true,

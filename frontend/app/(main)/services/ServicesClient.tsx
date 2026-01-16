@@ -86,27 +86,27 @@ export default function ServicesPage() {
     {
       title: 'Children (5+)',
       description: 'Age-appropriate support focusing on emotional understanding, behavioral challenges, and healthy development in a safe and nurturing environment.',
-      image: '/images/clients/child.png'
+      image: '/images/clients/child.webp'
     },
     {
       title: 'Teens',
       description: 'Support for emotional regulation, self-identity, academic stress, peer relationships, and life transitions.',
-      image: '/images/clients/teenager.png'
+      image: '/images/clients/teenager.webp'
     },
     {
       title: 'Adults (up to 65 years)',
       description: 'Guidance for managing stress, emotional well-being, personal challenges, and life changes with clarity and resilience.',
-      image: '/images/clients/adult.png'
+      image: '/images/clients/adult.webp'
     },
     {
       title: 'Couples',
       description: 'Support for improving communication, emotional connection, conflict resolution, and relationship satisfaction.',
-      image: '/images/clients/couple.png'
+      image: '/images/clients/couple.webp'
     },
     {
       title: 'Families',
       description: 'Collaborative sessions aimed at strengthening family dynamics, understanding emotional needs, and building healthier relationships within the family system.',
-      image: '/images/clients/family.png'
+      image: '/images/clients/family.webp'
     },
   ];
 
@@ -256,10 +256,10 @@ export default function ServicesPage() {
                   {}
                   <div
                     className="absolute w-[240px] sm:w-[280px] aspect-[3/4] rounded-2xl shadow-2xl overflow-hidden transform -rotate-12 translate-x-[-100px] sm:translate-x-[-150px] translate-y-[20px] opacity-90 animate-float-slow z-0 border-4 border-white cursor-pointer transition-all duration-500 hover:scale-105 hover:-translate-y-4 hover:rotate-[-5deg] hover:z-30 hover:shadow-[0_20px_50px_rgba(0,0,0,0.3)] ease-out"
-                    onClick={() => setSelectedImage('/assets/services1.png')}
+                    onClick={() => setSelectedImage('/assets/services1.webp')}
                   >
                     <Image
-                      src="/assets/services1.png"
+                      src="/assets/services1.webp"
                       alt="Service 1"
                       fill
                       className="object-cover"
@@ -269,10 +269,10 @@ export default function ServicesPage() {
                   {}
                   <div
                     className="absolute w-[240px] sm:w-[280px] aspect-[3/4] rounded-2xl shadow-2xl overflow-hidden transform -rotate-6 translate-x-[0px] translate-y-[-20px] z-10 border-4 border-white animate-float-medium cursor-pointer transition-all duration-500 hover:scale-105 hover:-translate-y-4 hover:rotate-0 hover:z-30 hover:shadow-[0_20px_50px_rgba(0,0,0,0.3)] ease-out"
-                    onClick={() => setSelectedImage('/assets/services2.png')}
+                    onClick={() => setSelectedImage('/assets/services2.webp')}
                   >
                     <Image
-                      src="/assets/services2.png"
+                      src="/assets/services2.webp"
                       alt="Service 2"
                       fill
                       className="object-cover"
@@ -282,10 +282,10 @@ export default function ServicesPage() {
                   {}
                   <div
                     className="absolute w-[240px] sm:w-[280px] aspect-[3/4] rounded-2xl shadow-2xl overflow-hidden transform rotate-6 translate-x-[100px] sm:translate-x-[130px] translate-y-[40px] z-20 border-4 border-white animate-float-fast cursor-pointer transition-all duration-500 hover:scale-105 hover:-translate-y-4 hover:rotate-[5deg] hover:z-30 hover:shadow-[0_20px_50px_rgba(0,0,0,0.3)] ease-out"
-                    onClick={() => setSelectedImage('/assets/services3.png')}
+                    onClick={() => setSelectedImage('/assets/services3.webp')}
                   >
                     <Image
-                      src="/assets/services3.png"
+                      src="/assets/services3.webp"
                       alt="Service 3"
                       fill
                       className="object-cover"

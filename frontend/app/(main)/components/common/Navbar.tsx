@@ -123,7 +123,7 @@ export default function Navbar() {
           <Link href="/" className="relative z-50 group">
             <div className="relative rounded-xl bg-white/50 backdrop-blur-sm border border-white/20 px-3 py-1.5 transition-all duration-300 group-hover:scale-105">
               <Image
-                src="/assets/Mindsettler-logo.png"
+                src="/assets/Mindsettler-logo.webp"
                 alt="MindSettler Logo"
                 width={140}
                 height={40}

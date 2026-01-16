@@ -231,7 +231,7 @@ function Card({ item, i, flippedIndices, handleFlip }: { item: any, i: number, f
         <div className="absolute inset-0 backface-hidden bg-white hover:bg-white rounded-2xl shadow-md border border-[#3F2965]/10 flex flex-col items-center justify-center p-3 transition-all duration-300 hover:border-[#3F2965] hover:shadow-lg">
           <div className="relative w-12 h-12 sm:w-16 sm:h-16 mb-2">
             <Image
-              src="/assets/heart-brain-icon.png"
+              src="/assets/heart-brain-icon.webp"
               alt="Icon"
               fill
               className="object-contain"
