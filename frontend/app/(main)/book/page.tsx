@@ -688,6 +688,7 @@ export default function BookPage() {
                   </div>
                 </div>
 
+
                 {/* --- RIGHT COLUMN (Summary & Details) --- */}
                 <div className="lg:col-span-4 h-full overflow-y-auto custom-scrollbar lg:border-l lg:border-[#3F2965]/5 lg:bg-white/30 p-6 md:p-8 pb-20">
                     
