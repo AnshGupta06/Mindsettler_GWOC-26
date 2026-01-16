@@ -46,21 +46,21 @@ export default function BookPage() {
   
   const [user, setUser] = useState<User | null>(null);
   const [authChecking, setAuthChecking] = useState(true);
-  const [isBlocked, setIsBlocked] = useState(false); // ✨ New State
+  const [isBlocked, setIsBlocked] = useState(false); 
   
-  // ✨ Dynamic Pricing State
+  
   const [pricing, setPricing] = useState({
     FIRST: 1499,
     FOLLOW_UP: 999
   });
   
-  // Data State
+  
   const [slots, setSlots] = useState<Slot[]>([]);
   const [bookingHistory, setBookingHistory] = useState<BookingHistory[]>([]);
   const [discount, setDiscount] = useState<ApplicableDiscount | null>(null);
   const [checkingDiscount, setCheckingDiscount] = useState(false);
   
-  // Selection State
+  
   const [selectedSlot, setSelectedSlot] = useState<Slot | null>(null);
   const [type, setType] = useState<"FIRST" | "FOLLOW_UP">("FIRST");
   const [paymentMethod, setPaymentMethod] = useState<"UPI" | "CASH">("UPI");
@@ -68,7 +68,7 @@ export default function BookPage() {
   const [therapyType, setTherapyType] = useState<string>("general");
   const [slotModeFilter, setSlotModeFilter] = useState<"ONLINE" | "OFFLINE" | "BOTH">("BOTH");
   
-  // UI State
+  
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -76,18 +76,18 @@ export default function BookPage() {
   const [bookingSuccess, setBookingSuccess] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  // Logic State
+  
   const [isFirstSessionAllowed, setIsFirstSessionAllowed] = useState(true);
 
   const therapyApproaches = therapyApproachesData;
 
-  // 1. Initial Auth & Data Fetch
+  
   useEffect(() => {
-    // ✨ Fetch Dynamic Pricing from Admin Settings
+    
     fetch(`${API_URL}/api/settings`)
       .then(res => res.json())
       .then(data => {
-         // Only update if valid numbers exist
+         
          if(data.priceFirst && data.priceFollowUp) {
              setPricing({ 
                FIRST: Number(data.priceFirst), 
@@ -102,7 +102,7 @@ export default function BookPage() {
       if (currentUser) {
         setUser(currentUser);
         
-        // ✨ Check Block Status Immediately
+        
         try {
             const token = await currentUser.getIdToken();
             const res = await fetch(`${API_URL}/api/auth/me`, {
@@ -132,12 +132,12 @@ export default function BookPage() {
     return () => unsub();
   }, []);
 
-  // 2. Fetch Slots
+  
   useEffect(() => {
     if (user && !isBlocked) fetchSlots();
   }, [therapyType, user, isBlocked]);
 
-  // 3. Dynamic Session Logic
+  
   useEffect(() => {
     if (!user) return;
 
@@ -174,7 +174,7 @@ export default function BookPage() {
 
   }, [bookingHistory, therapyType, user, therapyApproaches]);
 
-  // --- API CALLS ---
+  
   const fetchApplicableDiscount = async (currentUser: User) => {
     try {
         setCheckingDiscount(true);
@@ -245,7 +245,7 @@ export default function BookPage() {
     return acc;
   }, {} as Record<string, Slot[]>);
 
-  // --- CALCULATIONS ---
+  
   const calculateTotal = () => {
     const basePrice = type === "FIRST" ? pricing.FIRST : pricing.FOLLOW_UP;
     
@@ -256,7 +256,7 @@ export default function BookPage() {
 
   const finalPrice = calculateTotal();
 
-  // --- UPI HELPERS ---
+  
   const handleCopyUpi = () => {
     navigator.clipboard.writeText(UPI_ID);
     setCopied(true);
@@ -299,7 +299,7 @@ export default function BookPage() {
       if (discount) {
         finalReason += ` | [${discount.label}: ${discount.discountPercent}% OFF APPLIED]`;
       }
-      // Add price info to reason for admin reference
+      
       finalReason += ` | [System Price: ₹${finalPrice}]`;
 
       const res = await fetch(`${API_URL}/api/bookings`, {
@@ -411,7 +411,7 @@ export default function BookPage() {
               
               <div className="grid lg:grid-cols-12 h-full gap-0 lg:gap-8">
                 
-                {/* --- LEFT COLUMN (Form) --- */}
+                {}
                 <div className="lg:col-span-8 h-full overflow-y-auto custom-scrollbar p-1 pb-20 lg:p-4 lg:pr-2">
                   <div className="space-y-10">
                     
@@ -426,7 +426,7 @@ export default function BookPage() {
                         </p>
                         </div>
 
-                        {/* STEP 1: Therapy Selection */}
+                        {}
                         <section>
                         <div className="flex items-center gap-3 mb-4">
                             <div className="w-8 h-8 rounded-xl bg-[#3F2965] text-white flex items-center justify-center font-bold text-sm shadow-lg shadow-[#3F2965]/20">1</div>
@@ -469,7 +469,7 @@ export default function BookPage() {
                         </div>
                         </section>
 
-                        {/* STEP 2: Session Type */}
+                        {}
                         <section className={!therapyType ? "opacity-50 grayscale pointer-events-none blur-[1px] transition-all" : "transition-all"}>
                         <div className="flex items-center gap-3 mb-4">
                             <div className="w-8 h-8 rounded-xl bg-[#3F2965] text-white flex items-center justify-center font-bold text-sm shadow-lg shadow-[#3F2965]/20">2</div>
@@ -478,7 +478,7 @@ export default function BookPage() {
                         
                         <div className="grid sm:grid-cols-2 gap-4">
                             
-                            {/* FIRST SESSION */}
+                            {}
                             <button
                                 disabled={!isFirstSessionAllowed}
                                 onClick={() => setType("FIRST")}
@@ -523,7 +523,7 @@ export default function BookPage() {
                                 )}
                             </button>
 
-                            {/* FOLLOW UP */}
+                            {}
                             <button
                                 disabled={isFirstSessionAllowed} 
                                 onClick={() => setType("FOLLOW_UP")}
@@ -570,14 +570,14 @@ export default function BookPage() {
                         </div>
                         </section>
 
-                        {/* STEP 3: Slot Selection */}
+                        {}
                         <section className={!therapyType ? "opacity-50 grayscale pointer-events-none blur-[1px] transition-all" : "transition-all"}>
                         <div className="flex items-center gap-3 mb-4">
                             <div className="w-8 h-8 rounded-xl bg-[#3F2965] text-white flex items-center justify-center font-bold text-sm shadow-lg shadow-[#3F2965]/20">3</div>
                             <h2 className="text-xl font-bold">Select Time</h2>
                         </div>
 
-                        {/* Filter */}
+                        {}
                         <div className="bg-white/60 rounded-2xl p-4 mb-6 border border-[#3F2965]/5">
                             <div className="flex flex-wrap gap-2">
                             <button
@@ -679,7 +679,7 @@ export default function BookPage() {
                     <div className="bg-white rounded-[2rem] shadow-xl shadow-[#3F2965]/5 border border-[#3F2965]/5 overflow-hidden mb-6">
                       
                       <div className="bg-[#3F2965] p-5 text-white text-center relative overflow-hidden">
-                        <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+                        <div className="absolute top-0 left-0 w-full h-full bg-[url('https:
                         <h3 className="text-base font-bold relative z-10 flex items-center justify-center gap-2">
                            <Receipt size={16} className="text-[#Dd1764]" /> Booking Summary
                         </h3>
@@ -694,7 +694,7 @@ export default function BookPage() {
                           </div>
                         ) : (
                           <div className="space-y-4">
-                            {/* Time & Date */}
+                            {}
                             <div className="flex justify-between items-center pb-4 border-b border-gray-100">
                               <div>
                                 <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">Date</p>
@@ -710,7 +710,7 @@ export default function BookPage() {
                               </div>
                             </div>
 
-                            {/* Details Grid */}
+                            {}
                             <div className="space-y-3">
                                 <div className="flex justify-between items-center">
                                   <span className="text-xs font-medium text-gray-500">Therapy</span>
@@ -733,7 +733,7 @@ export default function BookPage() {
                                 </div>
                             </div>
 
-                            {/* --- AUTOMATIC DISCOUNT SECTION --- */}
+                            {}
                             <div className="pt-2">
                                 {checkingDiscount ? (
                                     <div className="flex items-center gap-2 text-[#3F2965]/50 text-xs">
@@ -757,7 +757,7 @@ export default function BookPage() {
                                 ) : null}
                             </div>
                             
-                            {/* PRICING ROW */}
+                            {}
                             <div className="pt-3 border-t border-gray-100 flex justify-between items-end">
                                 <span className="text-sm font-bold text-[#3F2965]">Total Amount</span>
                                 <div className="text-right">
@@ -814,7 +814,7 @@ export default function BookPage() {
                               </div>
                             )}
 
-                            {/* --- PAYMENT SECTION --- */}
+                            {}
                             <div className="bg-[#F9F6FF] p-4 rounded-xl border border-[#3F2965]/5 space-y-3">
                                 
                                 <div className="flex items-center gap-2 mb-1">
@@ -831,7 +831,7 @@ export default function BookPage() {
                                 {paymentMethod === "UPI" ? (
                                     <>
                                         <div className="flex gap-4 items-center bg-white p-3 rounded-xl border border-gray-100 shadow-sm">
-                                            {/* QR Code */}
+                                            {}
                                             <div className="shrink-0 bg-white p-1 rounded-lg border border-gray-100">
                                                 <img 
                                                     src={qrCodeUrl} 
@@ -840,7 +840,7 @@ export default function BookPage() {
                                                 />
                                             </div>
 
-                                            {/* UPI Actions */}
+                                            {}
                                             <div className="flex-1 space-y-2">
                                                 <div className="flex items-center justify-between bg-gray-50 p-2 rounded-lg border border-gray-100">
                                                     <code className="text-[10px] font-mono font-bold text-[#3F2965] truncate max-w-[100px]">
@@ -855,7 +855,7 @@ export default function BookPage() {
                                                     </button>
                                                 </div>
 
-                                                {/* HIDDEN ON DESKTOP to fix 'Scheme not found' error */}
+                                                {}
                                                 <a 
                                                     href={upiDeepLink}
                                                     className="w-full text-center py-1.5 rounded-lg bg-[#3F2965] text-white text-[10px] font-bold hover:bg-[#2a1b45] transition-colors flex items-center justify-center gap-1.5 md:hidden"

@@ -22,7 +22,7 @@ gsap.registerPlugin(ScrollTrigger);
 export default function JourneySection() {
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Ref pointers for animations
+  
   const cardsEntranceRef = useRef<HTMLDivElement[]>([]); 
   const cardsFloatRef = useRef<HTMLDivElement[]>([]);    
 
@@ -38,10 +38,10 @@ export default function JourneySection() {
     const containerRect = containerRef.current.getBoundingClientRect();
     const points: { x: number; y: number }[] = [];
 
-    // 1. Start Point (Top Center)
+    
     points.push({ x: containerRect.width / 2, y: 0 });
 
-    // 2. Card Centers
+    
     cardsFloatRef.current.forEach((card) => {
       if (card) {
         const cardRect = card.getBoundingClientRect();
@@ -51,7 +51,7 @@ export default function JourneySection() {
       }
     });
 
-    // 3. End Point (Bottom Center)
+    
     points.push({ x: containerRect.width / 2, y: containerRect.height });
 
     if (points.length < 2) return;
@@ -164,13 +164,13 @@ export default function JourneySection() {
   }, [pathd]);
 
   return (
-    // UPDATED: Full Width White Background
+    
     <section className="py-20 md:py-28 px-4 sm:px-6 md:px-8 bg-[#F9F6FF]" id="journey">
 
-      {/* Container for content (no inner box style) */}
+      {}
       <div className="max-w-[1440px] mx-auto px-4 sm:px-8 md:px-12 lg:px-20 relative overflow-hidden">
 
-        {/* Heading */}
+        {}
         <div className="max-w-3xl mx-auto text-center mb-12 sm:mb-16 md:mb-20 lg:mb-24 relative z-10 flex flex-col items-center">
           <SlideUp>
             <span className="block text-[#Dd1764] font-bold text-xs sm:text-sm tracking-wide mb-2 sm:mb-3 uppercase">
@@ -183,7 +183,7 @@ export default function JourneySection() {
                 Your Path to
               </CharReveal>
             </div>
-            {/* UPDATED: Italic Pink Serif Style */}
+            {}
             <div className="text-[#Dd1764] italic font-serif">
               <CharReveal delay={0.1} className="justify-center">
                 Inner Transformation

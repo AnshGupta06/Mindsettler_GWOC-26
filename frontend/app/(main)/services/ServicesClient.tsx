@@ -7,11 +7,11 @@ import Image from 'next/image';
 import { useState, useEffect, useRef } from 'react';
 import { SlideUp, StaggerContainer, StaggerItem, CharReveal } from '../components/common/RevealComponent';
 import SectionDivider from '../components/common/SectionDivider';
-// Import JSON data
+
 import therapyApproachesData from '../../../data/therapyApproaches.json';
 import testimonialsData from '../../../data/testimonials.json';
 
-// --- NEW COMPONENT: Handles Loading SVG on Reveal ---
+
 const RevealOnScrollImage = ({ src, alt, className, ...props }: any) => {
   const [isVisible, setIsVisible] = useState(false);
   const containerRef = useRef(null);
@@ -21,10 +21,10 @@ const RevealOnScrollImage = ({ src, alt, className, ...props }: any) => {
       ([entry]) => {
         if (entry.isIntersecting) {
           setIsVisible(true);
-          observer.disconnect(); // Run once so it doesn't reload when scrolling back up
+          observer.disconnect(); 
         }
       },
-      { threshold: 0.2 } // Trigger when 20% of the item is visible
+      { threshold: 0.2 } 
     );
 
     if (containerRef.current) {
@@ -49,11 +49,11 @@ const RevealOnScrollImage = ({ src, alt, className, ...props }: any) => {
 };
 
 export default function ServicesPage() {
-  // Use imported JSON data
+  
   const therapyApproaches = therapyApproachesData;
   const testimonials = testimonialsData;
 
-  // --- Responsive Logic & State ---
+  
   const [isMobile, setIsMobile] = useState(false);
   const [itemsPerSlide, setItemsPerSlide] = useState(3);
   
@@ -63,22 +63,22 @@ export default function ServicesPage() {
       setIsMobile(width < 768);
       
       if (width < 768) {
-        setItemsPerSlide(1); // Mobile: 1 card
+        setItemsPerSlide(1); 
       } else if (width < 1024) {
-        setItemsPerSlide(2); // Tablet: 2 cards
+        setItemsPerSlide(2); 
       } else {
-        setItemsPerSlide(3); // Desktop: 3 cards
+        setItemsPerSlide(3); 
       }
     };
 
-    // Initial check
+    
     handleResize();
 
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // --- Speed Adjustment for Mobile ---
+  
   const baseDelay = isMobile ? 0 : 0.1;
   const staggerDelay = isMobile ? 0.05 : 0.1;
 
@@ -138,16 +138,16 @@ export default function ServicesPage() {
     }
   ];
 
-  // Testimonial Carousel State
+  
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const autoPlayInterval = useRef<NodeJS.Timeout | null>(null);
 
-  // Calculate slides
+  
   const slidesCount = Math.ceil(testimonials.length / itemsPerSlide);
 
-  // Navigation functions
+  
   const nextSlide = () => {
     setCurrentIndex((prevIndex) =>
       prevIndex >= slidesCount - 1 ? 0 : prevIndex + 1
@@ -204,15 +204,15 @@ export default function ServicesPage() {
   };
 
   return (
-    // MAIN PAGE BACKGROUND set to continuous Light Purple (#F9F6FF)
+    
     <main className="min-h-screen bg-[#F9F6FF]">
       
-      {/* Hero Section */}
+      {}
       <section className="relative overflow-visible pt-32 pb-12 sm:pt-40 sm:pb-16 px-4 sm:px-6 md:px-8">
         <div className="max-w-[1440px] mx-auto w-full relative">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-20 items-center">
 
-            {/* Left Column: Text */}
+            {}
             <div className="text-center lg:text-left z-10">
               <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-[5rem] leading-tight font-bold tracking-tight mb-6 flex flex-col items-center lg:items-start">
                 <span className="text-[#3F2965] mb-2">
@@ -249,11 +249,11 @@ export default function ServicesPage() {
               </SlideUp>
             </div>
 
-            {/* Right Column: Animated Images */}
+            {}
             <div className="relative h-[300px] sm:h-[500px] w-full flex items-center justify-center lg:justify-end perspective-1000 lg:pr-40">
               <SlideUp delay={baseDelay} className="w-full h-full relative flex items-center justify-center lg:justify-end">
                 <div className="relative w-full h-full flex items-center justify-center scale-[0.65] sm:scale-100 origin-center lg:origin-right">
-                  {/* Image 1 (Back) */}
+                  {}
                   <div
                     className="absolute w-[240px] sm:w-[280px] aspect-[3/4] rounded-2xl shadow-2xl overflow-hidden transform -rotate-12 translate-x-[-100px] sm:translate-x-[-150px] translate-y-[20px] opacity-90 animate-float-slow z-0 border-4 border-white cursor-pointer transition-all duration-500 hover:scale-105 hover:-translate-y-4 hover:rotate-[-5deg] hover:z-30 hover:shadow-[0_20px_50px_rgba(0,0,0,0.3)] ease-out"
                     onClick={() => setSelectedImage('/assets/services1.png')}
@@ -266,7 +266,7 @@ export default function ServicesPage() {
                     />
                   </div>
 
-                  {/* Image 2 (Middle) */}
+                  {}
                   <div
                     className="absolute w-[240px] sm:w-[280px] aspect-[3/4] rounded-2xl shadow-2xl overflow-hidden transform -rotate-6 translate-x-[0px] translate-y-[-20px] z-10 border-4 border-white animate-float-medium cursor-pointer transition-all duration-500 hover:scale-105 hover:-translate-y-4 hover:rotate-0 hover:z-30 hover:shadow-[0_20px_50px_rgba(0,0,0,0.3)] ease-out"
                     onClick={() => setSelectedImage('/assets/services2.png')}
@@ -279,7 +279,7 @@ export default function ServicesPage() {
                     />
                   </div>
 
-                  {/* Image 3 (Front) */}
+                  {}
                   <div
                     className="absolute w-[240px] sm:w-[280px] aspect-[3/4] rounded-2xl shadow-2xl overflow-hidden transform rotate-6 translate-x-[100px] sm:translate-x-[130px] translate-y-[40px] z-20 border-4 border-white animate-float-fast cursor-pointer transition-all duration-500 hover:scale-105 hover:-translate-y-4 hover:rotate-[5deg] hover:z-30 hover:shadow-[0_20px_50px_rgba(0,0,0,0.3)] ease-out"
                     onClick={() => setSelectedImage('/assets/services3.png')}
@@ -296,7 +296,7 @@ export default function ServicesPage() {
             </div>
           </div>
 
-          {/* Custom Animation Styles Inline */}
+          {}
           <style jsx global>{`
           @keyframes float {
             0%, 100% { transform: translateY(0px) rotate(var(--tw-rotate)) translateX(var(--tw-translate-x)); }
@@ -312,7 +312,7 @@ export default function ServicesPage() {
           }
         `}</style>
 
-          {/* Lightbox Overlay */}
+          {}
           {selectedImage && (
             <div
               className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 transition-opacity duration-300"
@@ -338,18 +338,18 @@ export default function ServicesPage() {
             </div>
           )}
 
-          {/* Therapy Sessions Section */}
+          {}
           <div className="pt-20 sm:pt-32"></div>
 
-          {/* UPDATED HEADER SECTION WITH ICONS IN SIDE SPACES */}
-          {/* Using grid-cols-12 to perfectly place content: 3 cols left, 6 cols center, 3 cols right */}
+          {}
+          {}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center mb-10 sm:mb-16 max-w-7xl mx-auto px-4">
             
-            {/* Left Column: Icon 1 (Centered in the left 3 columns) */}
+            {}
             <div className="hidden lg:flex justify-center items-center order-1 lg:col-span-3">
               <SlideUp delay={baseDelay + 0.2}>
                 <div className="relative w-52 h-52 xl:w-72 xl:h-72">
-                    {/* MODIFIED: Uses RevealOnScrollImage to load SVG on view */}
+                    {}
                     <RevealOnScrollImage 
                       src="/assets/services1.svg" 
                       alt="Mental Health Illustration Left" 
@@ -360,7 +360,7 @@ export default function ServicesPage() {
               </SlideUp>
             </div>
 
-            {/* Center Column: Text Content (Perfectly Centered) */}
+            {}
             <div className="flex flex-col items-center text-center order-2 lg:col-span-6 z-10">
               <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-[4rem] leading-tight sm:leading-[1.1] font-bold tracking-tight mb-4 sm:mb-6 md:mb-8 flex flex-col items-center">
                 <div className="text-[#3F2965] mb-1 sm:mb-2">
@@ -378,11 +378,11 @@ export default function ServicesPage() {
               </SlideUp>
             </div>
 
-            {/* Right Column: Icon 2 (Centered in the right 3 columns) */}
+            {}
             <div className="hidden lg:flex justify-center items-center order-3 lg:col-span-3">
               <SlideUp delay={baseDelay + 0.3}>
                 <div className="relative w-52 h-52 xl:w-72 xl:h-72">
-                    {/* MODIFIED: Uses RevealOnScrollImage to load SVG on view */}
+                    {}
                     <RevealOnScrollImage 
                       src="/assets/services2.svg" 
                       alt="Mental Health Illustration Right" 
@@ -395,7 +395,7 @@ export default function ServicesPage() {
 
           </div>
 
-          {/* Therapy Cards Grid */}
+          {}
           <StaggerContainer 
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8" 
             delay={staggerDelay}
@@ -403,7 +403,7 @@ export default function ServicesPage() {
             {therapyApproaches.map((therapy) => (
               <StaggerItem key={therapy.id} className="h-full">
                 <Card className="flex flex-col h-full overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 bg-white border border-[#3F2965]/5">
-                  {/* Image Section */}
+                  {}
                   <div className="relative h-48 w-full overflow-hidden">
                     <Image
                       src={therapy.image}
@@ -432,10 +432,10 @@ export default function ServicesPage() {
                       ))}
                     </ul>
 
-                    {/* Buttons Section */}
+                    {}
                     <div className="mt-auto space-y-3">
                       <div className="flex flex-col sm:flex-row gap-2 justify-center">
-                        {/* Online Button */}
+                        {}
                         {therapy.availableOnline ? (
                           <Link
                             href={`/book?therapy=${encodeURIComponent(therapy.title)}&type=online`}
@@ -461,7 +461,7 @@ export default function ServicesPage() {
                           </button>
                         )}
 
-                        {/* Offline Button */}
+                        {}
                         {therapy.availableOffline ? (
                           <Link
                             href={`/book?therapy=${encodeURIComponent(therapy.title)}&type=offline`}
@@ -488,7 +488,7 @@ export default function ServicesPage() {
                         )}
                       </div>
 
-                      {/* Book Session Button */}
+                      {}
                       <Link href={`/book?therapy=${encodeURIComponent(therapy.title)}`}>
                         <button className="w-full relative px-6 py-3 rounded-full bg-[#Dd1764] text-white text-sm font-bold tracking-wide overflow-hidden group transition-all duration-300 hover:shadow-lg hover:shadow-[#3F2965]/20 hover:-translate-y-0.5">
                           <span className="absolute top-0 left-[-25%] w-[80%] h-full bg-gradient-to-r from-[#3F2965] to-[#513681] -skew-x-12 -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-left" />
@@ -508,17 +508,17 @@ export default function ServicesPage() {
         </div>
       </section>
 <SectionDivider/>
-      {/* Corporate Services Section */}
+      {}
       <section className="py-12 sm:py-16 md:py-20 lg:py-24 px-4 sm:px-6 md:px-8 bg-[#F9F6FF]">
         <div className="max-w-7xl mx-auto">
-          {/* Using grid-cols-12 to place content with left SVG space */}
+          {}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
 
-            {/* Left Column: Peace of Mind SVG */}
+            {}
             <div className="hidden lg:flex justify-center items-center order-1 lg:col-span-4">
               <SlideUp delay={baseDelay + 0.1}>
                 <div className="relative w-64 h-64 xl:w-80 xl:h-80">
-                  {/* MODIFIED: Uses RevealOnScrollImage to load SVG on view */}
+                  {}
                   <RevealOnScrollImage
                     src="/assets/peace-of-mind-animate.svg"
                     alt="Peace of Mind Illustration"
@@ -529,10 +529,10 @@ export default function ServicesPage() {
               </SlideUp>
             </div>
 
-            {/* Center Column: Content */}
+            {}
             <div className="flex flex-col items-center text-center order-2 lg:col-span-8 z-10">
               <SlideUp delay={baseDelay}>
-                {/* Changed background to White to stand out against Purple page */}
+                {}
                 <div className="inline-flex items-center justify-center w-20 h-20 sm:w-24 sm:h-24 rounded-2xl sm:rounded-3xl bg-white text-[#Dd1764] mb-6 sm:mb-8 shadow-sm">
                   <Building2 size={40} strokeWidth={1.5} className="sm:w-12 sm:h-12" />
                 </div>
@@ -580,7 +580,7 @@ export default function ServicesPage() {
         </div>
       </section>
 <SectionDivider/>
-      {/* Who We Work With Section */}
+      {}
       <section className="py-8 sm:py-12 bg-[#F9F6FF]">
         <div className="container mx-auto px-4">
           <div className="text-center mb-10 sm:mb-16">
@@ -631,7 +631,7 @@ export default function ServicesPage() {
         </div>
       </section>
 <SectionDivider/>
-      {/* What You Can Expect Section */}
+      {}
       <section className="py-8 sm:py-12 bg-[#F9F6FF]">
         <div className="container mx-auto px-4">
           <div className="text-center mb-10 sm:mb-16">
@@ -651,16 +651,16 @@ export default function ServicesPage() {
             </SlideUp>
           </div>
 
-          {/* Cards */}
+          {}
           <div className="max-w-4xl mx-auto">
-            {/* First Row - 2 Cards */}
+            {}
             <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 mb-6 sm:mb-8" delay={staggerDelay}>
               {whatToExpect.slice(0, 2).map((item) => (
                 <StaggerItem key={item.title}>
-                  {/* Changed BG to WHITE to pop on Purple Page */}
+                  {}
                   <div className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-md transition-all duration-300 border border-[#3F2965]/10 hover:border-[#3F2965]/20 hover:-translate-y-1 h-full">
                     <div className="flex flex-col items-center text-center">
-                      {/* Icon BG changed to light purple */}
+                      {}
                       <div className="w-16 h-16 rounded-full bg-[#F9F6FF] flex items-center justify-center mb-6 shadow-sm text-[#3F2965]">
                         {item.icon}
                       </div>
@@ -676,14 +676,14 @@ export default function ServicesPage() {
               ))}
             </StaggerContainer>
 
-            {/* Second Row - 3 Cards */}
+            {}
             <StaggerContainer className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8" delay={staggerDelay + 0.1}>
               {whatToExpect.slice(2, 5).map((item) => (
                 <StaggerItem key={item.title}>
-                  {/* Changed BG to WHITE */}
+                  {}
                   <div className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-300 border border-[#3F2965]/10 hover:border-[#3F2965]/20 hover:-translate-y-1 h-full">
                     <div className="flex flex-col items-center text-center">
-                      {/* Icon BG changed to light purple */}
+                      {}
                       <div className="w-14 h-14 rounded-full bg-[#F9F6FF] flex items-center justify-center mb-4 shadow-sm">
                         {item.icon}
                       </div>
@@ -714,7 +714,7 @@ export default function ServicesPage() {
         </div>
       </section>
 <SectionDivider/>
-      {/* Testimonials - Removed the inner box styling */}
+      {}
       <section className="flex items-center py-12 sm:py-16 md:py-20 px-4 sm:px-6 md:px-8 bg-[#F9F6FF]">
         <div className="max-w-[1440px] mx-auto w-full relative overflow-visible">
 
@@ -767,7 +767,7 @@ export default function ServicesPage() {
                 {getCurrentTestimonials().map((testimonial) => (
                   <div
                     key={testimonial.id}
-                    // Cards kept white
+                    
                     className="bg-white rounded-2xl p-6 shadow-md hover:shadow-lg transition-all duration-300 border border-[#3F2965]/5 transform hover:-translate-y-1 h-full flex flex-col"
                   >
                     <div className="mb-4">

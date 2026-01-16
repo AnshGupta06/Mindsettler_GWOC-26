@@ -50,15 +50,15 @@ export default function SignupPage() {
 
       <div className="w-full h-full max-w-[1600px] bg-white rounded-[30px] shadow-2xl overflow-hidden flex relative ring-1 ring-black/5">
         
-        {/* LEFT VISUAL (45%) */}
-        {/* ✅ FIXED: Wrapped the ENTIRE visual panel in ImageWipeReveal */}
+        {}
+        {}
         <ImageWipeReveal className="hidden lg:flex w-[45%] h-full relative bg-[#3F2965] overflow-hidden flex-row gap-3 p-3">
            <div className="absolute inset-0 z-20 bg-gradient-to-t from-[#3F2965] via-transparent to-[#3F2965]/80 pointer-events-none" />
            
            <div className="w-1/2 relative h-full overflow-hidden">
              <div className="flex flex-col animate-scroll-up">
                 {quadColumn1.map((img, i) => (
-                  // ✅ FIXED: Unique key on div
+                  
                   <div key={i} className="w-full aspect-[3/4] rounded-xl bg-cover bg-center shrink-0 shadow-sm mb-3" style={{backgroundImage: `url(${img})`}} />
                 ))}
              </div>
@@ -67,7 +67,7 @@ export default function SignupPage() {
            <div className="w-1/2 relative h-full overflow-hidden">
              <div className="flex flex-col animate-scroll-down">
                 {quadColumn2.map((img, i) => (
-                  // ✅ FIXED: Unique key on div
+                  
                   <div key={i} className="w-full aspect-[3/4] rounded-xl bg-cover bg-center shrink-0 shadow-sm mb-3" style={{backgroundImage: `url(${img})`}} />
                 ))}
              </div>
@@ -85,7 +85,7 @@ export default function SignupPage() {
            </div>
         </ImageWipeReveal>
 
-        {/* RIGHT FORM (55%) */}
+        {}
         <div className="flex-1 h-full bg-white flex flex-col bg-grid-pattern relative overflow-hidden">
            <SlideUp delay={0.2} className="absolute top-0 left-0 flex justify-between items-center w-full px-4 pt-4 z-30 pointer-events-none">
               <img 

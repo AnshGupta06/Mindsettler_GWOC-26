@@ -13,37 +13,37 @@ export default function HeroSection() {
       
       <div className="max-w-[1440px] mx-auto w-full relative z-10 grid lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-20 items-center">
 
-        {/* LEFT COLUMN: 3D Model (Swapped to Left) */}
-        {/* Mobile: order-2 (Bottom), Desktop: order-1 (Left) */}
+        {}
+        {}
         <div className="order-2 lg:order-1 relative w-full flex items-center justify-center lg:justify-end min-h-[300px] sm:min-h-[400px]">
           <SlideUp delay={0.2} className="w-full h-full flex justify-center">
             
-            {/* CONTAINER FOR MODEL & ANIMATIONS */}
+            {}
             <div className="relative w-full max-w-[350px] sm:max-w-[500px] aspect-square flex items-center justify-center scale-90 sm:scale-100">
               
-              {/* --- ALIVE ANIMATED BACKGROUND START --- */}
+              {}
               
-              {/* 1. Breathing Outer Circle */}
+              {}
               <div className="absolute inset-0 border border-[#3F2965] opacity-15 rounded-full animate-[ping_3s_ease-in-out_infinite]" />
               
-              {/* 2. Pulsing Mid Circle */}
+              {}
               <div className="absolute inset-8 border-2 border-[#Dd1764] opacity-20 rounded-full animate-[pulse_2s_ease-in-out_infinite]" />
               
-              {/* 3. Static Inner Circle */}
+              {}
               <div className="absolute inset-16 border border-[#3F2965] opacity-10 rounded-full" />
 
-              {/* 4. Fast Rotating Dashed Circle */}
+              {}
               <div className="absolute inset-4 border border-dashed border-[#Dd1764] opacity-25 rounded-full animate-[spin_8s_linear_infinite]" />
               
-              {/* 5. Slow Counter Rotating Dashed Circle */}
+              {}
               <div className="absolute inset-12 border border-dashed border-[#3F2965] opacity-20 rounded-full animate-[spin_15s_linear_infinite_reverse]" />
 
-              {/* 6. Pulsing Center Ring - Heartbeat effect */}
+              {}
               <div className="absolute inset-[35%] border-2 border-[#Dd1764] opacity-30 rounded-full animate-[ping_1.5s_ease-in-out_infinite]" />
 
-              {/* --- ALIVE ANIMATED BACKGROUND END --- */}
+              {}
 
-              {/* 3D Model */}
+              {}
               <ModelViewer
                 src="/assets/heart+with+brain+3d+model.glb"
                 alt="MindSettler 3D model"
@@ -69,8 +69,8 @@ export default function HeroSection() {
           </SlideUp>
         </div>
 
-        {/* RIGHT COLUMN: Text Content (Swapped to Right) */}
-        {/* Mobile: order-1 (Top), Desktop: order-2 (Right) */}
+        {}
+        {}
         <div className="order-1 lg:order-2 flex flex-col items-center lg:items-start text-center lg:text-left">
           
 
@@ -120,7 +120,7 @@ export default function HeroSection() {
 
       </div>
 
-      {/* BOTTOM BAR: Trust Indicators / Stats */}
+      {}
       <div className="relative z-10 max-w-[1440px] mx-auto w-full mt-12 sm:mt-16 lg:mt-24 px-4">
         <SlideUp delay={0.7}>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 md:gap-12 py-6 sm:py-8 border-t border-[#3F2965]/5">

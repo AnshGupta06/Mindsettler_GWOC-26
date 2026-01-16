@@ -12,7 +12,7 @@ export default {
         background: "var(--background)",
         foreground: "var(--foreground)",
         primary: {
-          DEFAULT: "#3F2965", // MindSettler Purple
+          DEFAULT: "#3F2965", 
           foreground: "var(--primary-foreground)",
         },
         secondary: {
@@ -20,7 +20,7 @@ export default {
           foreground: "var(--secondary-foreground)",
         },
         accent: {
-          DEFAULT: "#DD1764", // MindSettler Pink
+          DEFAULT: "#DD1764", 
           foreground: "var(--accent-foreground)",
         },
         destructive: {

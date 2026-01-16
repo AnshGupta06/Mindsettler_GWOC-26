@@ -14,7 +14,7 @@ import AlertModal from "../components/common/AlertModal";
 import toast from "react-hot-toast";
 import Loader from "../components/common/Loader";
 
-// --- Types ---
+
 type Booking = {
   id: string;
   status: "PENDING" | "CONFIRMED" | "REJECTED";
@@ -44,13 +44,13 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"UPCOMING" | "HISTORY">("UPCOMING");
   
-  // Profile Edit State
+  
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState("");
   const [editPhone, setEditPhone] = useState("");
   const [isSaving, setIsSaving] = useState(false);
 
-  // Modal State
+  
   const [modalState, setModalState] = useState<{
     isOpen: boolean;
     type: "AUTH" | "CONFIRM" | "SUCCESS" | "ERROR" | "BLOCKED";
@@ -65,7 +65,7 @@ export default function ProfilePage() {
   
   const [actionLoading, setActionLoading] = useState(false);
 
-  // Force re-render every minute for "Join" button logic
+  
   const [, setTick] = useState(0);
   useEffect(() => {
     const timer = setInterval(() => setTick(t => t + 1), 60000); 
@@ -95,7 +95,7 @@ export default function ProfilePage() {
 
       const userData = await userRes.json();
       
-      // ✨ Handle Blocked User with Modal
+      
       if (userRes.status === 403 && userData.error === "ACCOUNT_BLOCKED") {
         setModalState({
           isOpen: true,
@@ -103,13 +103,13 @@ export default function ProfilePage() {
           title: "Account Restricted",
           message: "Your account has been temporarily restricted. Please contact support for assistance."
         });
-        setLoading(false); // Stop loading to show modal
+        setLoading(false); 
         return;
       }
 
       setDbUser(userData);
       
-      // Initialize Edit State
+      
       setEditName(userData.name || currentUser.displayName || "");
       setEditPhone(userData.phone || "");
 
@@ -208,13 +208,13 @@ export default function ProfilePage() {
     return name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2);
   };
 
-  // ✨ FIX: Filter Logic Updated
-  // Upcoming: Future dates AND Not Rejected
+  
+  
   const upcomingBookings = bookings
     .filter(b => new Date(b.slot.endTime) >= new Date() && b.status !== "REJECTED")
     .sort((a,b) => new Date(a.slot.startTime).getTime() - new Date(b.slot.startTime).getTime());
   
-  // History: Past dates OR Rejected (moved here)
+  
   const historyBookings = bookings
     .filter(b => new Date(b.slot.endTime) < new Date() || b.status === "REJECTED")
     .sort((a,b) => new Date(b.slot.startTime).getTime() - new Date(a.slot.startTime).getTime());
@@ -240,7 +240,7 @@ export default function ProfilePage() {
 
       <div className={`max-w-[1280px] mx-auto flex flex-col lg:flex-row gap-8 relative z-10 ${modalState.isOpen && modalState.type === 'BLOCKED' ? 'blur-md pointer-events-none opacity-50' : ''}`}>
         
-        {/* LEFT SIDEBAR: PROFILE CARD */}
+        {}
         <motion.div 
            initial={{ opacity: 0, x: -20 }}
            animate={{ opacity: 1, x: 0 }}
@@ -250,14 +250,14 @@ export default function ProfilePage() {
             
             <div className="flex flex-col items-center text-center relative">
               
-              {/* Avatar */}
+              {}
               <div className="relative mb-6">
                 <div className="w-28 h-28 rounded-full bg-[#F9F6FF] flex items-center justify-center text-[#Dd1764] text-3xl font-bold shadow-sm border border-[#3F2965]/5">
                   {getInitials(dbUser?.name || user?.displayName || "")}
                 </div>
               </div>
 
-              {/* Name & Details */}
+              {}
               {isEditing ? (
                   <div className="w-full mb-6 space-y-4">
                      <div>
@@ -280,7 +280,7 @@ export default function ProfilePage() {
               
               <div className="w-full space-y-4">
                 
-                {/* Phone Field */}
+                {}
                 <div className={`flex items-center gap-4 p-4 rounded-2xl border transition-all duration-300 ${!dbUser?.phone && !isEditing ? "bg-amber-50 border-amber-200" : "bg-white border-[#3F2965]/10"}`}>
                    <div className={`p-2 rounded-xl shadow-sm transition-colors ${!dbUser?.phone && !isEditing ? "bg-amber-100 text-amber-600" : "bg-[#F9F6FF] text-[#3F2965]/60"}`}>
                      <Smartphone size={18} />
@@ -304,7 +304,7 @@ export default function ProfilePage() {
                    </div>
                 </div>
 
-                {/* ✨ BIG EDIT PROFILE BUTTON */}
+                {}
                 {!isEditing ? (
                     <button 
                         onClick={() => setIsEditing(true)}
@@ -336,10 +336,10 @@ export default function ProfilePage() {
           </div>
         </motion.div>
 
-        {/* RIGHT CONTENT: BOOKINGS */}
+        {}
         <div className="flex-1 min-w-0">
            
-           {/* HEADER & TABS */}
+           {}
            <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-8">
               <h1 className="text-3xl font-bold text-[#3F2965] self-start sm:self-auto">My Sessions</h1>
               
@@ -358,7 +358,7 @@ export default function ProfilePage() {
               </div>
            </div>
 
-           {/* NOTE Banner */}
+           {}
            {activeTab === "UPCOMING" && upcomingBookings.length > 0 && (
              <div className="mb-6 p-4 bg-blue-50 border border-blue-100 rounded-xl flex items-start gap-3">
                 <Info className="text-blue-600 shrink-0 mt-0.5" size={18} />
@@ -368,7 +368,7 @@ export default function ProfilePage() {
              </div>
            )}
 
-           {/* BOOKINGS LIST */}
+           {}
            <div className="space-y-4">
              <AnimatePresence mode="popLayout">
                {displayBookings.length === 0 ? (
@@ -413,7 +413,7 @@ export default function ProfilePage() {
                       > 
                         <div className="flex flex-col md:flex-row gap-6 md:gap-8 items-start">
                             
-                            {/* Calendar Leaf Widget - Mobile Optimized */}
+                            {}
                             <div className="flex-shrink-0 w-full md:w-auto flex flex-row md:flex-col items-stretch justify-between md:justify-center bg-white rounded-2xl border border-[#3F2965]/10 overflow-hidden shadow-sm h-auto">
                                 <div className="md:w-full w-auto bg-[#3F2965] py-2 px-6 md:py-1.5 md:px-6 flex items-center justify-center">
                                     <p className="text-[10px] font-bold text-white uppercase tracking-widest">{startTime.toLocaleString('default', { month: 'short' })}</p>
@@ -424,7 +424,7 @@ export default function ProfilePage() {
                                 </div>
                             </div>
 
-                            {/* Info */}
+                            {}
                             <div className="flex-1 space-y-4 w-full">
                                 <div className="flex flex-wrap items-center justify-between gap-3">
                                     <div>
@@ -438,7 +438,7 @@ export default function ProfilePage() {
                                         </div>
                                     </div>
 
-                                    {/* Status Badge */}
+                                    {}
                                     <div className={`pl-3 pr-4 py-1.5 rounded-full text-xs font-bold flex items-center gap-2 border ${
                                         booking.status === "CONFIRMED" ? "bg-green-50 text-green-700 border-green-100" : 
                                         booking.status === "PENDING" ? "bg-amber-50 text-amber-700 border-amber-100" : 
@@ -463,7 +463,7 @@ export default function ProfilePage() {
                                 </div>
                             </div>
 
-                            {/* Actions */}
+                            {}
                             <div className="w-full md:w-[180px] flex flex-col gap-3">
                                 {booking.status === "CONFIRMED" && booking.slot.mode === "ONLINE" && !isSessionOver && (
                                     <>

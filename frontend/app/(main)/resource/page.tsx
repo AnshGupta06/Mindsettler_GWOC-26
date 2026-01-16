@@ -2,7 +2,7 @@
 import { resources } from '@/data/resources';
 import ResourceCard from '@/components/resource/ResourceCard';
 import Link from 'next/link';
-// Import CharReveal
+
 import { SlideUp, CharReveal } from '../components/common/RevealComponent';
 
 export default function ResourcesPage() {
@@ -10,7 +10,7 @@ export default function ResourcesPage() {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-white via-[#f9f7fc] to-[#f0eaff]">
-            {/* Hero Section */}
+            {}
             <section className="relative overflow-hidden">
                 <div className="absolute inset-0 bg-transparent h-3/4"></div>
 
@@ -18,7 +18,7 @@ export default function ResourcesPage() {
                     <SlideUp delay={0.1}>
                         <div className="bg-gradient-to-br from-white via-[#f9f7fc] to-[#f0eaff]/80 backdrop-blur-sm rounded-[2rem] md:rounded-3xl p-8 md:p-16 border border-white/60 shadow-xl shadow-purple-900/5 ring-1 ring-slate-100/50">
 
-                            {/* Updated Main Heading */}
+                            {}
                             <h1 className="text-4xl md:text-6xl font-bold text-primary leading-tight md:leading-tight mb-6">
                                 <span className="inline-block mr-3">
                                     <CharReveal delay={0.1} className="drop-shadow-sm">
@@ -41,7 +41,7 @@ export default function ResourcesPage() {
                 </div>
             </section>
 
-            {/* Resources Content */}
+            {}
             <section className="max-w-7xl mx-auto px-4 md:px-6 py-12">
                 {categories.map((category) => {
                     const categoryResources = resources.filter(r => r.category === category);
@@ -51,7 +51,7 @@ export default function ResourcesPage() {
                             <SlideUp delay={0.3}>
                                 <div className="text-center mb-10">
                                     <h2 className="text-2xl md:text-3xl font-bold text-gray-800 relative inline-block">
-                                        {/* Optional: Add CharReveal to category titles too if desired, currently standard text */}
+                                        {}
                                         {category}
                                         <span className="absolute -bottom-2 left-0 w-full h-1 bg-gradient-to-r from-primary/20 via-accent/50 to-primary/20 rounded-full"></span>
                                     </h2>
@@ -75,7 +75,7 @@ export default function ResourcesPage() {
                 })}
             </section>
 
-            {/* Call to Action */}
+            {}
             <section className="bg-transparent py-20 px-4">
                 <SlideUp delay={0.5}>
                     <div className="max-w-4xl mx-auto text-center bg-white from-primary/5 to-accent/5 rounded-[2rem] md:rounded-3xl p-8 md:p-16 border border-slate-100">

@@ -57,14 +57,14 @@ export default function ConfidentialityPage() {
   return (
     <div className="bg-white min-h-screen">
       
-      {/* Added top padding to push the Heading down from navbar */}
+      {}
       <div className="pt-16 sm:pt-2">
         <PageHeader
           title="Confidentiality Policy"
         />
       </div>
 
-      {/* Added negative top margin to pull cards up towards the heading */}
+      {}
       <section className="-mt-8 sm:-mt-12 pb-12 bg-gradient-to-b from-white to-lightBg relative z-10">
         <div className="container mx-auto max-w-4xl px-4">
 

@@ -9,12 +9,12 @@ import { CharReveal, SlideUp, ImageWipeReveal } from "../components/common/Revea
 export default function AboutPage() {
     const videoRef = useRef<HTMLVideoElement>(null);
     const [isPlaying, setIsPlaying] = useState(false);
-    const [isMuted, setIsMuted] = useState(false); // Default: Unmuted
+    const [isMuted, setIsMuted] = useState(false); 
 
-    // 1. Play Video
+    
     const handlePlay = () => {
         if (videoRef.current) {
-            videoRef.current.muted = false; // Ensure sound is on by default
+            videoRef.current.muted = false; 
             setIsMuted(false);
             videoRef.current.play()
                 .then(() => setIsPlaying(true))
@@ -22,7 +22,7 @@ export default function AboutPage() {
         }
     };
 
-    // 2. Pause Video
+    
     const handlePause = () => {
         if (videoRef.current) {
             videoRef.current.pause();
@@ -30,7 +30,7 @@ export default function AboutPage() {
         }
     };
 
-    // 3. Toggle Play/Pause (for main container click)
+    
     const togglePlay = () => {
         if (videoRef.current) {
             if (videoRef.current.paused) {
@@ -41,7 +41,7 @@ export default function AboutPage() {
         }
     };
 
-    // 4. Restart Video
+    
     const restartVideo = (e: React.MouseEvent) => {
         e.stopPropagation();
         if (videoRef.current) {
@@ -50,7 +50,7 @@ export default function AboutPage() {
         }
     };
 
-    // 5. Toggle Mute
+    
     const toggleMute = (e: React.MouseEvent) => {
         e.stopPropagation();
         if (videoRef.current) {
@@ -60,13 +60,13 @@ export default function AboutPage() {
         }
     };
 
-    // 6. Handle Video End (Reset to initial state)
+    
     const handleVideoEnd = () => {
         setIsPlaying(false);
         if (videoRef.current) {
             videoRef.current.currentTime = 0;
-            videoRef.current.load(); // Reloads to show the poster
-            // Reset to default settings (Unmuted)
+            videoRef.current.load(); 
+            
             videoRef.current.muted = false;
             setIsMuted(false);
         }
@@ -75,11 +75,11 @@ export default function AboutPage() {
     return (
         <>
         <main className="bg-white">
-            {/* --- HERO SECTION --- */}
+            {}
             <section className="min-h-[85vh] flex items-center pt-24 pb-12 px-4 sm:px-6 md:px-8 relative overflow-hidden bg-white">
                 <div className="max-w-7xl mx-auto w-full grid lg:grid-cols-2 gap-8 lg:gap-11 items-center">
 
-                    {/* Text Content */}
+                    {}
                     <div className="order-2 lg:order-1 relative z-10">
                         <SlideUp>
                             <div className="flex items-center gap-3 mb-3">
@@ -116,7 +116,7 @@ export default function AboutPage() {
                         </SlideUp>
                     </div>
 
-                    {/* IMAGE / VISUAL */}
+                    {}
                     <div className="order-1 lg:order-2 relative flex justify-center lg:justify-end">
                         <ImageWipeReveal delay={0.2} className="w-full max-w-xl">
                             <div className="relative aspect-[4/4] w-full rounded-tl-[100px] rounded-tr-3xl  overflow-hidden shadow-2xl">
@@ -137,7 +137,7 @@ export default function AboutPage() {
                 </div>
             </section>
 
-            {/* --- VISION SECTION --- */}
+            {}
             <section className="py-10 px-4 sm:px-6 relative overflow-hidden bg-white">
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full text-center pointer-events-none opacity-[0.03] select-none">
                     <h2 className="text-[15rem] font-black text-[#3F2965]">VISION</h2>
@@ -172,14 +172,14 @@ export default function AboutPage() {
                 </div>
             </section>
 
-            {/* --- FOUNDER SECTION --- */}
+            {}
             <section className="py-8 px-4 sm:px-6 bg-white relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-white rounded-full blur-[100px] translate-x-1/2 -translate-y-1/2" />
 
                 <div className="max-w-6xl mx-auto w-full relative z-10">
                     <div className="grid lg:grid-cols-2 gap-12 items-center">
 
-                        {/* Founder Info */}
+                        {}
                         <div className="space-y-8 relative">
                             <div className="absolute -left-20 -top-20 w-64 h-64 bg-[#Dd1764]/5 rounded-full blur-3xl -z-10" />
 
@@ -224,19 +224,19 @@ export default function AboutPage() {
                             </SlideUp>
                         </div>
 
-                        {/* VIDEO SECTION - Minimalist Controls */}
+                        {}
                         <ImageWipeReveal delay={0.6} className="w-full">
                             <div
                                 className="relative w-full max-w-sm mx-auto aspect-[9/14] bg-black rounded-3xl overflow-hidden shadow-2xl cursor-pointer group"
-                                onClick={togglePlay} // Toggle Play/Pause on Click
+                                onClick={togglePlay} 
                             >
                                 <video
                                     ref={videoRef}
-                                    playsInline // Crucial for mobile
-                                    muted={false} // Default Unmuted
+                                    playsInline 
+                                    muted={false} 
                                     className="w-full h-full object-cover"
                                     poster="/assets/aboutus_videointro.jpeg"
-                                    onEnded={handleVideoEnd} // Reset when finished
+                                    onEnded={handleVideoEnd} 
                                     onPause={() => setIsPlaying(false)}
                                     onPlay={() => setIsPlaying(true)}
                                 >
@@ -244,7 +244,7 @@ export default function AboutPage() {
                                     Your browser does not support the video tag.
                                 </video>
 
-                                {/* --- STATE 1: PAUSED (Bottom-Right CTA Badge) --- */}
+                                {}
                                 {!isPlaying && (
                                     <div className="absolute bottom-6 right-6 z-20 group-hover:scale-105 transition-transform duration-300">
                                         <div className="flex items-center gap-3 bg-white/20 backdrop-blur-md border border-white/30 px-5 py-3 rounded-full shadow-lg">
@@ -256,15 +256,15 @@ export default function AboutPage() {
                                     </div>
                                 )}
 
-                                {/* --- STATE 2: PLAYING (Minimalist Bottom Controls) --- */}
+                                {}
                                 {isPlaying && (
-                                    // Gradient overlay at the bottom for contrast
+                                    
                                     <div 
                                         className="absolute bottom-0 left-0 right-0 z-20 p-5 bg-gradient-to-t from-black/70 via-black/30 to-transparent flex items-end justify-between"
-                                        onClick={(e) => e.stopPropagation()} // Prevent clicking bar from toggling main pause
+                                        onClick={(e) => e.stopPropagation()} 
                                     >
                                         
-                                        {/* Left: Play/Pause */}
+                                        {}
                                         <button 
                                             onClick={togglePlay}
                                             className="text-white/90 hover:text-white hover:scale-110 transition-all p-2 rounded-full bg-black/20 backdrop-blur-sm"
@@ -273,9 +273,9 @@ export default function AboutPage() {
                                             {isPlaying ? <Pause size={24} fill="currentColor" /> : <Play size={24} fill="currentColor" />}
                                         </button>
 
-                                        {/* Right: Restart & Mute */}
+                                        {}
                                         <div className="flex items-center gap-3">
-                                            {/* Restart */}
+                                            {}
                                             <button 
                                                 onClick={restartVideo}
                                                 className="text-white/90 hover:text-white hover:scale-110 transition-all p-2 rounded-full bg-black/20 backdrop-blur-sm"
@@ -284,7 +284,7 @@ export default function AboutPage() {
                                                 <RotateCcw size={20} />
                                             </button>
 
-                                            {/* Mute Toggle */}
+                                            {}
                                             <button 
                                                 onClick={toggleMute}
                                                 className="text-white/90 hover:text-white hover:scale-110 transition-all p-2 rounded-full bg-black/20 backdrop-blur-sm"

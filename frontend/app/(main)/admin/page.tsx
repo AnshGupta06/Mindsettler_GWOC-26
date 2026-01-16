@@ -29,7 +29,7 @@ import {
   Save
 } from "lucide-react";
 
-// --- Types ---
+
 type Booking = {
   id: string;
   status: "PENDING" | "CONFIRMED" | "REJECTED";
@@ -38,7 +38,7 @@ type Booking = {
   reason?: string;
   meetingLink?: string;
   user: {
-    id: string; // Needed for blocking
+    id: string; 
     name?: string;
     email: string;
     phone?: string;
@@ -72,14 +72,14 @@ export default function AdminBookingsPage() {
   const [error, setError] = useState("");
   const [filter, setFilter] = useState<"ALL" | "PENDING" | "CONFIRMED" | "REJECTED">("ALL");
 
-  // Modal State
+  
   const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean; bookingId: string | null }>({
     isOpen: false,
     bookingId: null
   });
   const [manualLink, setManualLink] = useState("");
 
-  // Meeting Notes Modal State
+  
   const [notesModal, setNotesModal] = useState<{ isOpen: boolean; booking: Booking | null }>({
     isOpen: false,
     booking: null
@@ -127,7 +127,7 @@ export default function AdminBookingsPage() {
     return () => unsub();
   }, [router]);
 
-  // --- ACTIONS ---
+  
 
   const handleConfirmClick = (booking: Booking) => {
     if (booking.slot.mode === "ONLINE") {
@@ -152,7 +152,7 @@ export default function AdminBookingsPage() {
     const token = await auth.currentUser?.getIdToken();
     const toastId = toast.loading(status === "CONFIRMED" ? "Confirming..." : "Rejecting...");
 
-    // Optimistic Update
+    
     setBookings(prev => prev.map(b => b.id === id ? { ...b, status, meetingLink: link } : b));
 
     try {
@@ -178,7 +178,7 @@ export default function AdminBookingsPage() {
     }
   };
 
-  // --- MEETING MANAGEMENT ---
+  
 
   const startMeeting = async (bookingId: string) => {
     const token = await auth.currentUser?.getIdToken();
@@ -194,7 +194,7 @@ export default function AdminBookingsPage() {
 
       toast.success("Meeting started!", { id: toastId });
       
-      // Refresh bookings to update meeting status
+      
       const refreshedToken = await auth.currentUser?.getIdToken();
       if(refreshedToken) await fetchBookings(refreshedToken);
 
@@ -218,7 +218,7 @@ export default function AdminBookingsPage() {
       const data = await res.json();
       toast.success(`Meeting ended! Duration: ${data.duration} minutes`, { id: toastId });
       
-      // Refresh bookings to update meeting status
+      
       const refreshedToken = await auth.currentUser?.getIdToken();
       if(refreshedToken) await fetchBookings(refreshedToken);
 
@@ -230,7 +230,7 @@ export default function AdminBookingsPage() {
   const openNotesModal = async (booking: Booking) => {
     setNotesModal({ isOpen: true, booking });
     
-    // Fetch existing notes
+    
     try {
       const token = await auth.currentUser?.getIdToken();
       const res = await fetch(`${API_URL}/api/bookings/${booking.id}/meeting-notes`, {
@@ -249,7 +249,7 @@ export default function AdminBookingsPage() {
           therapistNotes: notes.therapistNotes || ""
         });
       } else {
-        // No existing notes
+        
         setMeetingNotes(null);
         setNotesForm({
           sessionSummary: "",
@@ -286,7 +286,7 @@ export default function AdminBookingsPage() {
       toast.success("Notes saved successfully!", { id: toastId });
       setNotesModal({ isOpen: false, booking: null });
       
-      // Refresh bookings to update notes
+      
       const refreshedToken = await auth.currentUser?.getIdToken();
       if(refreshedToken) await fetchBookings(refreshedToken);
 
@@ -311,7 +311,7 @@ export default function AdminBookingsPage() {
   return (
     <div className="min-h-screen bg-[#F9F6FF] pt-20 sm:pt-24 pb-8 sm:pb-12 px-4 sm:px-6 md:px-8">
       
-      {/* CONFIRMATION MODAL */}
+      {}
       {confirmModal.isOpen && (
          <div className="fixed inset-0 bg-[#3F2965]/20 backdrop-blur-sm z-50 flex items-center justify-center p-4">
            <div className="bg-white rounded-[2rem] p-8 max-w-md w-full shadow-2xl border border-[#3F2965]/10 animate-in zoom-in-95">
@@ -354,7 +354,7 @@ export default function AdminBookingsPage() {
              
              {manualLink && !isValidLink(manualLink) && (
                 <p className="text-xs text-red-500 font-bold mb-4 ml-1">
-                  ⚠️ Please enter a valid URL (starting with http:// or https://)
+                  ⚠️ Please enter a valid URL (starting with http:
                 </p>
              )}
              
@@ -371,7 +371,7 @@ export default function AdminBookingsPage() {
          </div>
       )}
         
-        {/* MEETING NOTES MODAL */}
+        {}
         {notesModal.isOpen && (
           <div className="fixed inset-0 bg-[#3F2965]/20 backdrop-blur-sm z-50 flex items-center justify-center p-4">
             <div className="bg-white rounded-[2rem] p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-[#3F2965]/10 animate-in zoom-in-95">
@@ -487,7 +487,7 @@ export default function AdminBookingsPage() {
           </div>
         )}
         
-        {/* HEADER & NAV ACTIONS */}
+        {}
         <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-6 mb-10">
           <div>
             <h1 className="text-2xl md:text-3xl font-bold flex items-center gap-3">
@@ -498,7 +498,7 @@ export default function AdminBookingsPage() {
           </div>
           
            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 w-full xl:w-auto">
-            {/* Clients */}
+            {}
             <button
               onClick={() => router.push("/admin/clients")}
               className="justify-center px-4 py-3 bg-white text-[#3F2965] border border-[#3F2965]/10 rounded-full font-bold shadow-sm hover:bg-[#F9F6FF] transition-all flex items-center gap-2 text-xs md:text-sm"
@@ -507,7 +507,7 @@ export default function AdminBookingsPage() {
               Clients
             </button>
 
-            {/* Discounts */}
+            {}
             <button
               onClick={() => router.push("/admin/discounts")}
               className="justify-center px-4 py-3 bg-white text-[#3F2965] border border-[#3F2965]/10 rounded-full font-bold shadow-sm hover:bg-[#F9F6FF] transition-all flex items-center gap-2 text-xs md:text-sm"
@@ -516,7 +516,7 @@ export default function AdminBookingsPage() {
               Discounts
             </button>
 
-            {/* Config / Settings */}
+            {}
             <button
               onClick={() => router.push("/admin/settings")}
               className="justify-center px-4 py-3 bg-white text-[#3F2965] border border-[#3F2965]/10 rounded-full font-bold shadow-sm hover:bg-[#F9F6FF] transition-all flex items-center gap-2 text-xs md:text-sm"
@@ -525,7 +525,7 @@ export default function AdminBookingsPage() {
               Config
             </button>
 
-            {/* Slots */}
+            {}
             <button
               onClick={() => router.push("/admin/slots")}
               className="justify-center px-4 py-3 bg-[#3F2965] text-white rounded-full font-bold shadow-lg hover:shadow-[#3F2965]/20 hover:scale-105 transition-all flex items-center gap-2 text-xs md:text-sm"
@@ -536,7 +536,7 @@ export default function AdminBookingsPage() {
           </div>
         </div>
 
-        {/* STATS */}
+        {}
         <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-12 px-2 md:px-8">
           <StatCircle
             label="Total Requests"
@@ -566,7 +566,7 @@ export default function AdminBookingsPage() {
           />
         </div>
 
-        {/* FILTERS */}
+        {}
         <div className="flex overflow-x-auto pb-4 mb-4 md:mb-8 border-b border-[#3F2965]/10 gap-2 no-scrollbar">
           {["ALL", "PENDING", "CONFIRMED", "REJECTED"].map((f) => (
             <button
@@ -582,7 +582,7 @@ export default function AdminBookingsPage() {
           ))}
         </div>
 
-        {/* BOOKINGS GRID */}
+        {}
         {loading ? (
           <Loader fullScreen={true} message="Loading Dashboard Data..."/>
         ) : filteredBookings.length === 0 ? (
@@ -608,7 +608,7 @@ export default function AdminBookingsPage() {
   );
 }
 
-// ---------------- SUB-COMPONENTS ---------------- //
+
 
 type StatCircleProps = {
   label: string;
@@ -711,7 +711,7 @@ function BookingCard({ booking, onConfirm, onReject, onStartMeeting, onEndMeetin
             </div>
           )}
 
-          {/* MEETING CONTROLS - Only for confirmed online sessions */}
+          {}
           {booking.status === "CONFIRMED" && booking.slot.mode === "ONLINE" && (
             <div>
               <div className="flex gap-2 flex-wrap">

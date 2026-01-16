@@ -5,7 +5,7 @@ import { SlideUp, StaggerContainer, StaggerItem } from "../common/RevealComponen
 import Image from "next/image";
 import Link from "next/link";
 
-// --- NEW COMPONENT: Handles Loading SVG on Reveal ---
+
 const RevealOnScrollImage = ({ src, alt, className, ...props }: any) => {
   const [isVisible, setIsVisible] = useState(false);
   const containerRef = useRef(null);
@@ -15,10 +15,10 @@ const RevealOnScrollImage = ({ src, alt, className, ...props }: any) => {
       ([entry]) => {
         if (entry.isIntersecting) {
           setIsVisible(true);
-          observer.disconnect(); // Run once so it doesn't reload when scrolling back up
+          observer.disconnect(); 
         }
       },
-      { threshold: 0.2 } // Trigger when 20% of the item is visible
+      { threshold: 0.2 } 
     );
 
     if (containerRef.current) {
@@ -64,16 +64,13 @@ export default function AboutPreview() {
     <section className="relative py-8 lg:py-20 px-4 sm:px-6 md:px-8 bg-[#F9F6FF] overflow-hidden">
       <div className="max-w-[1440px] mx-auto w-full relative z-10">
 
-        {/* =========================================
-            MOBILE LAYOUT (< 1024px)
-            Strategy: Split Header (Text Left, Image Right)
-           ========================================= */}
+        {}
         <div className="lg:hidden flex flex-col">
           
-          {/* 1. Header Row: Text + Image Side-by-Side */}
+          {}
           <div className="flex items-center justify-between gap-2 mb-6">
             
-            {/* Text Side */}
+            {}
             <div className="flex-1 flex flex-col items-start pr-2">
                <Reveal>
                 <div className="inline-block py-1 px-3 rounded-full bg-white border border-[#3F2965]/10 text-[#3F2965] font-bold text-[10px] uppercase tracking-widest shadow-sm mb-3">
@@ -85,13 +82,13 @@ export default function AboutPreview() {
               </h2>
             </div>
 
-            {/* Image Side (Compact) */}
+            {}
             <div className="w-[110px] sm:w-[140px] shrink-0">
                <PeaceOfMindIllustration />
             </div>
           </div>
 
-          {/* 2. Main Content Body */}
+          {}
           <div className="mb-8">
              <Reveal delay={0.1}>
                 <div className="mb-4 pl-4 border-l-4 border-[#Dd1764]">
@@ -108,7 +105,7 @@ export default function AboutPreview() {
               </SlideUp>
           </div>
 
-          {/* 3. Cards Grid */}
+          {}
           <div className="w-full mb-8">
               <StaggerContainer className="grid grid-cols-2 gap-3 justify-items-center">
                 {features.map((item, i) => (
@@ -119,7 +116,7 @@ export default function AboutPreview() {
               </StaggerContainer>
           </div>
 
-          {/* 4. CTA + Footer Image Row */}
+          {}
           <div className="flex items-end justify-between">
              <div className="mb-4">
                 <Link href="/about">
@@ -132,7 +129,7 @@ export default function AboutPreview() {
                   </button>
                 </Link>
              </div>
-             {/* Bottom Image */}
+             {}
              <div className="w-[120px] sm:w-[150px] -mr-4 -mb-4 opacity-90">
                 <MindIllustration />
              </div>
@@ -140,20 +137,17 @@ export default function AboutPreview() {
 
         </div>
 
-        {/* =========================================
-            DESKTOP LAYOUT (>= 1024px)
-            Strategy: 3-Column Balanced Layout
-           ========================================= */}
+        {}
         <div className="hidden lg:grid grid-cols-12 gap-8 items-center">
           
-          {/* Left Image */}
+          {}
           <div className="col-span-3 flex justify-start">
              <div className="w-full max-w-[350px]">
                 <MindIllustration />
              </div>
           </div>
 
-          {/* Center Content */}
+          {}
           <div className="col-span-6 flex flex-col items-center text-center px-4">
             <Reveal>
               <div className="inline-block py-1.5 px-5 rounded-full bg-white border border-[#3F2965]/10 text-[#3F2965] font-bold text-xs uppercase tracking-widest shadow-sm mb-6">
@@ -193,7 +187,7 @@ export default function AboutPreview() {
 
             <SlideUp delay={0.4}>
               <Link href="/about">
-                {/* <button className="flex items-center gap-3 px-8 py-4 rounded-full bg-[#3F2965] text-white font-bold text-sm tracking-wide transition-all duration-300 hover:bg-[#281a41] hover:shadow-xl hover:-translate-y-1 active:scale-95"> */}
+                {}
                   
                   <button className="flex items-center gap-3 w-full relative px-8 py-4 md:px-10 md:py-4 rounded-full bg-[#3F2965] text-white border-[#3F2965]/10 text-lg font-bold tracking-wide overflow-hidden group transition-all duration-300 hover:shadow-lg hover:shadow-[#3F2965]/30 hover:-translate-y-0.5">
                 <span className="absolute top-0 left-[-25%] w-[80%] h-full bg-gradient-to-r from-[#Dd1764] to-[#Dd1764] -skew-x-12 -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-left" />
@@ -210,7 +204,7 @@ export default function AboutPreview() {
             </SlideUp>
           </div>
 
-          {/* Right Image */}
+          {}
           <div className="col-span-3 flex justify-end">
              <div className="w-full max-w-[350px]">
                 <PeaceOfMindIllustration />
@@ -224,7 +218,7 @@ export default function AboutPreview() {
   );
 }
 
-// Extracted Card Component to keep code DRY
+
 function Card({ item, i, flippedIndices, handleFlip }: { item: any, i: number, flippedIndices: number[], handleFlip: (i:number)=>void }) {
   return (
     <div
@@ -233,7 +227,7 @@ function Card({ item, i, flippedIndices, handleFlip }: { item: any, i: number, f
     >
       <div className={`relative w-full h-full duration-500 transform-style-3d ${flippedIndices.includes(i) ? 'rotate-y-180' : 'lg:group-hover:rotate-y-180'}`}>
         
-        {/* FRONT */}
+        {}
         <div className="absolute inset-0 backface-hidden bg-white hover:bg-white rounded-2xl shadow-md border border-[#3F2965]/10 flex flex-col items-center justify-center p-3 transition-all duration-300 hover:border-[#3F2965] hover:shadow-lg">
           <div className="relative w-12 h-12 sm:w-16 sm:h-16 mb-2">
             <Image
@@ -248,7 +242,7 @@ function Card({ item, i, flippedIndices, handleFlip }: { item: any, i: number, f
           </span>
         </div>
 
-        {/* BACK */}
+        {}
         <div className="absolute inset-0 backface-hidden rotate-y-180 bg-[#3F2965] rounded-2xl shadow-lg flex items-center justify-center text-center p-3 border border-[#3F2965]">
           <p className="text-white font-medium text-[11px] sm:text-sm leading-tight">
             {item.text}

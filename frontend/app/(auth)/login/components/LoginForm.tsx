@@ -8,7 +8,7 @@ import Link from "next/link";
 import { Loader2, ArrowLeft } from "lucide-react";
 import { API_URL } from "@/app/lib/api";
 import toast from "react-hot-toast";
-// 🟢 Import Reveal Components
+
 import { CharReveal, StaggerContainer, StaggerItem, SlideUp} from "../../../(main)/components/common/RevealComponent";
 
 export default function LoginForm() {
@@ -34,10 +34,10 @@ export default function LoginForm() {
   };
 
   return (
-    // 🟢 Wrapped in StaggerContainer for cascading entry
+    
     <StaggerContainer className="w-full" delay={0.2}>
       
-      {/* 🔹 Return Home Button */}
+      {}
       <StaggerItem className="flex justify-start mb-6">
         <Link href="/" className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-[#3F2965] transition-colors">
            <ArrowLeft size={12} /> Return Home
@@ -45,7 +45,7 @@ export default function LoginForm() {
       </StaggerItem>
 
       <div className="mb-8">
-        {/* 🟢 CharReveal for Title */}
+        {}
         <h2 className="text-3xl font-bold text-[#3F2965] tracking-tight">
           <CharReveal delay={0.4}>Welcome Back</CharReveal>
         </h2>

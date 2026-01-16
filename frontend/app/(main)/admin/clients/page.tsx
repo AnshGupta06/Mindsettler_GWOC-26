@@ -14,7 +14,7 @@ import Loader from "../../components/common/Loader";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
 
-// --- Types ---
+
 type Booking = {
   id: string;
   status: "PENDING" | "CONFIRMED" | "REJECTED";
@@ -52,12 +52,12 @@ export default function AdminClientsPage() {
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
   
-  // Search & Filters
+  
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<"ALL" | "ACTIVE" | "BLOCKED">("ALL");
   const [activityFilter, setActivityFilter] = useState<"ALL" | "REGULAR" | "NEW">("ALL");
 
-  // State
+  
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editNotes, setEditNotes] = useState("");
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -88,7 +88,7 @@ export default function AdminClientsPage() {
     }
   };
 
-  // --- Client Actions ---
+  
   const handleSaveNotes = async (id: string) => {
     const token = await auth.currentUser?.getIdToken();
     const toastId = toast.loading("Saving note...");
@@ -141,7 +141,7 @@ export default function AdminClientsPage() {
       toast.success("Message sent successfully!", { id: toastId });
       setReportModal({isOpen: false, client: null});
       setReportContent("");
-      // Refresh clients to update notes
+      
       fetchClients(token);
     } catch (err) { 
       toast.error("Failed to send message", { id: toastId }); 
@@ -162,18 +162,18 @@ export default function AdminClientsPage() {
     } catch (err) { toast.error("Failed to update", { id: toastId }); }
   };
 
-  // --- Filter Logic ---
+  
   const filteredClients = clients.filter(c => {
     const matchesSearch = (c.name || "").toLowerCase().includes(search.toLowerCase()) || 
                           (c.email || "").toLowerCase().includes(search.toLowerCase());
     
     const matchesStatus = statusFilter === "ALL" ? true :
                           statusFilter === "BLOCKED" ? c.isBlocked :
-                          !c.isBlocked; // Active
+                          !c.isBlocked; 
 
     const matchesActivity = activityFilter === "ALL" ? true :
                             activityFilter === "REGULAR" ? c.totalBookings > 0 :
-                            c.totalBookings === 0; // New
+                            c.totalBookings === 0; 
 
     return matchesSearch && matchesStatus && matchesActivity;
   });
@@ -184,7 +184,7 @@ export default function AdminClientsPage() {
     <div className="min-h-screen bg-[#F9F6FF] pt-24 pb-12 px-4 sm:px-8">
       <div className="max-w-7xl mx-auto">
         
-        {/* Header Section */}
+        {}
         <div className="flex flex-col gap-6 mb-10">
           <div>
             <h1 className="text-3xl font-bold flex items-center gap-3 text-[#3F2965]">
@@ -193,10 +193,10 @@ export default function AdminClientsPage() {
             <p className="text-[#3F2965]/60 mt-2">Manage users, notes, and booking history.</p>
           </div>
 
-          {/* Search & Filters Bar */}
+          {}
           <div className="flex flex-col md:flex-row gap-4">
             
-            {/* Search */}
+            {}
             <div className="relative flex-1 group">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#3F2965]/40 group-focus-within:text-[#Dd1764]" size={20} />
               <input 
@@ -207,7 +207,7 @@ export default function AdminClientsPage() {
               />
             </div>
 
-            {/* Status Filter */}
+            {}
             <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-xl border border-[#3F2965]/10 shadow-sm">
                 <Filter size={16} className="text-[#3F2965]/40" />
                 <select 
@@ -221,7 +221,7 @@ export default function AdminClientsPage() {
                 </select>
             </div>
 
-            {/* Activity Filter */}
+            {}
             <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-xl border border-[#3F2965]/10 shadow-sm">
                 <Calendar size={16} className="text-[#3F2965]/40" />
                 <select 
@@ -238,7 +238,7 @@ export default function AdminClientsPage() {
           </div>
         </div>
 
-        {/* Clients List */}
+        {}
         <div className="space-y-4">
           {filteredClients.length === 0 ? (
              <div className="text-center py-20 bg-white rounded-3xl border border-dashed border-[#3F2965]/20">
@@ -263,7 +263,7 @@ export default function AdminClientsPage() {
             >
               <div className="p-6 md:p-8 flex flex-col lg:flex-row gap-8">
                 
-                {/* 1. Client Info */}
+                {}
                 <div className="flex-1 space-y-5">
                   <div className="flex items-start gap-4">
                     <div className={`w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold ${
@@ -284,7 +284,7 @@ export default function AdminClientsPage() {
                     </div>
                   </div>
                   
-                  {/* Stats */}
+                  {}
                   <div className="grid grid-cols-2 gap-4">
                     <div className="p-3 rounded-2xl bg-gray-50 border border-gray-100">
                         <p className="text-[10px] font-bold text-gray-400 uppercase">Bookings</p>
@@ -299,7 +299,7 @@ export default function AdminClientsPage() {
                   </div>
                 </div>
 
-                {/* 2. Admin Notes */}
+                {}
                 <div className="flex-1 bg-gray-50 p-5 rounded-2xl border border-gray-100 relative group flex flex-col">
                     <div className="flex justify-between items-center mb-2">
                         <p className="text-xs font-bold text-gray-400 uppercase flex items-center gap-2"><Edit2 size={12} /> Admin Notes</p>
@@ -340,7 +340,7 @@ export default function AdminClientsPage() {
                     )}
                 </div>
 
-                {/* 3. Actions */}
+                {}
                 <div className="flex flex-col justify-center gap-3 border-t lg:border-t-0 lg:border-l border-gray-100 pt-6 lg:pt-0 lg:pl-8 min-w-[140px]">
                     <button 
                         onClick={() => toggleBlock(client)}
@@ -366,7 +366,7 @@ export default function AdminClientsPage() {
                 </div>
               </div>
 
-              {/* ✨ EXPANDABLE BOOKING HISTORY */}
+              {}
               <AnimatePresence>
                 {expandedId === client.id && (
                   <motion.div 
@@ -424,7 +424,7 @@ export default function AdminClientsPage() {
         </div>
       </div>
 
-      {/* Report Modal */}
+      {}
       {reportModal.isOpen && reportModal.client && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl max-w-md w-full p-6">

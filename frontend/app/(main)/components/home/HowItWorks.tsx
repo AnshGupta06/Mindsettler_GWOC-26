@@ -48,12 +48,12 @@ export default function HowItWorks() {
   };
 
   return (
-    // Full width Purple background (#F9F6FF)
+    
     <section className="pt-20 pb-24 relative overflow-hidden bg-[#F9F6FF]" id="howitworks">
       
       <div className="max-w-[1440px] mx-auto px-4 sm:px-8 md:px-12 lg:px-20 relative">
 
-        {/* Header */}
+        {}
         <div className="text-center mb-16 md:mb-20">
           
 
@@ -65,7 +65,7 @@ export default function HowItWorks() {
             className="text-3xl md:text-5xl font-bold text-[#3F2965]"
           >
             Your Journey to 
-            {/* Italic Pink Serif Style */}
+            {}
             <span className="text-[#Dd1764] italic font-serif ml-2">Wellness</span>
           </motion.h2>
           <motion.p
@@ -79,7 +79,7 @@ export default function HowItWorks() {
           </motion.p>
         </div>
 
-        {/* Steps Grid */}
+        {}
         <motion.div
           variants={containerVariants}
           initial="hidden"
@@ -87,7 +87,7 @@ export default function HowItWorks() {
           viewport={{ once: true }}
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 relative"
         >
-          {/* Connector Line (Desktop Only) */}
+          {}
           <div className="hidden lg:block absolute top-12 left-0 w-full h-0.5 border-t-2 border-dashed border-[#3F2965]/10 -z-10 mt-8" />
 
           {steps.map((step, index) => (
@@ -96,20 +96,20 @@ export default function HowItWorks() {
               variants={itemVariants}
               className="relative group"
             >
-              {/* Card is White to pop against Purple BG */}
+              {}
               <div className="bg-white rounded-[2rem] p-8 border border-[#3F2965]/5 shadow-lg shadow-[#3F2965]/5 hover:shadow-xl hover:shadow-[#3F2965]/10 hover:-translate-y-2 transition-all duration-300 h-full flex flex-col items-center text-center">
 
-                {/* Step Number Badge */}
+                {}
                 <div className="absolute top-6 right-6 text-4xl font-black text-[#F9F6FF] group-hover:text-[#3F2965]/5 transition-colors select-none">
                   {step.step}
                 </div>
 
-                {/* Icon Wrapper */}
+                {}
                 <div className="w-20 h-20 rounded-2xl bg-[#F9F6FF] flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-[#3F2965] group-hover:text-white transition-all duration-300 text-[#3F2965] shadow-inner">
                   <step.icon size={32} strokeWidth={1.5} />
                 </div>
 
-                {/* Content */}
+                {}
                 <h3 className="text-xl font-bold text-[#3F2965] mb-3 group-hover:text-[#Dd1764] transition-colors">
                   {step.title}
                 </h3>
@@ -121,7 +121,7 @@ export default function HowItWorks() {
           ))}
         </motion.div>
 
-        {/* CTA */}
+        {}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -136,7 +136,7 @@ export default function HowItWorks() {
                       overflow-hidden group transition-all duration-300 
                       hover:-translate-y-1 hover:shadow-lg hover:shadow-[#3F2965]/20"
           >
-            {/* LEFT SLIDE */}
+            {}
             <span
               className="absolute top-0 left-[-25%] w-[80%] h-full 
                         bg-gradient-to-r from-[#3F2965] to-[#513681] 
@@ -145,7 +145,7 @@ export default function HowItWorks() {
                         transition-transform duration-500 ease-out origin-left"
             />
 
-            {/* RIGHT SLIDE */}
+            {}
             <span
               className="absolute top-0 right-[-25%] w-[80%] h-full 
                         bg-gradient-to-l from-[#3F2965] to-[#513681] 
@@ -154,7 +154,7 @@ export default function HowItWorks() {
                         transition-transform duration-500 ease-out origin-right"
             />
 
-            {/* CONTENT */}
+            {}
             <span className="relative z-10 flex items-center gap-2">
               Book Your Session Now
               <ArrowRight size={20} className="transition-transform group-hover:translate-x-1" />

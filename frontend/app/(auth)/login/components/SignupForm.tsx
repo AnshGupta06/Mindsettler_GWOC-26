@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 import { Loader2, ArrowLeft, Mail, AlertCircle } from "lucide-react";
 import { API_URL } from "@/app/lib/api";
 import toast from "react-hot-toast";
-// 🟢 Import Reveal Components
+
 import { CharReveal, StaggerContainer, StaggerItem, SlideUp} from "../../../(main)/components/common/RevealComponent";
 
 export default function SignupForm() {

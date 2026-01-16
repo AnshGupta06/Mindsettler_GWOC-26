@@ -5,16 +5,16 @@ import { CharReveal, SlideUp, ImageWipeReveal } from "../common/RevealComponent"
 
 export default function PersonalPathSection() {
   return (
-    // UPDATED: Full width White background, No inner box
+    
     <section className="py-20 md:py-28 px-4 sm:px-6 md:px-8 bg-[#F9F6FF] relative overflow-hidden">
         
           <div className="grid lg:grid-cols-2 gap-10 sm:gap-12 md:gap-16 lg:gap-20 items-center">
 
-           {/* LEFT: IMAGE */}
+           {}
             <SlideUp>
               <div className="relative group">
                 <ImageWipeReveal delay={0.1}>
-                  {/* Changed border-white to border-[#F9F6FF] (very subtle) or just relied on shadow since bg is white */}
+                  {}
                   <div className="relative rounded-xl sm:rounded-2xl md:rounded-[2.5rem] overflow-hidden shadow-2xl shadow-[#3F2965]/10 h-[350px] sm:h-[400px] md:h-[450px] lg:h-[500px] w-full border-4 border-[#F9F6FF]">
 
                     <Image
@@ -24,7 +24,7 @@ export default function PersonalPathSection() {
                       className="object-cover transition-transform duration-700 group-hover:scale-105"
                     />
 
-                    {/* Subtle Overlay */}
+                    {}
                     <div className="absolute inset-0 bg-[#3F2965]/10 group-hover:bg-transparent transition-colors duration-500" />
 
                   </div>
@@ -32,9 +32,9 @@ export default function PersonalPathSection() {
               </div>
             </SlideUp>
 
-            {/* RIGHT: TEXT */}
+            {}
             <div className="max-w-xl mx-auto lg:mx-0">
-                {/* Header */}
+                {}
                 <div className="mb-4 sm:mb-6">
                     <SlideUp>
                         <span className="block text-[#Dd1764] font-bold text-xs sm:text-sm tracking-wide mb-2 sm:mb-3 uppercase">
@@ -47,7 +47,7 @@ export default function PersonalPathSection() {
                                 Every journey is unique.
                             </CharReveal>
                         </div>
-                        {/* Italic Pink Serif Style */}
+                        {}
                         <div className="text-[#Dd1764] italic font-serif mt-1">
                             <CharReveal delay={0.1}>
                                 Your care should be too.

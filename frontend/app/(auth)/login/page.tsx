@@ -68,7 +68,7 @@ export default function LoginPage() {
 
       <div className="w-full h-full max-w-[1600px] bg-white rounded-[30px] shadow-2xl overflow-hidden flex flex-col lg:flex-row relative ring-1 ring-black/5">
 
-        {/* 🟢 LEFT FORM PANEL (55%) */}
+        {}
         <div className="flex-1 h-full bg-white flex flex-col bg-grid-pattern relative order-2 lg:order-1 overflow-hidden">
            
            <SlideUp delay={0.2} className="absolute top-0 left-0 flex justify-between items-start w-full z-30 p-6 lg:px-8 lg:pt-8 pointer-events-none">
@@ -90,15 +90,15 @@ export default function LoginPage() {
            </div>
         </div>
 
-        {/* 🟣 RIGHT VISUAL PANEL (45%) */}
-        {/* ✅ FIXED: Wrapped the ENTIRE right panel in ImageWipeReveal instead of individual images */}
+        {}
+        {}
         <ImageWipeReveal className="hidden lg:flex w-[45%] h-full relative bg-[#3F2965] overflow-hidden flex-row gap-3 p-3 order-1 lg:order-2">
            <div className="absolute inset-0 z-20 bg-gradient-to-b from-[#3F2965]/90 via-transparent to-[#3F2965]/90 pointer-events-none" />
 
            <div className="w-1/2 relative h-full overflow-hidden">
              <div className="flex flex-col animate-scroll-down w-full">
                 {quadColumn1.map((img, i) => (
-                  // ✅ FIXED: Standard div with unique key, no reveal here
+                  
                   <div key={i} className="w-full aspect-[3/4] rounded-xl bg-cover bg-center shrink-0 shadow-sm mb-3" style={{backgroundImage: `url(${img})`}} />
                 ))}
              </div>
@@ -107,7 +107,7 @@ export default function LoginPage() {
            <div className="w-1/2 relative h-full overflow-hidden">
              <div className="flex flex-col animate-scroll-up w-full">
                 {quadColumn2.map((img, i) => (
-                  // ✅ FIXED: Standard div with unique key, no reveal here
+                  
                   <div key={i} className="w-full aspect-[3/4] rounded-xl bg-cover bg-center shrink-0 shadow-sm mb-3" style={{backgroundImage: `url(${img})`}} />
                 ))}
              </div>

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Plus, Minus, Search } from "lucide-react";
 import { CharReveal, SlideUp, StaggerContainer, StaggerItem } from "../components/common/RevealComponent";
 
-// --- DATA ---
+
 const faqs = [
   {
     category: "General",
@@ -70,16 +70,16 @@ export default function FAQPage() {
   return (
     <div className="min-h-screen bg-white pt-24 pb-12 px-4 sm:px-6 md:px-8">
       
-      {/* 🟣 Main Container */}
+      {}
       <div className="max-w-[1440px] mx-auto bg-[#F9F6FF] rounded-[2.5rem] sm:rounded-[3rem] px-6 sm:px-12 lg:px-20 py-16 sm:py-20 relative overflow-hidden min-h-[80vh]">
         
-        {/* Background Decor */}
+        {}
         <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-[#3F2965]/5 rounded-full blur-[100px] pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-[#Dd1764]/5 rounded-full blur-[80px] pointer-events-none" />
 
         <div className="max-w-4xl mx-auto relative z-10">
             
-            {/* Header */}
+            {}
             <div className="text-center mb-12">
                  <SlideUp>
                     <span className="block text-[#Dd1764] font-bold tracking-widest uppercase text-sm mb-3">
@@ -87,7 +87,7 @@ export default function FAQPage() {
                     </span>
                  </SlideUp>
                  
-                 {/* 🛠️ FIX: Pass text as Children, not prop */}
+                 {}
                  <CharReveal className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#3F2965] leading-tight mb-6">
                    Frequently Asked Questions
                  </CharReveal>
@@ -98,7 +98,7 @@ export default function FAQPage() {
                    </p>
                  </SlideUp>
 
-                 {/* 🔍 Search Bar */}
+                 {}
                  <SlideUp delay={0.3}>
                    <div className="mt-8 relative max-w-md mx-auto">
                      <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#3F2965]/40" size={20} />
@@ -113,13 +113,13 @@ export default function FAQPage() {
                  </SlideUp>
             </div>
 
-            {/* Content */}
+            {}
             <div className="space-y-10">
               {filteredFaqs.length > 0 ? (
                 filteredFaqs.map((category) => (
                   <StaggerContainer key={category.category} className="space-y-4">
                     
-                    {/* Category Title */}
+                    {}
                     <StaggerItem>
                       <h3 className="text-xl font-bold text-[#3F2965] mb-4 flex items-center gap-3">
                         <span className="w-2 h-8 bg-[#Dd1764] rounded-full" />
@@ -127,7 +127,7 @@ export default function FAQPage() {
                       </h3>
                     </StaggerItem>
 
-                    {/* Questions */}
+                    {}
                     <div className="space-y-4">
                       {category.items.map((faq, index) => {
                         const id = `${category.category}-${index}`;
@@ -158,7 +158,7 @@ export default function FAQPage() {
               )}
             </div>
 
-            {/* Contact CTA */}
+            {}
             <div className="mt-20 text-center border-t border-[#3F2965]/10 pt-10">
                <p className="text-[#3F2965] font-bold text-lg mb-4">Still have questions?</p>
                <a href="/contact">

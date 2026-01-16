@@ -29,12 +29,12 @@ export default function DiscountAdminPage() {
     const [enabled, setEnabled] = useState(false);
     const [loading, setLoading] = useState(true);
     
-    // Processing States
+    
     const [isToggling, setIsToggling] = useState(false);
     const [isCreating, setIsCreating] = useState(false);
     const [deletingId, setDeletingId] = useState<string | null>(null);
 
-    // Form State
+    
     const [newRule, setNewRule] = useState({
         bookingCountFrom: "",
         bookingCountTo: "",
@@ -42,7 +42,7 @@ export default function DiscountAdminPage() {
         label: ""
     });
 
-    // 1. Fetch Data
+    
     const fetchData = async (token: string) => {
         try {
             const [statusData, rulesData] = await Promise.all([
@@ -71,7 +71,7 @@ export default function DiscountAdminPage() {
         return () => unsub();
     }, [router]);
 
-    // 2. Handlers
+    
     const handleToggleStatus = async () => {
         setIsToggling(true);
         const toastId = toast.loading("Updating system status...");
@@ -103,7 +103,7 @@ export default function DiscountAdminPage() {
             if (!user) return;
             const token = await user.getIdToken();
             
-            // Validate Logic: From <= To
+            
             if (parseInt(newRule.bookingCountFrom) > parseInt(newRule.bookingCountTo)) {
                 throw new Error("'From' count cannot be greater than 'To' count");
             }
@@ -147,12 +147,12 @@ export default function DiscountAdminPage() {
     };
 
     return (
-        // 1. Outer Container: White background with top padding (Same as Slots Page)
+        
         <div className="min-h-screen bg-white pt-20 sm:pt-24 pb-8 sm:pb-12 px-4 sm:px-6 md:px-8">
             
-            {/* 2. Inner Container: Purple Box (Same as Slots Page) */}
+            {}
                 
-                {/* HEADER */}
+                {}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
                     <div>
                         <h1 className="text-3xl font-bold flex items-center gap-3">
@@ -163,7 +163,7 @@ export default function DiscountAdminPage() {
                     </div>
 
                     <div className="flex items-center gap-4">
-                       {/* Status Toggle Switch */}
+                       {}
 {!loading && (
     <button
         onClick={handleToggleStatus}
@@ -174,15 +174,15 @@ export default function DiscountAdminPage() {
                 : "bg-gray-50 border-gray-200 hover:bg-gray-100"
         }`}
     >
-        {/* The Switch Track */}
+        {}
         <div className={`relative w-11 h-6 rounded-full transition-colors duration-300 ease-in-out ${
             enabled ? "bg-green-500" : "bg-gray-300"
         }`}>
-            {/* The Switch Thumb */}
+            {}
             <div className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-transform duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] flex items-center justify-center ${
                 enabled ? "translate-x-5" : "translate-x-0"
             }`}>
-                {/* Icon inside Thumb */}
+                {}
                 {isToggling ? (
                     <Loader2 size={10} className="animate-spin text-gray-400" />
                 ) : (
@@ -195,7 +195,7 @@ export default function DiscountAdminPage() {
             </div>
         </div>
 
-        {/* Text Labels */}
+        {}
         <div className="text-left leading-none">
             <p className="text-[9px] font-extrabold text-gray-400 uppercase tracking-widest mb-0.5">
                 System Status
@@ -223,7 +223,7 @@ export default function DiscountAdminPage() {
                 ) : (
                     <div className="grid lg:grid-cols-3 gap-8 items-start">
                         
-                        {/* === LEFT: CREATE FORM === */}
+                        {}
                         <div className="bg-white p-6 rounded-3xl shadow-lg border border-[#3F2965]/5 lg:sticky lg:top-8">
                             <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
                                 <Plus className="bg-[#3F2965] text-white rounded-full p-1" size={24} />
@@ -299,10 +299,10 @@ export default function DiscountAdminPage() {
                             </form>
                         </div>
 
-                        {/* === RIGHT: RULES LIST === */}
+                        {}
                         <div className="lg:col-span-2 space-y-6">
                             
-                            {/* Simple Header for List */}
+                            {}
                             <div className="flex items-center justify-between bg-white p-4 rounded-2xl shadow-sm border border-[#3F2965]/5">
                                 <h3 className="font-bold text-lg text-[#3F2965]">Active Rules</h3>
                                 <span className="bg-[#F9F6FF] text-[#Dd1764] px-3 py-1 rounded-lg text-xs font-bold">
@@ -328,7 +328,7 @@ export default function DiscountAdminPage() {
                                                 className="group bg-white p-5 rounded-2xl shadow-sm border border-[#3F2965]/5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-[#Dd1764]/20 hover:shadow-md transition-all"
                                             >
                                                 <div className="flex items-center gap-5">
-                                                    {/* Percentage Badge */}
+                                                    {}
                                                     <div className="w-16 h-16 shrink-0 rounded-2xl bg-[#F9F6FF] text-[#Dd1764] flex flex-col items-center justify-center shadow-inner ring-1 ring-[#Dd1764]/10">
                                                         <span className="text-2xl font-black">{rule.discountPercent}%</span>
                                                         <span className="text-[10px] uppercase font-bold opacity-60">OFF</span>

@@ -3,9 +3,9 @@
   import { motion } from "framer-motion";
   import { useState, useEffect } from "react";
   import React from "react";
-  import emailjs from "@emailjs/browser"; //
+  import emailjs from "@emailjs/browser"; 
 
-  // Optimized Input Component
+  
   const FloatingInput = React.memo(
     ({ label, name, type = "text", rows, value, onChange }: any) => {
       const isTextarea = !!rows;
@@ -63,13 +63,13 @@
       setLoading(true);
       setError("");
 
-      // Configuration from Environment Variables
+      
       const serviceId = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID!;
       const templateId = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID!;
       const publicKey = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY!;
 
       try {
-        // Send directly via EmailJS
+        
         await emailjs.send(
           serviceId,
           templateId,
@@ -92,7 +92,7 @@
       }
     };
 
-    // Auto-reset success message
+    
     useEffect(() => {
       if (!isSubmitted) return;
       const timer = setTimeout(() => setIsSubmitted(false), 10000);
@@ -113,7 +113,7 @@
           className="relative w-full h-full"
           style={{ transformStyle: "preserve-3d" }}
         >
-          {/* FRONT: Form */}
+          {}
           <div
             className="bg-white/70 backdrop-blur-2xl p-8 md:p-10 rounded-[2.5rem] shadow-2xl shadow-[#3F2965]/10 border border-white"
             style={{ backfaceVisibility: "hidden" }}

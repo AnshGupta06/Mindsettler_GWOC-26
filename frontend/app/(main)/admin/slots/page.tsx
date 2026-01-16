@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import Loader from "../../components/common/Loader";
 
-// Import therapy approaches data
+
 import therapyApproachesData from '../../../../data/therapyApproaches.json';
 
 type Slot = {
@@ -31,18 +31,18 @@ export default function AdminSlotsPage() {
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   
-  // 🔄 Sort & Filter State
+  
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [filterDate, setFilterDate] = useState(""); 
 
-  // Form State
+  
   const [date, setDate] = useState("");
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
   const [mode, setMode] = useState<"ONLINE" | "OFFLINE">("ONLINE");
   const [therapyType, setTherapyType] = useState<string>("");
 
-  // Therapy approaches data
+  
   const therapyApproaches = therapyApproachesData;
 
   const fetchSlots = async (token?: string) => {
@@ -61,8 +61,8 @@ export default function AdminSlotsPage() {
       }
     } catch (err: any) {
       setError(err.message);
-      // Optional: We don't usually toast on initial load errors, but you could:
-      // toast.error("Could not load slots");
+      
+      
     } finally {
       setLoading(false);
     }
@@ -80,21 +80,21 @@ export default function AdminSlotsPage() {
     return () => unsub();
   }, [router]);
 
-  // 🔎 Step 1: Filter Slots by Date
+  
   const filteredSlots = slots.filter((slot) => {
     if (!filterDate) return true;
     const slotDate = new Date(slot.startTime).toISOString().split('T')[0];
     return slotDate === filterDate;
   });
 
-  // 🗓️ Step 2: Sort the Filtered Slots
+  
   const sortedSlots = [...filteredSlots].sort((a, b) => {
     const dateA = new Date(a.startTime).getTime();
     const dateB = new Date(b.startTime).getTime();
     return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
   });
 
-  // 📦 Step 3: Group Slots
+  
   const groupedSlots = sortedSlots.reduce((acc, slot) => {
     const dateStr = new Date(slot.date).toLocaleDateString('en-US', { 
       weekday: 'long', month: 'short', day: 'numeric' 
@@ -117,7 +117,7 @@ export default function AdminSlotsPage() {
     setError("");
     setSubmitting(true);
     
-    // 🔔 1. Show Loading Toast
+    
     const toastId = toast.loading("Adding slot availability...");
 
     try {
@@ -152,7 +152,7 @@ export default function AdminSlotsPage() {
 
       await fetchSlots(token);
       
-      // 🔔 2. Success Toast
+      
       toast.success("Slot added successfully!", { id: toastId });
       
       setStartTime("");
@@ -163,7 +163,7 @@ export default function AdminSlotsPage() {
       setError("");
     } catch (err: any) {
       setError(err.message);
-      // 🔔 3. Error Toast
+      
       toast.error(err.message || "Failed to create slot", { id: toastId });
     } finally {
       setSubmitting(false);
@@ -171,10 +171,10 @@ export default function AdminSlotsPage() {
   };
 
   const handleDelete = async (id: string) => {
-    // Keep native confirm for safety (or replace with your Modal if preferred)
+    
     if (!confirm("Delete this slot permanently?")) return;
     
-    // 🔔 1. Loading Toast
+    
     const toastId = toast.loading("Deleting slot...");
 
     try {
@@ -190,11 +190,11 @@ export default function AdminSlotsPage() {
 
       setSlots((prev) => prev.filter((s) => s.id !== id));
       
-      // 🔔 2. Success Toast
+      
       toast.success("Slot deleted", { id: toastId });
     } catch (err: any) {
       console.error(err);
-      // 🔔 3. Error Toast (Replaced Alert)
+      
       toast.error("Could not delete slot", { id: toastId });
     }
   };
@@ -203,13 +203,13 @@ export default function AdminSlotsPage() {
   const bookedSlots = slots.filter(s => s.isBooked).length;
 
   return (
-    // 1. Outer Container: White background with top padding
+    
     <div className="min-h-screen bg-white pt-20 sm:pt-24 pb-8 sm:pb-12 px-4 sm:px-6 md:px-8">
       
-      {/* 2. Inner Container: Purple Box */}
+      {}
       <div className="max-w-[1440px] mx-auto bg-[#F9F6FF] rounded-[2.5rem] p-6 md:p-12 shadow-sm min-h-[80vh] text-[#3F2965]">
       
-        {/* HEADER */}
+        {}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
           <div>
             <h1 className="text-3xl font-bold flex items-center gap-3">
@@ -235,7 +235,7 @@ export default function AdminSlotsPage() {
 
         <div className="grid lg:grid-cols-3 gap-8 items-start">
           
-          {/* === LEFT: CREATE FORM === */}
+          {}
           <div className="bg-white p-6 rounded-3xl shadow-lg border border-[#3F2965]/5 lg:sticky lg:top-8">
             <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
               <Plus className="bg-[#3F2965] text-white rounded-full p-1" size={24} />
@@ -334,15 +334,15 @@ export default function AdminSlotsPage() {
             </form>
           </div>
 
-          {/* === RIGHT: SLOTS LIST === */}
+          {}
           <div className="lg:col-span-2 space-y-6">
             
-            {/* 🔽 Filter & Sort Bar */}
+            {}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between bg-white p-4 rounded-2xl shadow-sm border border-[#3F2965]/5 gap-4">
               <h3 className="font-bold text-lg text-[#3F2965] shrink-0">Schedule</h3>
               
               <div className="flex items-center gap-3 w-full sm:w-auto">
-                {/* 📅 Date Filter */}
+                {}
                 <div className="relative flex-1 sm:flex-none">
                   <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[#3F2965]/40 pointer-events-none">
                     <Search size={14} />
@@ -365,7 +365,7 @@ export default function AdminSlotsPage() {
 
                 <div className="w-px h-6 bg-[#3F2965]/10 hidden sm:block" />
 
-                {/* 🔃 Sort Toggle */}
+                {}
                 <button
                   onClick={() => setSortOrder(prev => prev === "asc" ? "desc" : "asc")}
                   className="flex items-center gap-2 text-sm font-bold text-[#3F2965]/70 hover:text-[#Dd1764] transition-colors whitespace-nowrap"

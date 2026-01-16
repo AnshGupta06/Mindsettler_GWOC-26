@@ -42,7 +42,7 @@ const AdminSettingsPage = () => {
 
   const fetchSettings = async (token: string) => {
     try {
-      // Assuming public endpoint or secured endpoint
+      
       const res = await fetch(`${API_URL}/api/settings`, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -102,7 +102,7 @@ const AdminSettingsPage = () => {
     <div className="min-h-screen bg-[#F9F6FF] pt-24 pb-12 px-4 md:px-8">
       <div className="max-w-4xl mx-auto">
         
-        {/* Header */}
+        {}
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-3xl font-bold text-[#3F2965] flex items-center gap-3">
@@ -120,7 +120,7 @@ const AdminSettingsPage = () => {
 
         <form onSubmit={handleSave} className="grid md:grid-cols-2 gap-6">
           
-          {/* PRICING CARD */}
+          {}
           <div className="bg-white p-6 rounded-3xl shadow-sm border border-[#3F2965]/5 space-y-6">
             <div className="flex items-center gap-3 border-b border-gray-100 pb-4">
                <div className="p-2 bg-green-50 rounded-lg text-green-600">
@@ -152,7 +152,7 @@ const AdminSettingsPage = () => {
             </div>
           </div>
 
-          {/* POLICY CARD */}
+          {}
           <div className="bg-white p-6 rounded-3xl shadow-sm border border-[#3F2965]/5 space-y-6">
             <div className="flex items-center gap-3 border-b border-gray-100 pb-4">
                <div className="p-2 bg-red-50 rounded-lg text-red-600">
@@ -186,7 +186,7 @@ const AdminSettingsPage = () => {
             </div>
           </div>
 
-          {/* SAVE BUTTON */}
+          {}
           <div className="md:col-span-2">
             <button 
               type="submit" 
