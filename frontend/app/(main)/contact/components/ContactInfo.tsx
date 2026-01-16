@@ -36,7 +36,7 @@ export default function ContactInfo() {
   return (
     <div className="space-y-10">
 
-      {/* Header Section */}
+      {}
       <div className="space-y-4">
         <motion.h2
           initial={{ opacity: 0, x: -20 }}
@@ -58,7 +58,7 @@ export default function ContactInfo() {
         </motion.p>
       </div>
 
-      {/* Info Cards Grid */}
+      {}
       <div className="grid gap-6">
         {contactDetails.map((item, idx) => (
           <motion.a
@@ -86,7 +86,7 @@ export default function ContactInfo() {
         ))}
       </div>
 
-      {/* Socials */}
+      {}
       <div className="pt-6">
         <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4">Connect with us</h3>
         <div className="flex gap-4">

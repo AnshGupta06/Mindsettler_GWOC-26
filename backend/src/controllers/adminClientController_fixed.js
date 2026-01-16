@@ -1,24 +1,24 @@
 import prisma from "../config/prisma.js";
 import { sendUserBlockedEmail, sendAdminReportEmail } from "../services/emailService.js";
 
-// 1. Get All Clients (with full Booking History)
+
 export const getAllClients = async (req, res) => {
   try {
     const users = await prisma.user.findMany({
       include: {
         bookings: {
-          orderBy: { slot: { startTime: "desc" } }, // Latest first
+          orderBy: { slot: { startTime: "desc" } }, 
           include: { slot: true },
         },
         adminNotes: {
-          orderBy: { createdAt: "desc" }, // Latest first
-          include: { user: false }, // Don't include user relation
+          orderBy: { createdAt: "desc" }, 
+          include: { user: false }, 
         },
       },
       orderBy: { createdAt: "desc" },
     });
 
-    // Format data for the frontend
+    
     const clients = users.map((user) => {
       const bookings = user.bookings || [];
       const totalBookings = bookings.length;
@@ -44,13 +44,13 @@ export const getAllClients = async (req, res) => {
   }
 };
 
-// 2. Update Client (Add Admin Note or Block Status)
+
 export const updateClient = async (req, res) => {
   const { id } = req.params;
   const { adminNotes, isBlocked } = req.body;
 
   try {
-    // First, get the current user
+    
     const currentUser = await prisma.user.findUnique({
       where: { id },
       select: { name: true, email: true }
@@ -63,7 +63,7 @@ export const updateClient = async (req, res) => {
     const updateData = {};
     if (isBlocked !== undefined) updateData.isBlocked = isBlocked;
 
-    // Update user (only isBlocked for now)
+    
     const updatedUser = await prisma.user.update({
       where: { id },
       data: updateData,
@@ -74,7 +74,7 @@ export const updateClient = async (req, res) => {
       },
     });
 
-    // If adminNotes provided, create a new AdminNote
+    
     if (adminNotes && adminNotes.trim()) {
       await prisma.adminNote.create({
         data: {
@@ -84,7 +84,7 @@ export const updateClient = async (req, res) => {
         },
       });
 
-      // Refresh the updatedUser to include the new note
+      
       const userWithNotes = await prisma.user.findUnique({
         where: { id },
         include: {
@@ -94,7 +94,7 @@ export const updateClient = async (req, res) => {
         },
       });
 
-      // ✨ Send report email with the new note
+      
       console.log(`📧 Sending new admin note as report to ${currentUser.email}...`);
       sendAdminReportEmail(currentUser.email, currentUser.name || "User", adminNotes.trim(), "Admin")
         .catch(err => console.error("❌ Failed to send notes update email:", err));
@@ -102,7 +102,7 @@ export const updateClient = async (req, res) => {
       return res.json({ success: true, user: userWithNotes });
     }
 
-    // ✨ FIX: Trigger email if user is being blocked
+    
     if (isBlocked === true) {
       console.log(`🔒 Blocking user ${currentUser.email}, sending email...`);
       sendUserBlockedEmail(currentUser.email, currentUser.name || "User")
@@ -116,7 +116,7 @@ export const updateClient = async (req, res) => {
   }
 };
 
-// 3. Send Report to Client
+
 export const sendClientReport = async (req, res) => {
   const { id } = req.params;
   const { reportContent, adminName } = req.body;
@@ -135,10 +135,10 @@ export const sendClientReport = async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
 
-    // Send the report email
+    
     await sendAdminReportEmail(user.email, user.name || "User", reportContent, adminName);
 
-    // Create a new AdminNote for the sent message
+    
     await prisma.adminNote.create({
       data: {
         userId: id,

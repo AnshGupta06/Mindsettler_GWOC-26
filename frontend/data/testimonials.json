@@ -4,41 +4,41 @@
     "role": "Anxiety Management Client",
     "content": "The CBT sessions transformed how I handle stress. I've learned practical tools that I use every day. My therapist was incredibly understanding and professional.",
     "rating": 5,
-    "avatar": "/images/testimonials/sarah.png"
+    "avatar": "/images/testimonials/sarah.webp"
   },
   {
     "id": 2,
     "role": "Couples Therapy Clients",
     "content": "Emotion-focused couples therapy saved our marriage. We learned to communicate effectively and understand each other's emotional needs.",
     "rating": 5,
-    "avatar": "/images/testimonials/couple.png"
+    "avatar": "/images/testimonials/couple.webp"
   },
   {
     "id": 3,
     "role": "Mindfulness Practice",
     "content": "MBCT helped me find balance in my busy life. The mindfulness techniques have become an essential part of my daily routine.",
     "rating": 5,
-    "avatar": "/images/testimonials/james.png"
+    "avatar": "/images/testimonials/james.webp"
   },
   {
     "id": 4,
     "role": "Family Therapy Client",
     "content": "Working with the whole family helped us rebuild trust and understanding. The therapist created a safe space for everyone to express themselves.",
     "rating": 5,
-    "avatar": "/images/testimonials/priya.png"
+    "avatar": "/images/testimonials/priya.webp"
   },
   {
     "id": 5,
     "role": "DBT Program Participant",
     "content": "The skills I learned in DBT have been life-changing. I finally feel in control of my emotions and can handle difficult situations with clarity.",
     "rating": 5,
-    "avatar": "/images/testimonials/michael.png"
+    "avatar": "/images/testimonials/michael.webp"
   },
   {
     "id": 6,
     "role": "Client-Centred Therapy",
     "content": "The non-judgmental approach made all the difference. I felt truly heard and supported throughout my healing journey.",
     "rating": 5,
-    "avatar": "/images/testimonials/lisa.png"
+    "avatar": "/images/testimonials/lisa.webp"
   }
 ]

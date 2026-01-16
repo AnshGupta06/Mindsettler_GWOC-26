@@ -1,7 +1,7 @@
 import prisma from "../config/prisma.js";
 import * as discountService from "../services/discountService.js";
 
-// User: Check Discount
+
 export const checkDiscount = async (req, res) => {
     try {
         if (!req.user || !req.user.uid) {
@@ -9,7 +9,7 @@ export const checkDiscount = async (req, res) => {
             return res.status(401).json({ error: "Unauthorized" });
         }
 
-        // Fetch the internal Database User ID using Firebase UID
+        
         const user = await prisma.user.findUnique({
             where: { firebaseUid: req.user.uid }
         });
@@ -19,7 +19,7 @@ export const checkDiscount = async (req, res) => {
             return res.status(404).json({ error: "User profile not found. Please complete registration." });
         }
 
-        const userId = user.id; // Correct Prisma UUID
+        const userId = user.id; 
         const discount = await discountService.getApplicableDiscount(userId);
         res.json({ discount });
     } catch (error) {
@@ -28,7 +28,7 @@ export const checkDiscount = async (req, res) => {
     }
 };
 
-// Admin: Get All Rules
+
 export const getRules = async (req, res) => {
     try {
         const rules = await discountService.getAllRules();
@@ -38,7 +38,7 @@ export const getRules = async (req, res) => {
     }
 };
 
-// Admin: Create Rule
+
 export const addRule = async (req, res) => {
     try {
         const rule = await discountService.createRule(req.body);
@@ -49,7 +49,7 @@ export const addRule = async (req, res) => {
     }
 };
 
-// Admin: Delete Rule
+
 export const removeRule = async (req, res) => {
     try {
         const { id } = req.params;
@@ -60,7 +60,7 @@ export const removeRule = async (req, res) => {
     }
 };
 
-// Admin: Get Global Status
+
 export const getStatus = (req, res) => {
     try {
         const status = discountService.getGlobalStatus();
@@ -70,7 +70,7 @@ export const getStatus = (req, res) => {
     }
 };
 
-// Admin: Toggle Global Status
+
 export const toggleStatus = (req, res) => {
     try {
         const { enable } = req.body;

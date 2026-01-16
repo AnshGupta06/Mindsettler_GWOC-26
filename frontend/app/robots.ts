@@ -5,7 +5,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: '*',
       allow: '/',
-      disallow: '/admin/', // Hide admin pages from Google
+      disallow: '/admin/', 
     },
     sitemap: 'https://mindsettler-bypb.vercel.app/sitemap.xml',
   };

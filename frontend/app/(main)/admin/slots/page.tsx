@@ -10,8 +10,6 @@ import {
   Calendar, Trash2, Plus, MapPin, Wifi, Lock, ArrowLeft, LayoutGrid, ArrowUpDown, Search, X 
 } from "lucide-react";
 import Loader from "../../components/common/Loader";
-
-// Import therapy approaches data
 import therapyApproachesData from '../../../../data/therapyApproaches.json';
 
 type Slot = {
@@ -31,7 +29,7 @@ export default function AdminSlotsPage() {
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   
-  // 🔄 Sort & Filter State
+  // Sorting & Filtering
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [filterDate, setFilterDate] = useState(""); 
 
@@ -42,7 +40,6 @@ export default function AdminSlotsPage() {
   const [mode, setMode] = useState<"ONLINE" | "OFFLINE">("ONLINE");
   const [therapyType, setTherapyType] = useState<string>("");
 
-  // Therapy approaches data
   const therapyApproaches = therapyApproachesData;
 
   const fetchSlots = async (token?: string) => {
@@ -61,8 +58,6 @@ export default function AdminSlotsPage() {
       }
     } catch (err: any) {
       setError(err.message);
-      // Optional: We don't usually toast on initial load errors, but you could:
-      // toast.error("Could not load slots");
     } finally {
       setLoading(false);
     }
@@ -80,21 +75,19 @@ export default function AdminSlotsPage() {
     return () => unsub();
   }, [router]);
 
-  // 🔎 Step 1: Filter Slots by Date
+  
   const filteredSlots = slots.filter((slot) => {
     if (!filterDate) return true;
     const slotDate = new Date(slot.startTime).toISOString().split('T')[0];
     return slotDate === filterDate;
   });
 
-  // 🗓️ Step 2: Sort the Filtered Slots
   const sortedSlots = [...filteredSlots].sort((a, b) => {
     const dateA = new Date(a.startTime).getTime();
     const dateB = new Date(b.startTime).getTime();
     return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
   });
 
-  // 📦 Step 3: Group Slots
   const groupedSlots = sortedSlots.reduce((acc, slot) => {
     const dateStr = new Date(slot.date).toLocaleDateString('en-US', { 
       weekday: 'long', month: 'short', day: 'numeric' 
@@ -117,7 +110,6 @@ export default function AdminSlotsPage() {
     setError("");
     setSubmitting(true);
     
-    // 🔔 1. Show Loading Toast
     const toastId = toast.loading("Adding slot availability...");
 
     try {
@@ -151,8 +143,6 @@ export default function AdminSlotsPage() {
       if (!res.ok) throw new Error(data.error || "Failed to create slot");
 
       await fetchSlots(token);
-      
-      // 🔔 2. Success Toast
       toast.success("Slot added successfully!", { id: toastId });
       
       setStartTime("");
@@ -163,7 +153,6 @@ export default function AdminSlotsPage() {
       setError("");
     } catch (err: any) {
       setError(err.message);
-      // 🔔 3. Error Toast
       toast.error(err.message || "Failed to create slot", { id: toastId });
     } finally {
       setSubmitting(false);
@@ -171,10 +160,7 @@ export default function AdminSlotsPage() {
   };
 
   const handleDelete = async (id: string) => {
-    // Keep native confirm for safety (or replace with your Modal if preferred)
     if (!confirm("Delete this slot permanently?")) return;
-    
-    // 🔔 1. Loading Toast
     const toastId = toast.loading("Deleting slot...");
 
     try {
@@ -189,12 +175,9 @@ export default function AdminSlotsPage() {
       if (!res.ok) throw new Error("Failed to delete");
 
       setSlots((prev) => prev.filter((s) => s.id !== id));
-      
-      // 🔔 2. Success Toast
       toast.success("Slot deleted", { id: toastId });
     } catch (err: any) {
       console.error(err);
-      // 🔔 3. Error Toast (Replaced Alert)
       toast.error("Could not delete slot", { id: toastId });
     }
   };
@@ -202,84 +185,85 @@ export default function AdminSlotsPage() {
   const totalSlots = slots.length;
   const bookedSlots = slots.filter(s => s.isBooked).length;
 
+  if (loading) return <Loader fullScreen message="Loading Slots..." />;
+
   return (
-    // 1. Outer Container: White background with top padding
-    <div className="min-h-screen bg-white pt-20 sm:pt-24 pb-8 sm:pb-12 px-4 sm:px-6 md:px-8">
+    <div className="min-h-screen bg-[#F9F6FF] pt-20 pb-12 px-4 sm:px-8">
+      <div className="max-w-7xl mx-auto">
       
-      {/* 2. Inner Container: Purple Box */}
-      <div className="max-w-[1440px] mx-auto bg-[#F9F6FF] rounded-[2.5rem] p-6 md:p-12 shadow-sm min-h-[80vh] text-[#3F2965]">
-      
-        {/* HEADER */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+        {/* --- HEADER --- */}
+        <div className="flex flex-col gap-6 mb-8 relative z-10">
           <div>
-            <h1 className="text-3xl font-bold flex items-center gap-3">
-              <LayoutGrid className="text-[#Dd1764]" />
-              Slot Manager
-            </h1>
-            <p className="text-[#3F2965]/60 mt-1">Create and manage your availability</p>
-          </div>
-          
-          <div className="flex items-center gap-4">
-            <div className="bg-white px-4 py-2 rounded-full shadow-sm text-sm font-bold border border-[#3F2965]/5">
-              <span className="text-[#3F2965]/50 uppercase text-xs mr-2">Capacity</span>
-              {bookedSlots} <span className="text-[#3F2965]/40">/</span> {totalSlots} Booked
-            </div>
             <button 
-              onClick={() => router.push("/admin")}
-              className="px-5 py-2.5 bg-white border border-[#3F2965]/10 text-[#3F2965] rounded-full font-bold hover:bg-[#F9F6FF] transition flex items-center gap-2"
+                onClick={() => router.push('/admin')} 
+                className="inline-flex items-center gap-2 text-gray-500 hover:text-[#3F2965] font-bold mb-4 transition-colors text-sm px-3 py-2 rounded-lg hover:bg-white/50"
             >
-              <ArrowLeft size={16} /> Back
+                <ArrowLeft size={18} /> Back to Dashboard
             </button>
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+                <div>
+                    <h1 className="text-3xl font-bold flex items-center gap-3 text-[#3F2965]">
+                    <LayoutGrid className="text-[#Dd1764]" size={32} /> Slot Manager
+                    </h1>
+                    <p className="text-gray-500 mt-1 font-medium">Create and manage your availability schedule.</p>
+                </div>
+                
+                {/* Stats Badge */}
+                <div className="bg-white px-5 py-2.5 rounded-xl shadow-sm border border-gray-200 text-sm font-bold flex items-center gap-3">
+                    <span className="text-gray-400 uppercase text-xs tracking-wider">Capacity</span>
+                    <span className="text-[#3F2965] text-base">{bookedSlots} <span className="text-gray-300">/</span> {totalSlots} <span className="text-xs text-gray-400 font-normal">Booked</span></span>
+                </div>
+            </div>
           </div>
         </div>
 
         <div className="grid lg:grid-cols-3 gap-8 items-start">
           
-          {/* === LEFT: CREATE FORM === */}
-          <div className="bg-white p-6 rounded-3xl shadow-lg border border-[#3F2965]/5 lg:sticky lg:top-8">
-            <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
-              <Plus className="bg-[#3F2965] text-white rounded-full p-1" size={24} />
+          {/* --- LEFT COL: CREATE FORM --- */}
+          <div className="bg-white p-6 rounded-2xl shadow-sm border border-[#3F2965]/10 lg:sticky lg:top-24">
+            <h2 className="text-lg font-bold mb-6 flex items-center gap-2 text-[#3F2965] border-b border-gray-100 pb-4">
+              <Plus className="bg-[#3F2965] text-white rounded-full p-1" size={20} />
               Add Availability
             </h2>
             
             <form onSubmit={handleCreate} className="space-y-5">
               <div>
-                <label className="text-xs font-bold text-[#3F2965]/60 uppercase ml-1">Date</label>
+                <label className="text-xs font-bold text-gray-500 uppercase ml-1 mb-1.5 block">Date</label>
                 <input
                   type="date"
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
-                  className="w-full mt-1 px-4 py-3 rounded-xl bg-[#F9F6FF] border border-[#3F2965]/10 focus:outline-none focus:ring-2 focus:ring-[#Dd1764]"
+                  className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:border-[#Dd1764] text-sm font-medium text-[#3F2965] transition-all"
                   required
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs font-bold text-[#3F2965]/60 uppercase ml-1">Start</label>
+                  <label className="text-xs font-bold text-gray-500 uppercase ml-1 mb-1.5 block">Start Time</label>
                   <input
                     type="time"
                     value={startTime}
                     onChange={(e) => setStartTime(e.target.value)}
-                    className="w-full mt-1 px-4 py-3 rounded-xl bg-[#F9F6FF] border border-[#3F2965]/10 focus:outline-none focus:ring-2 focus:ring-[#Dd1764]"
+                    className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:border-[#Dd1764] text-sm font-medium text-[#3F2965] transition-all"
                     required
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-bold text-[#3F2965]/60 uppercase ml-1">End</label>
+                  <label className="text-xs font-bold text-gray-500 uppercase ml-1 mb-1.5 block">End Time</label>
                   <input
                     type="time"
                     value={endTime}
                     onChange={(e) => setEndTime(e.target.value)}
-                    className="w-full mt-1 px-4 py-3 rounded-xl bg-[#F9F6FF] border border-[#3F2965]/10 focus:outline-none focus:ring-2 focus:ring-[#Dd1764]"
+                    className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:border-[#Dd1764] text-sm font-medium text-[#3F2965] transition-all"
                     required
                   />
                 </div>
               </div>
 
               <div>
-                <label className="text-xs font-bold text-[#3F2965]/60 uppercase ml-1">Mode</label>
-                <div className="grid grid-cols-2 gap-3 mt-1">
+                <label className="text-xs font-bold text-gray-500 uppercase ml-1 mb-1.5 block">Session Mode</label>
+                <div className="grid grid-cols-2 gap-3">
                   {["ONLINE", "OFFLINE"].map((m) => (
                     <button
                       key={m}
@@ -288,9 +272,9 @@ export default function AdminSlotsPage() {
                       className={`py-3 rounded-xl text-sm font-bold border transition-all ${
                         mode === m
                           ? m === "ONLINE" 
-                            ? "bg-green-600 text-white border-green-600"
-                            : "bg-blue-600 text-white border-blue-600"
-                          : "bg-white text-[#3F2965]/60 border-[#3F2965]/10 hover:bg-[#F9F6FF]"
+                            ? "bg-green-50 text-green-700 border-green-200"
+                            : "bg-blue-50 text-blue-700 border-blue-200"
+                          : "bg-white text-gray-400 border-gray-200 hover:bg-gray-50"
                       }`}
                     >
                       {m === "ONLINE" ? "Online" : "Studio"}
@@ -300,75 +284,73 @@ export default function AdminSlotsPage() {
               </div>
 
               <div>
-                <label className="text-xs font-bold text-[#3F2965]/60 uppercase ml-1">Therapy Type</label>
+                <label className="text-xs font-bold text-gray-500 uppercase ml-1 mb-1.5 block">Therapy Type</label>
                 <select
                   value={therapyType}
                   onChange={(e) => setTherapyType(e.target.value)}
-                  className="w-full mt-1 px-4 py-3 rounded-xl bg-[#F9F6FF] border border-[#3F2965]/10 focus:outline-none focus:ring-2 focus:ring-[#Dd1764]"
+                  className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:border-[#Dd1764] text-sm font-medium text-[#3F2965] transition-all appearance-none cursor-pointer"
                 >
-                  <option value="">All Therapies (General Slot)</option>
+                  <option value="">All Therapies (General)</option>
                   {therapyApproaches.map((therapy) => (
                     <option key={therapy.id} value={therapy.title}>
                       {therapy.title}
                     </option>
                   ))}
                 </select>
-                <p className="text-xs text-[#3F2965]/50 mt-1">
-                  Leave empty for general slots available to all therapies
+                <p className="text-[10px] text-gray-400 mt-1.5 ml-1 leading-tight">
+                  Leaving this empty creates a general slot open for any therapy type.
                 </p>
               </div>
 
               {error && error !== "Admin access only" && (
-                <div className="p-3 bg-red-50 text-red-600 text-xs font-bold rounded-lg border border-red-100">
-                  {error}
+                <div className="p-3 bg-red-50 text-red-600 text-xs font-bold rounded-lg border border-red-100 flex items-center gap-2">
+                  <X size={14} /> {error}
                 </div>
               )}
 
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full py-4 rounded-xl bg-[#Dd1764] text-white font-bold shadow-lg hover:shadow-[#Dd1764]/20 transition-all disabled:opacity-50"
+                className="w-full py-3.5 rounded-xl bg-[#Dd1764] text-white font-bold shadow-lg shadow-[#Dd1764]/20 hover:bg-[#b01350] transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-2"
               >
-                {submitting ? "Adding..." : "Create Slot"}
+                {submitting ? "Adding Slot..." : "Create Slot"}
               </button>
             </form>
           </div>
 
-          {/* === RIGHT: SLOTS LIST === */}
+          {/* --- RIGHT COL: SLOT LIST --- */}
           <div className="lg:col-span-2 space-y-6">
             
-            {/* 🔽 Filter & Sort Bar */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between bg-white p-4 rounded-2xl shadow-sm border border-[#3F2965]/5 gap-4">
-              <h3 className="font-bold text-lg text-[#3F2965] shrink-0">Schedule</h3>
+            {/* Filter Toolbar */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between bg-white p-3 rounded-2xl shadow-sm border border-[#3F2965]/10 gap-4">
+              <h3 className="font-bold text-base text-[#3F2965] shrink-0 px-2 hidden sm:block">Schedule</h3>
               
               <div className="flex items-center gap-3 w-full sm:w-auto">
-                {/* 📅 Date Filter */}
-                <div className="relative flex-1 sm:flex-none">
-                  <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[#3F2965]/40 pointer-events-none">
+                <div className="relative flex-1 sm:flex-none w-full sm:w-auto">
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
                     <Search size={14} />
                   </div>
                   <input 
                     type="date"
                     value={filterDate}
                     onChange={(e) => setFilterDate(e.target.value)}
-                    className="pl-9 pr-8 py-2 rounded-lg bg-[#F9F6FF] border border-[#3F2965]/10 text-sm font-medium text-[#3F2965] focus:outline-none focus:ring-2 focus:ring-[#Dd1764]/20 w-full sm:w-auto"
+                    className="w-full sm:w-auto pl-9 pr-8 py-2 rounded-lg bg-gray-50 border border-gray-200 text-sm font-medium text-[#3F2965] focus:outline-none focus:border-[#Dd1764]/30 cursor-pointer"
                   />
                   {filterDate && (
                     <button 
                       onClick={() => setFilterDate("")}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 text-[#3F2965]/40 hover:text-[#Dd1764]"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#Dd1764] transition-colors"
                     >
                       <X size={14} />
                     </button>
                   )}
                 </div>
 
-                <div className="w-px h-6 bg-[#3F2965]/10 hidden sm:block" />
+                <div className="w-px h-6 bg-gray-200 hidden sm:block" />
 
-                {/* 🔃 Sort Toggle */}
                 <button
                   onClick={() => setSortOrder(prev => prev === "asc" ? "desc" : "asc")}
-                  className="flex items-center gap-2 text-sm font-bold text-[#3F2965]/70 hover:text-[#Dd1764] transition-colors whitespace-nowrap"
+                  className="flex items-center gap-2 text-sm font-bold text-gray-500 hover:text-[#Dd1764] transition-colors whitespace-nowrap px-2"
                 >
                   <ArrowUpDown size={16} />
                   <span className="hidden sm:inline">{sortOrder === "desc" ? "Newest First" : "Oldest First"}</span>
@@ -376,12 +358,10 @@ export default function AdminSlotsPage() {
               </div>
             </div>
 
-            {loading ? (
-<Loader fullScreen={false} message="Loading Schedules..." />
-) : filteredSlots.length === 0 ? (
-              <div className="bg-white p-12 rounded-3xl border border-dashed border-[#3F2965]/20 text-center">
-                <Calendar className="mx-auto text-[#3F2965]/20 mb-4" size={48} />
-                <p className="text-[#3F2965]/60 font-medium">
+            {filteredSlots.length === 0 ? (
+              <div className="bg-white p-12 rounded-2xl border border-dashed border-gray-300 text-center">
+                <Calendar className="mx-auto text-gray-300 mb-4" size={48} />
+                <p className="text-gray-500 font-medium">
                   {filterDate ? "No slots found for this date." : "No slots created yet."}
                 </p>
                 {filterDate && (
@@ -395,12 +375,15 @@ export default function AdminSlotsPage() {
               </div>
             ) : (
               Object.entries(groupedSlots).map(([dateString, dateSlots]) => (
-                <div key={dateString} className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                  <h3 className="text-lg font-bold text-[#3F2965] mb-4 sticky top-4 bg-[#F9F6FF]/95 backdrop-blur-sm py-2 z-10 w-fit pr-4 rounded-r-lg">
-                    {dateString}
-                  </h3>
+                <div key={dateString} className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+                  <div className="sticky top-4 z-10 -mx-2 px-2 bg-[#F9F6FF]/95 backdrop-blur-sm py-3 mb-2 flex items-center gap-3">
+                     <span className="text-sm font-bold text-[#3F2965] bg-white border border-[#3F2965]/10 px-3 py-1 rounded-lg shadow-sm">
+                        {dateString}
+                     </span>
+                     <div className="h-px flex-1 bg-[#3F2965]/10"></div>
+                  </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {dateSlots.map((slot) => {
                       const start = new Date(slot.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                       const end = new Date(slot.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -408,46 +391,54 @@ export default function AdminSlotsPage() {
                       return (
                         <div 
                           key={slot.id} 
-                          className={`relative p-5 rounded-2xl border transition-all flex justify-between items-center group ${
+                          className={`relative p-4 rounded-xl border transition-all flex justify-between items-center group ${
                             slot.isBooked 
-                              ? "bg-gray-50 border-gray-200 text-gray-400" 
-                              : "bg-white border-[#3F2965]/10 text-[#3F2965] hover:border-[#3F2965]/30 hover:shadow-md"
+                              ? "bg-gray-50 border-gray-200" 
+                              : "bg-white border-gray-200 hover:border-[#3F2965]/20 hover:shadow-md"
                           }`}
                         >
                           <div>
-                            <p className="font-bold text-lg">{start} <span className="text-xs font-normal opacity-60">to</span> {end}</p>
-                            <div className="flex items-center gap-2 mt-2">
-                              <span className={`text-[10px] font-bold px-2 py-0.5 rounded flex items-center gap-1 w-fit ${
+                            <p className={`font-bold text-lg ${slot.isBooked ? "text-gray-400" : "text-[#3F2965]"}`}>
+                                {start} <span className="text-xs font-normal opacity-50">to</span> {end}
+                            </p>
+                            
+                            <div className="flex flex-wrap items-center gap-2 mt-2">
+                              <span className={`text-[10px] font-bold px-2 py-0.5 rounded flex items-center gap-1 border ${
                                 slot.mode === 'ONLINE' 
-                                  ? (slot.isBooked ? 'bg-gray-200 text-gray-500' : 'bg-blue-100 text-blue-700')
-                                  : (slot.isBooked ? 'bg-gray-200 text-gray-500' : 'bg-green-100 text-green-700')
+                                  ? (slot.isBooked ? 'bg-gray-100 text-gray-400 border-transparent' : 'bg-green-50 text-green-700 border-green-100')
+                                  : (slot.isBooked ? 'bg-gray-100 text-gray-400 border-transparent' : 'bg-blue-50 text-blue-700 border-blue-100')
                               }`}>
                                 {slot.mode === 'ONLINE' ? <Wifi size={10} /> : <MapPin size={10} />}
                                 {slot.mode}
                               </span>
-                              {slot.isBooked && (
-                                <span className="text-[10px] font-bold bg-gray-200 text-gray-600 px-2 py-0.5 rounded flex items-center gap-1">
-                                  <Lock size={10} /> BOOKED
+                              
+                              {slot.therapyType && (
+                                <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${
+                                    slot.isBooked ? "bg-gray-100 text-gray-400 border-transparent" : "bg-[#Dd1764]/5 text-[#Dd1764] border-[#Dd1764]/10"
+                                }`}>
+                                  {slot.therapyType}
                                 </span>
                               )}
-                              {slot.therapyType && (
-                                <span className="text-[10px] font-bold bg-[#Dd1764]/10 text-[#Dd1764] px-2 py-0.5 rounded">
-                                  {slot.therapyType}
+
+                              {slot.isBooked && (
+                                <span className="text-[10px] font-bold bg-gray-200 text-gray-500 px-2 py-0.5 rounded flex items-center gap-1">
+                                  <Lock size={10} /> BOOKED
                                 </span>
                               )}
                             </div>
                           </div>
 
-                          {!slot.isBooked && (
+                          {!slot.isBooked ? (
                             <button
                               onClick={() => handleDelete(slot.id)}
-                              className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors"
+                              className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100"
                               title="Delete Slot"
                             >
                               <Trash2 size={18} />
                             </button>
+                          ) : (
+                            <Lock className="text-gray-300" size={20} />
                           )}
-                          {slot.isBooked && <Lock className="text-gray-300" size={20} />}
                         </div>
                       );
                     })}

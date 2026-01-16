@@ -33,7 +33,7 @@ const corporateFormSchema = z.object({
 
 type CorporateFormValues = z.infer<typeof corporateFormSchema>;
 
-// Faster Scroll reveal animation component
+
 const FastScrollReveal = ({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-50px" });
@@ -50,7 +50,7 @@ const FastScrollReveal = ({ children, delay = 0 }: { children: React.ReactNode; 
   );
 };
 
-// Faster Staggered reveal for lists
+
 const FastStaggerReveal = ({ children, index }: { children: React.ReactNode; index: number }) => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-30px" });
@@ -76,7 +76,7 @@ type CarouselItem = {
   highlight?: string;
 };
 
-// Full-width Carousel component with smooth transitions and rounded borders
+
 const CorporateWellnessCarousel = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
@@ -146,7 +146,7 @@ const CorporateWellnessCarousel = () => {
     setTimeout(() => setIsAnimating(false), 500);
   };
 
-  // Auto-rotate slides every 6 seconds
+  
   useEffect(() => {
     if (isAnimating) return;
     
@@ -159,12 +159,12 @@ const CorporateWellnessCarousel = () => {
 
   return (
     <div className="w-full px-4 sm:px-6 md:px-8 max-w-[1600px] mx-auto">
-      {/* ROUNDED BORDERS APPLIED HERE */}
+      {}
       <div className="relative w-full h-[500px] md:h-[600px] overflow-hidden rounded-2xl sm:rounded-3xl md:rounded-[3rem] shadow-xl">
         
-        {/* Simple fade transition without complex animations */}
+        {}
         <div className="relative w-full h-full">
-          {/* All slides stacked, only current one visible */}
+          {}
           {carouselItems.map((item, index) => (
             <div
               key={index}
@@ -172,7 +172,7 @@ const CorporateWellnessCarousel = () => {
                 index === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'
               }`}
             >
-              {/* Background Image with smooth loading */}
+              {}
               <div 
                 className="absolute inset-0 z-0"
                 style={{
@@ -183,10 +183,10 @@ const CorporateWellnessCarousel = () => {
                 }}
               />
               
-              {/* Light overlay for better text readability */}
+              {}
               <div className="absolute inset-0 bg-black/60" />
               
-              {/* Content */}
+              {}
               <div className="relative z-10 h-full flex items-center">
                 <div className="container mx-auto px-4 py-8">
                   <div className="max-w-4xl mx-auto text-center">
@@ -230,7 +230,7 @@ const CorporateWellnessCarousel = () => {
           ))}
         </div>
 
-        {/* Dots indicator - Suppress Hydration Warning Added */}
+        {}
         <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex space-x-3 z-30">
           {carouselItems.map((_, index) => (
             <button
@@ -248,7 +248,7 @@ const CorporateWellnessCarousel = () => {
           ))}
         </div>
 
-        {/* Navigation buttons - Suppress Hydration Warning Added */}
+        {}
         <button
           onClick={prevSlide}
           disabled={isAnimating}
@@ -281,11 +281,11 @@ export default function CorporatePage() {
 
   const onSubmit = async (data: CorporateFormValues) => {
     try {
-      // ---------------------------------------------------------
-      // 🔑 EMAILJS CONFIGURATION (ENV VARS)
-      // ---------------------------------------------------------
-      // We use the non-null assertion (!) because we assume these are set.
-      // If not, it's better to fail fast in development.
+      
+      
+      
+      
+      
       const SERVICE_ID = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID_2!; 
       const TEMPLATE_ID = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID_2!; 
       const PUBLIC_KEY = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY_2!; 
@@ -349,15 +349,15 @@ export default function CorporatePage() {
     },
   ];
 
-  // Use the data from JSON file
+  
   const workshopCategories = workshopsData.workshops;
 
   return (
     <div className="min-h-screen bg-white pt-20 sm:pt-24">
-      {/* Full-width Carousel Section */}
+      {}
       <CorporateWellnessCarousel />
 
-      {/* What We Offer section */}
+      {}
       <div className="py-16 sm:py-24 bg-white">
         <div className="container mx-auto px-4">
           <FastScrollReveal>
@@ -546,7 +546,7 @@ export default function CorporatePage() {
                                         fieldName === 'companyName' ? 'Your Company Inc.' : 
                                         fieldName === 'contactName' ? 'Jane Doe' : 'jane.doe@company.com'
                                       }
-                                      suppressHydrationWarning // Added for safety against extensions
+                                      suppressHydrationWarning 
                                       {...field}
                                     />
                                   </FormControl>
@@ -566,15 +566,15 @@ export default function CorporatePage() {
                             type="submit" 
                             className="relative w-full px-6 py-3 rounded-full bg-[#Dd1764] text-white text-sm font-bold tracking-wide overflow-hidden group transition-all duration-300 hover:shadow-lg hover:shadow-[#3F2965]/20 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
                             disabled={form.formState.isSubmitting}
-                            suppressHydrationWarning // Added for safety against extensions
+                            suppressHydrationWarning 
                           >
-                            {/* Left Curtain */}
+                            {}
                             <span className="absolute top-0 left-[-25%] w-[75%] h-full bg-gradient-to-r from-[#3F2965] to-[#513681] -skew-x-12 -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-left" />
                             
-                            {/* Right Curtain */}
+                            {}
                             <span className="absolute top-0 right-[-25%] w-[75%] h-full bg-gradient-to-l from-[#3F2965] to-[#513681] -skew-x-12 translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out origin-right" />
                             
-                            {/* Text */}
+                            {}
                             <span className="relative z-10 flex items-center justify-center gap-2">
                               {form.formState.isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
                               Submit Inquiry

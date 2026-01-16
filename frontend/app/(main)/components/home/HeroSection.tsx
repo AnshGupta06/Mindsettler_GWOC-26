@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Reveal from "../common/Reveal";
 import { CharReveal, SlideUp } from "../common/RevealComponent";
-import { Users, Star, ShieldCheck } from "lucide-react";
+import { Users, Star, ShieldCheck, Hand } from "lucide-react";
 
 export default function HeroSection() {
   const ModelViewer: any = "model-viewer";
@@ -13,37 +13,32 @@ export default function HeroSection() {
       
       <div className="max-w-[1440px] mx-auto w-full relative z-10 grid lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-20 items-center">
 
-        {/* LEFT COLUMN: 3D Model (Swapped to Left) */}
-        {/* Mobile: order-2 (Bottom), Desktop: order-1 (Left) */}
+        {/* Hero Visual */}
         <div className="order-2 lg:order-1 relative w-full flex items-center justify-center lg:justify-end min-h-[300px] sm:min-h-[400px]">
           <SlideUp delay={0.2} className="w-full h-full flex justify-center">
             
-            {/* CONTAINER FOR MODEL & ANIMATIONS */}
+            {/* Blob Background */}
             <div className="relative w-full max-w-[350px] sm:max-w-[500px] aspect-square flex items-center justify-center scale-90 sm:scale-100">
               
-              {/* --- ALIVE ANIMATED BACKGROUND START --- */}
-              
-              {/* 1. Breathing Outer Circle */}
+              {/* Animated Blobs */}
               <div className="absolute inset-0 border border-[#3F2965] opacity-15 rounded-full animate-[ping_3s_ease-in-out_infinite]" />
               
-              {/* 2. Pulsing Mid Circle */}
+              {/* Inner Rings */}
               <div className="absolute inset-8 border-2 border-[#Dd1764] opacity-20 rounded-full animate-[pulse_2s_ease-in-out_infinite]" />
               
-              {/* 3. Static Inner Circle */}
+              {/* Core Decoration */}
               <div className="absolute inset-16 border border-[#3F2965] opacity-10 rounded-full" />
 
-              {/* 4. Fast Rotating Dashed Circle */}
+              {/* Dashed Rings */}
               <div className="absolute inset-4 border border-dashed border-[#Dd1764] opacity-25 rounded-full animate-[spin_8s_linear_infinite]" />
               
-              {/* 5. Slow Counter Rotating Dashed Circle */}
+              {/* Reverse Spin Ring */}
               <div className="absolute inset-12 border border-dashed border-[#3F2965] opacity-20 rounded-full animate-[spin_15s_linear_infinite_reverse]" />
 
-              {/* 6. Pulsing Center Ring - Heartbeat effect */}
+              {/* Center Pulse */}
               <div className="absolute inset-[35%] border-2 border-[#Dd1764] opacity-30 rounded-full animate-[ping_1.5s_ease-in-out_infinite]" />
 
-              {/* --- ALIVE ANIMATED BACKGROUND END --- */}
-
-              {/* 3D Model */}
+              {/* 3D Model Placeholder */}
               <ModelViewer
                 src="/assets/heart+with+brain+3d+model.glb"
                 alt="MindSettler 3D model"
@@ -65,15 +60,24 @@ export default function HeroSection() {
                 rotation-per-second="15deg"
                 suppressHydrationWarning
               />
+
+              {/* --- MOBILE INTERACTION HINT --- */}
+              <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 w-max lg:hidden flex flex-col items-center gap-1 pointer-events-none opacity-60 animate-pulse">
+                <div className="flex items-center gap-1.5 text-[10px] font-bold text-[#3F2965] uppercase tracking-widest bg-white/40 backdrop-blur-sm px-3 py-1 rounded-full border border-[#3F2965]/10">
+                   <Hand size={10} /> Touch Model to Play
+                </div>
+                <p className="text-[9px] font-medium text-[#3F2965]/50">
+                  (Scroll page outside model)
+                </p>
+              </div>
+
             </div>
           </SlideUp>
         </div>
 
-        {/* RIGHT COLUMN: Text Content (Swapped to Right) */}
-        {/* Mobile: order-1 (Top), Desktop: order-2 (Right) */}
+        {/* Text Content */}
         <div className="order-1 lg:order-2 flex flex-col items-center lg:items-start text-center lg:text-left">
           
-
           <div className="text-3xl sm:text-5xl md:text-6xl lg:text-[4.5rem] leading-[1.1] font-extrabold text-[#3F2965] tracking-tight mb-6 sm:mb-8">
             <div className="mb-1">
               <CharReveal delay={0}>Understand</CharReveal>
@@ -120,17 +124,17 @@ export default function HeroSection() {
 
       </div>
 
-      {/* BOTTOM BAR: Trust Indicators / Stats */}
+      {/* Stats Bar */}
       <div className="relative z-10 max-w-[1440px] mx-auto w-full mt-12 sm:mt-16 lg:mt-24 px-4">
         <SlideUp delay={0.7}>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 md:gap-12 py-6 sm:py-8 border-t border-[#3F2965]/5">
+          <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center sm:justify-between gap-8 py-8 border-t border-[#3F2965]/5 max-w-5xl mx-auto">
             {[
-              { label: "Lives Touched", value: "500+", icon: Users },
-              { label: "Expert Therapist", value: "Certified", icon: ShieldCheck },
-              { label: "Client Satisfaction", value: "4.9/5", icon: Star },
+              { label: "Our Approach", value: "Human-First", icon: Users },
+              { label: "Expertise", value: "Trauma-Informed", icon: ShieldCheck },
+              { label: "Practice", value: "Founder-Led", icon: Star },
             ].map((stat, i) => (
-              <div key={i} className="flex items-center justify-center sm:justify-start gap-4 group">
-                <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center text-[#Dd1764] group-hover:scale-110 transition-transform duration-300">
+              <div key={i} className="flex items-center gap-4 min-w-[200px] justify-center sm:justify-start group">
+                <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center text-[#Dd1764] group-hover:scale-110 transition-transform duration-300 shadow-sm border border-[#3F2965]/5">
                   <stat.icon size={24} strokeWidth={1.5} />
                 </div>
                 <div>

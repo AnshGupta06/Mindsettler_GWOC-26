@@ -33,7 +33,7 @@ export default function FAQSection() {
 
         <div className="grid lg:grid-cols-12 gap-12 lg:gap-20">
 
-          {/* LEFT: Header */}
+          {}
           <div className="lg:col-span-4 text-center lg:text-left">
             <SlideUp>
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-[#3F2965]/10 shadow-sm text-[#Dd1764] font-bold text-xs uppercase tracking-widest mb-6">
@@ -61,7 +61,7 @@ export default function FAQSection() {
             </SlideUp>
           </div>
 
-          {/* RIGHT: Accordion & Button */}
+          {}
           <div className="lg:col-span-8">
             <div className="space-y-4 mb-8">
               {faqs.map((faq, index) => (
@@ -69,7 +69,7 @@ export default function FAQSection() {
               ))}
             </div>
 
-            {/* View All Button */}
+            {}
             <SlideUp delay={0.5} className="flex justify-center lg:justify-start">
               <Link href="/faqs">
                 <button className="group flex items-center gap-2 px-6 py-3 rounded-full border-2 border-[#3F2965]/10 text-[#3F2965] font-bold text-sm hover:bg-[#3F2965] hover:text-white hover:border-[#3F2965] transition-all duration-300">

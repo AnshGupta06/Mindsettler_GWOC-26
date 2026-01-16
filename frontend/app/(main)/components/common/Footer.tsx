@@ -4,20 +4,20 @@ export default function Footer() {
   return (
     <footer className="relative bg-[#3F2965] text-white/80 overflow-hidden">
 
-      {/* Curved top shape */}
-      <div className="absolute top-0 left-0 w-full h-24 bg-white rounded-b-[100%] translate-y-[-50%]" />
+      {}
+      <div className="absolute top-0 left-0 w-full h-24 bg-[#F9F6FF] rounded-b-[100%] translate-y-[-50%]" />
 
       <div className="relative max-w-7xl mx-auto px-6 sm:px-10 lg:px-24 pt-28 pb-16 lg:pb-20">
 
-        {/* Brand + CTA */}
+        {}
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-10 pb-12 border-b border-white/10">
 
-          {/* Brand */}
+          {}
           <div>
             <Link href="/" className="flex items-center gap-3 z-50">
               <div className="relative rounded-xl flex items-center justify-center overflow-hidden py-2 px-3">
                 <Image
-                  src="/assets/Mindsettler-logo.png"
+                  src="/assets/Mindsettler-logo.webp"
                   alt="MindSettler Logo"
                   width={140}
                   height={1}
@@ -32,7 +32,7 @@ export default function Footer() {
             </p>
           </div>
 
-          {/* CTA */}
+          {}
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
             <span className="text-xs uppercase tracking-[0.18em] text-white/60">
               Ready to begin?
@@ -46,10 +46,10 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Main grid */}
+        {}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-16 pt-12">
 
-          {/* Navigate */}
+          {}
           <div>
             <h4 className="text-white text-sm font-semibold tracking-[0.14em] uppercase mb-5">
               Navigate
@@ -70,7 +70,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Legal */}
+          {}
           <div>
             <h4 className="text-white text-sm font-semibold tracking-[0.14em] uppercase mb-5">
               Legal
@@ -90,7 +90,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Contact */}
+          {}
           <div>
             <h4 className="text-white text-sm font-semibold tracking-[0.14em] uppercase mb-5">
               Contact
@@ -112,7 +112,7 @@ export default function Footer() {
             </p>
           </div>
 
-          {/* Practice */}
+          {}
           <div>
             <h4 className="text-white text-sm font-semibold tracking-[0.14em] uppercase mb-5">
               Practice
@@ -129,7 +129,7 @@ export default function Footer() {
 
         </div>
 
-        {/* Bottom bar */}
+        {}
         <div className="mt-14 border-t border-white/15 pt-6 text-xs sm:text-sm flex flex-col sm:flex-row gap-3 sm:gap-0 sm:items-center justify-between text-white/50">
           <span>© {new Date().getFullYear()} MindSettler. All rights reserved.</span>
           <span>Designed for clarity, not for crisis support.</span>

@@ -62,7 +62,10 @@ model Booking {
   slot      SessionSlot @relation(fields: [slotId], references: [id])
 
   meetingNotes MeetingNotes?
-
+  clientName    String?
+  phone         String?
+  attendees     Int       @default(1)
+  maritalStatus String?
   createdAt DateTime @default(now())
 }
 

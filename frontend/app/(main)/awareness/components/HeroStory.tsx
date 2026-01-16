@@ -8,27 +8,27 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const slides = [
   {
-    image: "/awareness_hero/brain-1.jpeg",
+    image: "/awareness_hero/brain-1.webp",
     title: "It’s okay to feel tired, sad, or anxious.",
     highlight: "It’s human.",
   },
   {
-    image: "/awareness_hero/brain-2.jpeg",
+    image: "/awareness_hero/brain-2.webp",
     title: "Mental well-being begins with awareness.",
     highlight: "Not judgment.",
   },
   {
-    image: "/awareness_hero/brain-3.jpeg",
+    image: "/awareness_hero/brain-3.webp",
     title: "Support is not weakness.",
     highlight: "It’s self-care.",
   },
   {
-    image: "/awareness_hero/brain-4.jpeg",
+    image: "/awareness_hero/brain-4.webp",
     title: "Healing doesn’t follow a straight line.",
     highlight: "Take your time.",
   },
   {
-    image: "/awareness_hero/brain-5.jpeg",
+    image: "/awareness_hero/brain-5.webp",
     title: "Asking for help shows strength.",
     highlight: "Never weakness.",
   },
@@ -78,7 +78,7 @@ export default function HeroStory() {
   return (
     <section className="relative overflow-hidden">
 
-      {/* Page Heading */}
+      {}
       <div className="relative z-10 pt-8 pb-2 md:pt-8 md:pb-2 text-center">
         <div className="text-2xl md:text-5xl font-extrabold text-[#3F2965] tracking-tight px-4">
           <CharReveal delay={0.1}>
@@ -88,10 +88,10 @@ export default function HeroStory() {
       </div>
 
       <div className="container mx-auto px-4 md:px-6 py-6 md:py-6 lg:py-6 relative z-10">
-        {/* CHANGED: Reduced gap-6 to gap-2 for mobile to pull items closer */}
+        {}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10 lg:gap-10 items-center">
 
-          {/* IMAGE AREA */}
+          {}
           <div className="relative h-[300px] md:h-[500px] lg:h-[500px] w-full flex items-center justify-center order-1">
             <div className="relative w-full h-full max-w-[500px] aspect-[4/5] md:aspect-square">
               <AnimatePresence mode="popLayout" custom={direction}>
@@ -117,7 +117,7 @@ export default function HeroStory() {
               </AnimatePresence>
             </div>
 
-            {/* Mobile Nav Buttons */}
+            {}
             <div className="absolute md:hidden inset-0 flex items-center justify-between pointer-events-none px-2 z-20">
               <button
                 onClick={goPrev}
@@ -134,9 +134,9 @@ export default function HeroStory() {
             </div>
           </div>
 
-          {/* TEXT AREA */}
+          {}
           <div className="order-2 flex flex-col items-center md:items-start text-center md:text-left">
-            {/* CHANGED: switched 'items-center' to 'items-start' on mobile to remove top gap */}
+            {}
             <div className="relative h-[120px] md:h-[200px] w-full flex items-start md:items-center justify-center md:justify-start pt-2 md:pt-0">
               <AnimatePresence mode="wait" custom={direction}>
                 <motion.div
@@ -159,8 +159,8 @@ export default function HeroStory() {
               </AnimatePresence>
             </div>
 
-            {/* Controls */}
-            {/* CHANGED: Reduced mt-4 to mt-0 on mobile if you want dots closer to text */}
+            {}
+            {}
             <div className="mt-2 md:mt-8 flex flex-col md:flex-row items-center gap-8">
               <div className="flex gap-2 bg-white p-2 rounded-full border border-[#3F2965]/5 shadow-sm">
                 {slides.map((_, i) => (

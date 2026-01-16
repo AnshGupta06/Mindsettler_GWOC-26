@@ -37,7 +37,7 @@ export default function Navbar() {
   const router = useRouter();
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // 🔤 Helper to get Initials
+  
   const getInitials = (name: string | null | undefined) => {
     if (!name) return "U";
     const parts = name.trim().split(" ");
@@ -46,14 +46,14 @@ export default function Navbar() {
       : parts[0][0].toUpperCase();
   };
 
-  // Scroll Listener
+  
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Click Outside Dropdown Listener
+  
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -64,7 +64,7 @@ export default function Navbar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Auth Listener
+  
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (u) => {
       setUser(u);
@@ -80,7 +80,7 @@ export default function Navbar() {
     return () => unsub();
   }, []);
 
-  // Lock Body Scroll on Mobile Menu
+  
   useEffect(() => {
     document.body.style.overflow = mobileMenuOpen ? "hidden" : "auto";
   }, [mobileMenuOpen]);
@@ -119,11 +119,11 @@ export default function Navbar() {
       >
         <nav className="max-w-[1440px] mx-auto px-6 md:px-8 flex items-center justify-between">
           
-          {/* LOGO */}
+          {}
           <Link href="/" className="relative z-50 group">
             <div className="relative rounded-xl bg-white/50 backdrop-blur-sm border border-white/20 px-3 py-1.5 transition-all duration-300 group-hover:scale-105">
               <Image
-                src="/assets/Mindsettler-logo.png"
+                src="/assets/Mindsettler-logo.webp"
                 alt="MindSettler Logo"
                 width={140}
                 height={40}
@@ -133,7 +133,7 @@ export default function Navbar() {
             </div>
           </Link>
 
-          {/* DESKTOP NAV (Pill Design) */}
+          {}
           <ul className="hidden xl:flex items-center gap-1 bg-white/60 backdrop-blur-md p-1.5 rounded-full border border-[#3F2965]/5 shadow-sm">
             {menuItems.map((item) => {
               const isActive = pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href));
@@ -159,7 +159,7 @@ export default function Navbar() {
             })}
           </ul>
 
-          {/* DESKTOP ACTIONS */}
+          {}
           <div className="hidden md:flex items-center gap-4">
             {!user ? (
               <div className="flex items-center gap-3">
@@ -177,7 +177,7 @@ export default function Navbar() {
             ) : (
               <div className="flex items-center gap-4">
                 
-                {/* Book Session CTA (Non-Admins) */}
+                {}
                 {!isAdmin && (
                   <Link href="/book">
                     <button className="hidden lg:flex px-5 py-2.5 rounded-full bg-[#Dd1764] text-white text-xs font-bold tracking-wide hover:shadow-lg hover:shadow-[#Dd1764]/30 transition hover:-translate-y-0.5 items-center gap-2">
@@ -186,7 +186,7 @@ export default function Navbar() {
                   </Link>
                 )}
 
-                {/* USER DROPDOWN */}
+                {}
                 <div className="relative" ref={dropdownRef}>
                   <button 
                     onClick={() => setDropdownOpen(!dropdownOpen)}
@@ -245,7 +245,7 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* MOBILE TOGGLE */}
+          {}
           <button
             className="xl:hidden z-50 w-10 h-10 flex items-center justify-center rounded-full bg-white border border-[#3F2965]/10 text-[#3F2965] active:scale-90 transition-all"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -255,7 +255,7 @@ export default function Navbar() {
         </nav>
       </header>
 
-      {/* MOBILE MENU */}
+      {}
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div
@@ -267,7 +267,7 @@ export default function Navbar() {
           >
             <div className="flex-1 px-6 pt-24 pb-8 overflow-y-auto">
               
-              {/* User Info (Mobile) */}
+              {}
               {user && (
                   <div className="mb-8 p-4 bg-[#F9F6FF] rounded-2xl flex items-center gap-4 border border-[#3F2965]/5">
                       <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center text-[#Dd1764] font-bold text-lg shadow-sm">
@@ -307,7 +307,7 @@ export default function Navbar() {
                 ))}
               </ul>
 
-              {/* MOBILE CTA */}
+              {}
               <div className="mt-auto space-y-3">
                 {!user ? (
                   <div className="flex flex-col gap-3">

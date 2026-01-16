@@ -60,14 +60,14 @@ export default function PrivacyPolicyPage() {
   return (
     <div className="bg-white min-h-screen">
       
-      {/* Reduced padding here to bring the heading closer to the navbar */}
+      {}
       <div className="pt-10 sm:pt-2">
         <PageHeader
           title="Privacy Policy"
         />
       </div>
 
-      {/* Main content with negative margin to pull cards up towards the heading */}
+      {}
       <section className="-mt-8 sm:-mt-12 pb-12 bg-gradient-to-b from-white to-lightBg relative z-10">
         <div className="container mx-auto max-w-4xl px-4">
 
@@ -105,7 +105,7 @@ export default function PrivacyPolicyPage() {
           </div>
 
           <div className="mt-10 text-center">
-            <Card className="border border-primary/10 shadow-xl bg-gradient-to-r from-primary/5 to-accent/5 hover:shadow-2xl transition-all duration-300">
+            <Card className="border border-primary/10 shadow-xl hover:shadow-2xl transition-all duration-300">
               <CardContent className="pt-6">
                 <p className="text-muted-foreground mb-4">
                   If you have any questions about this Privacy Policy, please don't hesitate to reach out.

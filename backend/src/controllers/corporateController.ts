@@ -1,18 +1,18 @@
-// backend/src/controllers/corporateController.ts
+
 import { Request, Response } from 'express';
-// Adjust the import path to where you saved the emailService.js file
+
 import { sendEmail } from '../services/emailService'; 
 
 export const submitInquiry = async (req: Request, res: Response) => {
   const { companyName, contactName, email, message } = req.body;
 
-  // Basic validation
+  
   if (!companyName || !contactName || !email || !message) {
     return res.status(400).json({ error: "All fields are required" });
   }
 
   try {
-    // 1. Construct the Email HTML for the user
+    
     const emailHtml = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px;">
         <h2 style="color: #3F2965;">Inquiry Received</h2>
@@ -31,7 +31,7 @@ export const submitInquiry = async (req: Request, res: Response) => {
       </div>
     `;
 
-    // 2. Send the email using your existing service
+    
     await sendEmail(
       email,
       "We received your Corporate Inquiry - MindSettler",

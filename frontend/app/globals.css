@@ -1,14 +1,11 @@
 @import "tailwindcss";
 @config "../tailwind.config.js";
 
-/* Variable definitions. 
-  Since tailwind.config.js uses "var(--name)" without HSL wrapper, 
-  we must provide the FULL color value here (e.g., hex or hsl(..)).
-*/
+
 
 @layer base {
   :root {
-    --background: #ffffff;
+    --background: #F9F6FF;
     --foreground: #171717;
 
     --card: #ffffff;
@@ -18,7 +15,7 @@
     --popover-foreground: #171717;
 
     --primary: #3F2965;
-    /* MindSettler Purple */
+    
     --primary-foreground: #ffffff;
 
     --secondary: #f1f5f9;
@@ -28,7 +25,7 @@
     --muted-foreground: #64748b;
 
     --accent: #DD1764;
-    /* MindSettler Pink */
+    
     --accent-foreground: #ffffff;
 
     --destructive: #ef4444;
@@ -40,7 +37,7 @@
 
     --radius: 0.75rem;
 
-    /* Custom colors */
+    
     --softPurple: #C7BEDA;
     --softPink: #F7C6D6;
     --lightBg: #F9F7FC;
@@ -48,7 +45,7 @@
 
   @media (prefers-color-scheme: light) {
     :root {
-      /* Converting previous HSL channels to full HSL strings */
+      
       --background: hsl(204 10% 10%);
       --foreground: hsl(180 10% 95%);
 
@@ -79,24 +76,19 @@
     }
   }
 
-  /* ----------------------------------------------------------------------- */
-  /* GLOBAL RESPONSIVE SCALING                                               */
-  /* ----------------------------------------------------------------------- */
+  
+  
+  
   
   html {
-    /* 1. MOBILE DEFAULT: 
-      Setting this to 14px means 1rem = 14px (instead of 16px).
-      This instantly scales down margins, paddings, and fonts by ~12.5% on mobile.
-    */
+    
     font-size: 14px; 
     scroll-behavior: smooth;
   }
 
   @media (min-width: 640px) {
     html {
-      /* 2. TABLET & DESKTOP: 
-        Reset to the standard 16px. 
-      */
+      
       font-size: 16px; 
     }
   }
@@ -106,7 +98,7 @@
   }
 
   body {
-    /* overflow-x-hidden prevents unwanted horizontal scrolling on mobile */
+    
     font-family: var(--font-jakarta), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     @apply bg-background text-foreground overflow-x-hidden antialiased;
   }
@@ -115,10 +107,7 @@
     @apply bg-transparent text-foreground placeholder:text-muted-foreground;
   }
 
-  /* GLOBAL TYPOGRAPHY DEFAULTS 
-     Forces headings to be smaller on mobile and larger on desktop.
-     This fixes the "text appears a little big" issue globally.
-  */
+  
   h1 {
     @apply text-3xl md:text-5xl lg:text-6xl; 
   }
@@ -136,7 +125,7 @@
   }
 }
 
-/* Custom Components */
+
 
 .ms-chatbot-trigger {
   background: #dd1764 !important;
@@ -212,7 +201,7 @@ button {
   100% { transform: translateX(400%); }
 }
 
-/* 3D Transform Utilities for Flip Cards */
+
 @layer utilities {
   .perspective-1000 {
     perspective: 1000px;
@@ -226,4 +215,15 @@ button {
   .rotate-y-180 {
     transform: rotateY(180deg);
   }
+}
+.bg-grain {
+  position: relative;
+}
+.bg-grain::after {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  opacity: 0.04;
+  pointer-events: none;
+  background-image: url('https://grainy-gradients.vercel.app/noise.svg');
 }

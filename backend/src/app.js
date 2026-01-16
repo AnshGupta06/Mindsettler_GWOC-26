@@ -7,7 +7,7 @@ import adminBookingRoutes from "./routes/adminBookingRoutes.js";
 import discountRoutes from "./routes/discountRoutes.js";
 import adminClientRoutes from "./routes/adminClientRoutes.js";
 import settingsRoutes from "./routes/settingsRoutes.js";
-import healthRoutes from "./routes/healthRoutes.js"; // Import health routes
+import healthRoutes from "./routes/healthRoutes.js"; 
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import hpp from 'hpp';
@@ -62,7 +62,7 @@ app.use('/api', limiter);
 
 app.use(express.json());
 
-// Routes
+
 app.use("/api/admin/", adminBookingRoutes);
 app.use("/api/settings", settingsRoutes);
 app.use("/api/auth", authRoutes);

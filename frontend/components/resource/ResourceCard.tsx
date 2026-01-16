@@ -23,7 +23,7 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ resource }) => {
         }
     };
 
-    // Videos link externally immediately. Books and Websites link to internal detail page.
+    
     const isVideo = resource.type === 'Video';
     const href = isVideo ? resource.link : `/resource/${resource.id}`;
     const target = isVideo ? "_blank" : undefined;

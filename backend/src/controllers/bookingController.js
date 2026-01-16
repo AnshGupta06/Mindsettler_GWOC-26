@@ -12,24 +12,23 @@ import "dotenv/config";
 
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
 
-// CONFIGURATION
-const BOOKING_COOLDOWN_MS = 2 * 60 * 1000; // 2 minutes
-const MAX_ACTIVE_BOOKINGS = 3;
+// --- CONSTANTS ---
+const BOOKING_COOLDOWN_MS = 2 * 60 * 1000; // 2 minutes between bookings
+const MAX_ACTIVE_BOOKINGS = 3;             // Max active bookings per user
 
-/* -------------------------------------------------------------------------- */
-/* CONTROLLERS                                                                */
-/* -------------------------------------------------------------------------- */
-
+// --- GET AVAILABLE SLOTS ---
 export const getSlots = async (req, res) => {
   try {
     const { therapyType } = req.query;
     const now = new Date();
     
+    // Base condition: Slot must be in future and not booked
     const whereCondition = {
       isBooked: false,
       startTime: { gt: now },
     };
 
+    // If therapyType provided, show general slots (null) OR specific therapy slots
     if (therapyType) {
       // When a specific therapyType is requested, show slots for that therapy or general slots (therapyType: null)
       whereCondition.OR = [
@@ -37,7 +36,11 @@ export const getSlots = async (req, res) => {
         { therapyType }, 
       ];
     } else {
+<<<<<<< HEAD
       // For general sessions, only show slots not reserved for any specific therapy
+=======
+      // If no type selected, show only general slots
+>>>>>>> e7e4ee1c2d09fe045833dfa4b810fbebf3340122
       whereCondition.therapyType = null;
     }
 
@@ -53,9 +56,19 @@ export const getSlots = async (req, res) => {
   }
 };
 
+// --- CREATE BOOKING ---
 export const createBooking = async (req, res) => {
   try {
-    const { slotId, type, reason, therapyType } = req.body;
+    const { 
+      slotId, 
+      type, 
+      reason, 
+      therapyType,
+      name,
+      phone,
+      attendees,
+      status 
+    } = req.body;
 
     const user = await prisma.user.findUnique({
       where: { firebaseUid: req.user.uid },
@@ -68,7 +81,7 @@ export const createBooking = async (req, res) => {
       return res.status(403).json({ error: "You are restricted from making new bookings." });
     }
 
-  // 1. SPAM PREVENTION
+    // 1. Check Max Active Bookings
     const activeFutureBookings = await prisma.booking.count({
       where: {
         userId: user.id,
@@ -81,6 +94,7 @@ export const createBooking = async (req, res) => {
       return res.status(400).json({ error: `You cannot have more than ${MAX_ACTIVE_BOOKINGS} active bookings.` });
     }
 
+    // 2. Check Cooldown
     const lastBooking = await prisma.booking.findFirst({
       where: { userId: user.id },
       orderBy: { createdAt: 'desc' },
@@ -92,7 +106,8 @@ export const createBooking = async (req, res) => {
         return res.status(429).json({ error: "Please wait a moment before booking another session." });
       }
     }
-    // 2. SESSION TYPE VALIDATION
+    
+    // 3. Check History (First vs Follow-up Logic)
     const historyCheckQuery = {
       userId: user.id,
       status: { not: "REJECTED" },
@@ -117,21 +132,20 @@ export const createBooking = async (req, res) => {
       return res.status(400).json({ error: msg });
     }
    
-    // 3. EXECUTE BOOKING (With Unique Constraint Fix)
+    // 4. Transaction: Create Booking & Reserve Slot
     const booking = await prisma.$transaction(async (tx) => {
       const slot = await tx.sessionSlot.findUnique({ where: { id: slotId } });
       if (!slot) throw new Error("Slot not found");
       if (slot.isBooked) throw new Error("Slot unavailable");
 
-      // ✨ CRITICAL FIX: Handle Unique Constraint on slotId
+      // Check for ghost bookings (failed previous attempts on same slot)
       const existingBooking = await tx.booking.findUnique({ where: { slotId } });
       
       if (existingBooking) {
         if (existingBooking.status === "REJECTED") {
-          // It's safe to overwrite a rejected booking
+          // Cleanup old rejected booking to free up slot ID relation
           await tx.booking.delete({ where: { id: existingBooking.id } });
         } else {
-          // This slot is occupied by a valid booking
           throw new Error("Slot is already tied to an active booking.");
         }
       }
@@ -143,7 +157,11 @@ export const createBooking = async (req, res) => {
           type, 
           reason, 
           therapyType,
-          status: "PENDING"
+          status: "PENDING",
+          clientName: name,        
+          phone: phone,            
+          attendees: Number(attendees),
+          maritalStatus: status    
         },
       });
 
@@ -157,13 +175,27 @@ export const createBooking = async (req, res) => {
 
     res.json(booking);
 
-    // Send Admin Notification via Service
+    // 5. Send Admin Notification
+    // Construct a detailed reason string so Admin sees all info immediately
+    const detailedReason = `
+      ${reason || ''} 
+      ---
+      Client Details:
+      Name: ${name}
+      Phone: ${phone}
+      Attendees: ${attendees}
+      Status: ${status}
+    `.trim();
+
     sendNewBookingAdminEmail(ADMIN_EMAIL, {
-        userName: user.name,
-        userEmail: user.email,
+        userName: name || user.name, // Prefer form name
+        userEmail: user.email,       // Verified DB email
+        phone,                       // Pass phone explicitly
+        attendees,                   // Pass attendees explicitly
+        status,                      // Pass marital status explicitly
         type,
         therapyType,
-        reason,
+        reason,                      // Pass raw reason (no need to pack details)
     }).catch(err => console.error("❌ Admin email failed:", err));
 
   } catch (err) {
@@ -172,6 +204,7 @@ export const createBooking = async (req, res) => {
   }
 };
 
+// --- GET MY BOOKINGS ---
 export const getMyBookings = async (req, res) => {
   try {
     const user = await prisma.user.findUnique({
@@ -195,6 +228,7 @@ export const getMyBookings = async (req, res) => {
   }
 };
 
+// --- CANCEL BOOKING ---
 export const cancelBooking = async (req, res) => {
   try {
     const { id } = req.params;
@@ -205,7 +239,7 @@ export const cancelBooking = async (req, res) => {
       return res.status(404).json({ error: "Booking not found or unauthorized" });
     }
 
-    // 🔒 CANCELLATION POLICY CHECK
+    // Check Cancellation Policy
     const settings = await getSettings(); 
     
     const sessionTime = new Date(booking.slot.startTime);
@@ -219,25 +253,24 @@ export const cancelBooking = async (req, res) => {
         });
     }
 
-    // Capture details before deletion for emails
+    // Prepare email data
     const dateObj = new Date(booking.slot.startTime);
     const dateStr = dateObj.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
     const timeStr = dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
     const isConfirmed = booking.status === "CONFIRMED";
 
-    // Proceed with cancellation
+    // Transaction: Free up slot & Delete booking
     await prisma.$transaction([
       prisma.sessionSlot.update({ where: { id: booking.slotId }, data: { isBooked: false } }),
       prisma.booking.delete({ where: { id } }),
     ]);
 
-    // ✨ SEND RELEVANT EMAILS
+    // Send Emails
     if (isConfirmed) {
-      // 1. Notify User of Refund Request
+      // Confirmed bookings trigger a refund request
       sendRefundRequestedEmail(user.email, user.name, dateStr, timeStr)
         .catch(err => console.error("Refund email failed:", err));
       
-      // 2. Alert Admin to Process Refund
       sendAdminRefundAlert(ADMIN_EMAIL, {
         userName: user.name,
         userEmail: user.email,
@@ -246,7 +279,7 @@ export const cancelBooking = async (req, res) => {
       }).catch(err => console.error("Admin refund alert failed:", err));
 
     } else {
-      // 1. Notify User of Cancellation (Pending/Rejected)
+      // Pending bookings just cancel
       sendBookingCancelledEmail(user.email, user.name, dateStr, timeStr)
         .catch(err => console.error("Cancel email failed:", err));
     }
@@ -258,8 +291,7 @@ export const cancelBooking = async (req, res) => {
   }
 };
 
-// --- MEETING NOTES FUNCTIONS ---
-
+// --- START MEETING (Admin Only) ---
 export const startMeeting = async (req, res) => {
   const { bookingId } = req.params;
 
@@ -279,7 +311,6 @@ export const startMeeting = async (req, res) => {
 
     const now = new Date();
     
-    // Create or update meeting notes
     const meetingNotes = await prisma.meetingNotes.upsert({
       where: { bookingId },
       update: { 
@@ -304,6 +335,7 @@ export const startMeeting = async (req, res) => {
   }
 };
 
+// --- END MEETING (Admin Only) ---
 export const endMeeting = async (req, res) => {
   const { bookingId } = req.params;
 
@@ -317,7 +349,7 @@ export const endMeeting = async (req, res) => {
     }
 
     const now = new Date();
-    const duration = Math.round((now - meetingNotes.meetingStartedAt) / (1000 * 60)); // in minutes
+    const duration = Math.round((now - meetingNotes.meetingStartedAt) / (1000 * 60)); // Duration in minutes
 
     await prisma.meetingNotes.update({
       where: { bookingId },
@@ -339,6 +371,7 @@ export const endMeeting = async (req, res) => {
   }
 };
 
+// --- UPDATE MEETING NOTES (Admin Only) ---
 export const updateMeetingNotes = async (req, res) => {
   const { bookingId } = req.params;
   const { 
@@ -374,14 +407,14 @@ export const updateMeetingNotes = async (req, res) => {
       }
     });
 
-    // Fetch booking details for email
+    // Check if we need to send notes to user or admin
     const booking = await prisma.booking.findUnique({
       where: { id: bookingId },
       include: { user: true, slot: true }
     });
 
     if (booking) {
-      // Compile public notes for user
+      // 1. Send Public Notes to User
       const publicNotes = [
         sessionSummary && `Session Summary:\n${sessionSummary}`,
         clientProgress && `Client Progress:\n${clientProgress}`,
@@ -390,13 +423,12 @@ export const updateMeetingNotes = async (req, res) => {
         additionalNotes && `Additional Notes:\n${additionalNotes}`
       ].filter(Boolean).join('\n\n');
 
-      // Send public notes to user if any exist
       if (publicNotes.trim()) {
         sendSessionNotesToUser(booking.user.email, booking.user.name || "Valued Client", publicNotes)
           .catch(err => console.error("Failed to send session notes to user:", err));
       }
 
-      // Send therapist notes to admin if provided
+      // 2. Send Private Notes to Admin
       if (therapistNotes && therapistNotes.trim()) {
         sendTherapistNotesToAdmin(ADMIN_EMAIL, booking.user.name || "Client", booking.user.email, therapistNotes)
           .catch(err => console.error("Failed to send therapist notes to admin:", err));
@@ -414,6 +446,7 @@ export const updateMeetingNotes = async (req, res) => {
   }
 };
 
+// --- GET MEETING NOTES (Admin Only) ---
 export const getMeetingNotes = async (req, res) => {
   const { bookingId } = req.params;
 

@@ -6,7 +6,7 @@ export const syncUser = async (req, res) => {
     const decoded = req.user; 
     const { name, phone } = req.body || {};
 
-    // Check if user exists BEFORE update to know if it's a signup
+    
     const existingUser = await prisma.user.findUnique({
         where: { firebaseUid: decoded.uid }
     });
@@ -26,9 +26,9 @@ export const syncUser = async (req, res) => {
       },
     });
 
-    // Send Welcome Email only on creation
+    
     if (!existingUser) {
-        // Run in background so we don't block the response
+        
         sendWelcomeEmail(user.email, user.name || "Friend").catch(console.error);
     }
 
@@ -46,7 +46,7 @@ export async function getMe(req, res) {
 
     if (!user) return res.status(404).json({ error: "User not found" });
     
-    // Pass specific error code for frontend redirection
+    
     if (user.isBlocked) return res.status(403).json({ error: "ACCOUNT_BLOCKED" });
 
     res.json(user);

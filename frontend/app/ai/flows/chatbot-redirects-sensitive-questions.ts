@@ -1,12 +1,6 @@
 'use server';
 
-/**
- * @fileOverview An AI chatbot flow that redirects sensitive mental health questions to booking or contact pages.
- *
- * - chatbotRedirectsSensitiveQuestions - A function that processes user queries and redirects sensitive questions.
- * - ChatbotRedirectsSensitiveQuestionsInput - The input type for the chatbotRedirectsSensitiveQuestions function.
- * - ChatbotRedirectsSensitiveQuestionsOutput - The return type for the chatbotRedirectsSensitiveQuestions function.
- */
+
 
 import {ai} from '../../ai/genkit';
 import {z} from 'genkit';

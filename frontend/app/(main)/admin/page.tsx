@@ -8,28 +8,13 @@ import { API_URL } from "@/app/lib/api";
 import toast from "react-hot-toast";
 import Loader from "../components/common/Loader";
 import { 
-  Calendar, 
-  Clock, 
-  User, 
-  CheckCircle, 
-  XCircle, 
-  LayoutDashboard,
-  Award,
-  Video,
-  X,
-  Link as LinkIcon,
-  ExternalLink,
-  Settings,
-  ShieldAlert,
-  Phone,
-  Mail,
-  Play,
-  Square,
-  FileText,
-  Save
+  Calendar, Clock, User, CheckCircle, XCircle, 
+  Video, X, Link as LinkIcon, ExternalLink,
+  Phone, Mail, FileText, Save, Users, Heart,
+  Filter, Search, LayoutDashboard, Award, Settings, ShieldAlert
 } from "lucide-react";
 
-// --- Types ---
+// --- TYPE DEFINITIONS ---
 type Booking = {
   id: string;
   status: "PENDING" | "CONFIRMED" | "REJECTED";
@@ -37,8 +22,16 @@ type Booking = {
   therapyType?: string;
   reason?: string;
   meetingLink?: string;
+  
+  // Database Fields
+  clientName?: string;
+  phone?: string;
+  attendees?: number;
+  maritalStatus?: string;
+
+  // Relations
   user: {
-    id: string; // Needed for blocking
+    id: string; 
     name?: string;
     email: string;
     phone?: string;
@@ -70,37 +63,30 @@ export default function AdminBookingsPage() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  
+  // --- FILTERS STATE ---
   const [filter, setFilter] = useState<"ALL" | "PENDING" | "CONFIRMED" | "REJECTED">("ALL");
+  const [dateSearch, setDateSearch] = useState("");
+  const [therapyFilter, setTherapyFilter] = useState("ALL");
 
-  // Modal State
   const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean; bookingId: string | null }>({
-    isOpen: false,
-    bookingId: null
+    isOpen: false, bookingId: null
   });
   const [manualLink, setManualLink] = useState("");
 
-  // Meeting Notes Modal State
   const [notesModal, setNotesModal] = useState<{ isOpen: boolean; booking: Booking | null }>({
-    isOpen: false,
-    booking: null
+    isOpen: false, booking: null
   });
   const [meetingNotes, setMeetingNotes] = useState<MeetingNotes | null>(null);
   const [notesForm, setNotesForm] = useState({
-    sessionSummary: "",
-    clientProgress: "",
-    keyInsights: "",
-    followUpPlan: "",
-    additionalNotes: "",
-    therapistNotes: ""
+    sessionSummary: "", clientProgress: "", keyInsights: "", followUpPlan: "", additionalNotes: "", therapistNotes: ""
   });
 
   const isValidLink = (link: string) => {
     try {
       const url = new URL(link);
       return url.protocol === "http:" || url.protocol === "https:";
-    } catch (_) {
-      return false;
-    }
+    } catch (_) { return false; }
   };
 
   const fetchBookings = async (token: string) => {
@@ -127,8 +113,6 @@ export default function AdminBookingsPage() {
     return () => unsub();
   }, [router]);
 
-  // --- ACTIONS ---
-
   const handleConfirmClick = (booking: Booking) => {
     if (booking.slot.mode === "ONLINE") {
       setManualLink(""); 
@@ -141,7 +125,7 @@ export default function AdminBookingsPage() {
   const submitConfirmWithLink = async () => {
     if (!confirmModal.bookingId) return;
     if (!isValidLink(manualLink)) {
-      toast.error("Please enter a valid URL (e.g., https://meet.google.com/...)");
+      toast.error("Please enter a valid URL");
       return;
     }
     await updateStatus(confirmModal.bookingId, "CONFIRMED", manualLink);
@@ -151,26 +135,19 @@ export default function AdminBookingsPage() {
   const updateStatus = async (id: string, status: "CONFIRMED" | "REJECTED", link?: string) => {
     const token = await auth.currentUser?.getIdToken();
     const toastId = toast.loading(status === "CONFIRMED" ? "Confirming..." : "Rejecting...");
-
-    // Optimistic Update
+    
     setBookings(prev => prev.map(b => b.id === id ? { ...b, status, meetingLink: link } : b));
 
     try {
       const res = await fetch(`${API_URL}/api/admin/bookings/${id}`, {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ status, meetingLink: link }),
       });
-
       if (!res.ok) throw new Error("Failed");
       toast.success(status === "CONFIRMED" ? "Confirmed!" : "Rejected", { id: toastId });
-      
       const refreshedToken = await auth.currentUser?.getIdToken();
       if(refreshedToken) await fetchBookings(refreshedToken);
-
     } catch (err) {
       toast.error("Failed to update.", { id: toastId });
       const refreshedToken = await auth.currentUser?.getIdToken();
@@ -178,59 +155,8 @@ export default function AdminBookingsPage() {
     }
   };
 
-  // --- MEETING MANAGEMENT ---
-
-  const startMeeting = async (bookingId: string) => {
-    const token = await auth.currentUser?.getIdToken();
-    const toastId = toast.loading("Starting meeting...");
-
-    try {
-      const res = await fetch(`${API_URL}/api/bookings/${bookingId}/start-meeting`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (!res.ok) throw new Error("Failed to start meeting");
-
-      toast.success("Meeting started!", { id: toastId });
-      
-      // Refresh bookings to update meeting status
-      const refreshedToken = await auth.currentUser?.getIdToken();
-      if(refreshedToken) await fetchBookings(refreshedToken);
-
-    } catch (err: any) {
-      toast.error(err.message || "Failed to start meeting", { id: toastId });
-    }
-  };
-
-  const endMeeting = async (bookingId: string) => {
-    const token = await auth.currentUser?.getIdToken();
-    const toastId = toast.loading("Ending meeting...");
-
-    try {
-      const res = await fetch(`${API_URL}/api/bookings/${bookingId}/end-meeting`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (!res.ok) throw new Error("Failed to end meeting");
-
-      const data = await res.json();
-      toast.success(`Meeting ended! Duration: ${data.duration} minutes`, { id: toastId });
-      
-      // Refresh bookings to update meeting status
-      const refreshedToken = await auth.currentUser?.getIdToken();
-      if(refreshedToken) await fetchBookings(refreshedToken);
-
-    } catch (err: any) {
-      toast.error(err.message || "Failed to end meeting", { id: toastId });
-    }
-  };
-
   const openNotesModal = async (booking: Booking) => {
     setNotesModal({ isOpen: true, booking });
-    
-    // Fetch existing notes
     try {
       const token = await auth.currentUser?.getIdToken();
       const res = await fetch(`${API_URL}/api/bookings/${booking.id}/meeting-notes`, {
@@ -249,56 +175,45 @@ export default function AdminBookingsPage() {
           therapistNotes: notes.therapistNotes || ""
         });
       } else {
-        // No existing notes
         setMeetingNotes(null);
-        setNotesForm({
-          sessionSummary: "",
-          clientProgress: "",
-          keyInsights: "",
-          followUpPlan: "",
-          additionalNotes: "",
-          therapistNotes: ""
-        });
+        setNotesForm({ sessionSummary: "", clientProgress: "", keyInsights: "", followUpPlan: "", additionalNotes: "", therapistNotes: "" });
       }
-    } catch (err) {
-      console.error("Failed to fetch meeting notes:", err);
-    }
+    } catch (err) { console.error("Failed to fetch meeting notes:", err); }
   };
 
   const saveMeetingNotes = async () => {
     if (!notesModal.booking) return;
-
     const token = await auth.currentUser?.getIdToken();
     const toastId = toast.loading("Saving notes...");
-
     try {
       const res = await fetch(`${API_URL}/api/bookings/${notesModal.booking.id}/meeting-notes`, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify(notesForm),
       });
-
       if (!res.ok) throw new Error("Failed to save notes");
-
       toast.success("Notes saved successfully!", { id: toastId });
       setNotesModal({ isOpen: false, booking: null });
-      
-      // Refresh bookings to update notes
       const refreshedToken = await auth.currentUser?.getIdToken();
       if(refreshedToken) await fetchBookings(refreshedToken);
-
     } catch (err: any) {
       toast.error(err.message || "Failed to save notes", { id: toastId });
     }
   };
 
+  // --- FILTER LOGIC ---
   const filteredBookings = bookings.filter(b => {
-    if (filter === "ALL") return true;
-    return b.status === filter;
+    const matchesStatus = filter === "ALL" ? true : b.status === filter;
+    let matchesDate = true;
+    if (dateSearch) {
+      const bookingDate = new Date(b.slot.date).toISOString().split('T')[0];
+      matchesDate = bookingDate === dateSearch;
+    }
+    const matchesTherapy = therapyFilter === "ALL" ? true : b.therapyType === therapyFilter;
+    return matchesStatus && matchesDate && matchesTherapy;
   });
+
+  const uniqueTherapyTypes = Array.from(new Set(bookings.map(b => b.therapyType).filter(Boolean)));
 
   const stats = {
     total: bookings.length,
@@ -306,12 +221,12 @@ export default function AdminBookingsPage() {
     confirmed: bookings.filter(b => b.status === "CONFIRMED").length,
   };
 
-  if (error === "Admin access only") return <div>Access Denied</div>;
+  if (error === "Admin access only") return <div className="p-10 text-center text-red-600 font-bold">Access Denied</div>;
 
   return (
-    <div className="min-h-screen bg-[#F9F6FF] pt-20 sm:pt-24 pb-8 sm:pb-12 px-4 sm:px-6 md:px-8">
+    <div className="min-h-screen bg-[#F9F6FF] pt-20 px-4 md:px-8 pb-12">
       
-      {/* CONFIRMATION MODAL */}
+      {/* --- CONFIRMATION MODAL --- */}
       {confirmModal.isOpen && (
          <div className="fixed inset-0 bg-[#3F2965]/20 backdrop-blur-sm z-50 flex items-center justify-center p-4">
            <div className="bg-white rounded-[2rem] p-8 max-w-md w-full shadow-2xl border border-[#3F2965]/10 animate-in zoom-in-95">
@@ -322,331 +237,237 @@ export default function AdminBookingsPage() {
                </button>
              </div>
              
-             <p className="text-sm text-[#3F2965]/60 mb-4 font-medium">
-               Create a meeting link below, then copy-paste it here.
-             </p>
-
-             <a 
-               href="https://meet.google.com/new" 
-               target="_blank" 
-               rel="noopener noreferrer"
-               className="flex items-center justify-center gap-2 w-full py-3 mb-4 bg-blue-50 text-blue-600 border border-blue-100 rounded-xl font-bold hover:bg-blue-100 transition-colors"
-             >
+             <p className="text-sm text-[#3F2965]/60 mb-4 font-medium">Create a meeting link below, then copy-paste it here.</p>
+             <a href="https://meet.google.com/new" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 w-full py-3 mb-4 bg-blue-50 text-blue-600 border border-blue-100 rounded-xl font-bold hover:bg-blue-100 transition-colors">
                 <Video size={18} /> Generate Google Meet Link <ExternalLink size={14} />
              </a>
-
              <div className="relative mb-2">
-               <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[#3F2965]/40 pointer-events-none">
-                 <LinkIcon size={18} />
-               </div>
+               <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[#3F2965]/40 pointer-events-none"><LinkIcon size={18} /></div>
                <input 
-                 className={`w-full pl-12 pr-4 py-3.5 bg-[#F9F6FF] rounded-xl border focus:ring-4 outline-none font-medium transition-all placeholder:text-[#3F2965]/30 ${
-                   manualLink && !isValidLink(manualLink) 
-                   ? "border-red-300 focus:border-red-500 focus:ring-red-100 text-red-600" 
-                   : "border-[#3F2965]/10 focus:border-[#Dd1764] focus:ring-[#Dd1764]/5 text-[#3F2965]"
-                 }`}
-                 placeholder="https://meet.google.com/..."
-                 value={manualLink}
-                 onChange={(e) => setManualLink(e.target.value)}
-                 autoFocus
+                 className={`w-full pl-12 pr-4 py-3.5 bg-[#F9F6FF] rounded-xl border focus:ring-4 outline-none font-medium transition-all placeholder:text-[#3F2965]/30 ${manualLink && !isValidLink(manualLink) ? "border-red-300 focus:border-red-500 focus:ring-red-100 text-red-600" : "border-[#3F2965]/10 focus:border-[#Dd1764] focus:ring-[#Dd1764]/5 text-[#3F2965]"}`} 
+                 placeholder="https://meet.google.com/..." 
+                 value={manualLink} 
+                 onChange={(e) => setManualLink(e.target.value)} 
+                 autoFocus 
                />
              </div>
              
-             {manualLink && !isValidLink(manualLink) && (
-                <p className="text-xs text-red-500 font-bold mb-4 ml-1">
-                  ⚠️ Please enter a valid URL (starting with http:// or https://)
-                </p>
-             )}
-             
-             <div className={manualLink && !isValidLink(manualLink) ? "" : "mt-6"}></div>
-
              <button 
                onClick={submitConfirmWithLink}
                disabled={!manualLink || !isValidLink(manualLink)}
-               className="w-full py-3.5 bg-[#Dd1764] text-white rounded-xl font-bold hover:bg-[#b01350] transition-all shadow-lg shadow-[#Dd1764]/20 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+               className="w-full mt-6 py-3.5 bg-[#Dd1764] text-white rounded-xl font-bold hover:bg-[#b01350] transition-all shadow-lg shadow-[#Dd1764]/20 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
              >
                <CheckCircle size={18} /> Confirm & Send
              </button>
            </div>
          </div>
       )}
-        
-        {/* MEETING NOTES MODAL */}
-        {notesModal.isOpen && (
-          <div className="fixed inset-0 bg-[#3F2965]/20 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+
+      {/* --- NOTES MODAL --- */}
+      {notesModal.isOpen && (
+        <div className="fixed inset-0 bg-[#3F2965]/20 backdrop-blur-sm z-50 flex items-center justify-center p-4">
             <div className="bg-white rounded-[2rem] p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-[#3F2965]/10 animate-in zoom-in-95">
-              <div className="flex justify-between items-center mb-6">
+                <div className="flex justify-between items-center mb-6">
                 <h3 className="text-xl font-bold text-[#3F2965]">Session Notes</h3>
-                <button onClick={() => setNotesModal({isOpen: false, booking: null})} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-                  <X size={20} className="text-[#3F2965]/60" />
-                </button>
-              </div>
-              
-              {notesModal.booking && (
-                <div className="mb-6 p-4 bg-[#F9F6FF] rounded-xl border border-[#3F2965]/10">
-                  <div className="flex items-center gap-3 mb-2">
-                    <User size={16} className="text-[#Dd1764]" />
-                    <span className="font-bold text-[#3F2965]">{notesModal.booking.user.name}</span>
-                    <span className="text-xs text-[#3F2965]/60">
-                      {new Date(notesModal.booking.slot.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })} • 
-                      {new Date(notesModal.booking.slot.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - 
-                      {new Date(notesModal.booking.slot.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    </span>
+                <button onClick={() => setNotesModal({isOpen: false, booking: null})} className="p-2 hover:bg-gray-100 rounded-full transition-colors"><X size={20} className="text-[#3F2965]/60" /></button>
+                </div>
+                
+                {notesModal.booking && (
+                  <div className="mb-6 p-4 bg-[#F9F6FF] rounded-xl border border-[#3F2965]/10">
+                    <div className="flex items-center gap-3 mb-2">
+                      <User size={16} className="text-[#Dd1764]" />
+                      <span className="font-bold text-[#3F2965]">{notesModal.booking.clientName || notesModal.booking.user.name}</span>
+                      <span className="text-xs text-[#3F2965]/60">
+                        {new Date(notesModal.booking.slot.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+                      </span>
+                    </div>
                   </div>
-                  {notesModal.booking.meetingNotes?.meetingStartedAt && (
-                    <p className="text-xs text-[#3F2965]/60">
-                      Meeting Duration: {notesModal.booking.meetingNotes.meetingDuration} minutes
-                    </p>
-                  )}
-                </div>
-              )}
+                )}
 
-              <div className="space-y-6">
-                <div>
-                  <label className="block text-sm font-bold text-[#3F2965] mb-2">Session Summary</label>
-                  <textarea
-                    value={notesForm.sessionSummary}
-                    onChange={(e) => setNotesForm(prev => ({ ...prev, sessionSummary: e.target.value }))}
-                    placeholder="Brief overview of what was discussed and accomplished in this session..."
-                    className="w-full p-3 bg-[#F9F6FF] rounded-xl border border-[#3F2965]/10 focus:border-[#Dd1764] focus:ring-4 focus:ring-[#Dd1764]/5 outline-none resize-none"
-                    rows={3}
-                  />
+                <div className="space-y-6">
+                    <div><label className="block text-sm font-bold text-[#3F2965] mb-2">Session Summary</label><textarea value={notesForm.sessionSummary} onChange={(e) => setNotesForm(prev => ({ ...prev, sessionSummary: e.target.value }))} className="w-full p-3 bg-[#F9F6FF] rounded-xl border border-[#3F2965]/10 focus:border-[#Dd1764] focus:ring-4 focus:ring-[#Dd1764]/5 outline-none resize-none" rows={3}/></div>
+                    <div className="grid md:grid-cols-2 gap-4">
+                        <div><label className="block text-sm font-bold text-[#3F2965] mb-2">Client Progress</label><textarea value={notesForm.clientProgress} onChange={(e) => setNotesForm(prev => ({ ...prev, clientProgress: e.target.value }))} className="w-full p-3 bg-[#F9F6FF] rounded-xl border border-[#3F2965]/10 focus:border-[#Dd1764] focus:ring-4 focus:ring-[#Dd1764]/5 outline-none resize-none" rows={3}/></div>
+                        <div><label className="block text-sm font-bold text-[#3F2965] mb-2">Key Insights</label><textarea value={notesForm.keyInsights} onChange={(e) => setNotesForm(prev => ({ ...prev, keyInsights: e.target.value }))} className="w-full p-3 bg-[#F9F6FF] rounded-xl border border-[#3F2965]/10 focus:border-[#Dd1764] focus:ring-4 focus:ring-[#Dd1764]/5 outline-none resize-none" rows={3}/></div>
+                    </div>
+                    <div><label className="block text-sm font-bold text-[#3F2965] mb-2">Follow-up Plan</label><textarea value={notesForm.followUpPlan} onChange={(e) => setNotesForm(prev => ({ ...prev, followUpPlan: e.target.value }))} className="w-full p-3 bg-[#F9F6FF] rounded-xl border border-[#3F2965]/10 focus:border-[#Dd1764] focus:ring-4 focus:ring-[#Dd1764]/5 outline-none resize-none" rows={3}/></div>
+                    <div><label className="block text-sm font-bold text-[#3F2965] mb-2">Additional Notes</label><textarea value={notesForm.additionalNotes} onChange={(e) => setNotesForm(prev => ({ ...prev, additionalNotes: e.target.value }))} className="w-full p-3 bg-[#F9F6FF] rounded-xl border border-[#3F2965]/10 focus:border-[#Dd1764] focus:ring-4 focus:ring-[#Dd1764]/5 outline-none resize-none" rows={3}/></div>
+                    <div className="p-4 bg-yellow-50 rounded-lg border border-yellow-100">
+                        <label className="block text-sm font-bold text-yellow-700 mb-2 flex items-center gap-2"><ShieldAlert size={14}/> Therapist Private Notes</label>
+                        <textarea value={notesForm.therapistNotes} onChange={(e) => setNotesForm(prev => ({ ...prev, therapistNotes: e.target.value }))} className="w-full p-3 bg-white rounded-lg border border-yellow-200 focus:border-yellow-500 outline-none text-sm min-h-[80px]" placeholder="Visible only to admins..." />
+                    </div>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-bold text-[#3F2965] mb-2">Client Progress</label>
-                  <textarea
-                    value={notesForm.clientProgress}
-                    onChange={(e) => setNotesForm(prev => ({ ...prev, clientProgress: e.target.value }))}
-                    placeholder="Notable progress, insights, or changes observed in the client's mental health..."
-                    className="w-full p-3 bg-[#F9F6FF] rounded-xl border border-[#3F2965]/10 focus:border-[#Dd1764] focus:ring-4 focus:ring-[#Dd1764]/5 outline-none resize-none"
-                    rows={3}
-                  />
+                <div className="flex justify-end gap-3 mt-8 pt-4 border-t border-gray-100">
+                    <button onClick={() => setNotesModal({isOpen: false, booking: null})} className="px-5 py-2.5 text-sm font-bold text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">Cancel</button>
+                    <button onClick={saveMeetingNotes} className="px-5 py-2.5 text-sm font-bold bg-[#3F2965] text-white rounded-lg hover:bg-[#2a1b45] transition-colors flex items-center gap-2"><Save size={16} /> Save Notes</button>
                 </div>
-
-                <div>
-                  <label className="block text-sm font-bold text-[#3F2965] mb-2">Key Insights</label>
-                  <textarea
-                    value={notesForm.keyInsights}
-                    onChange={(e) => setNotesForm(prev => ({ ...prev, keyInsights: e.target.value }))}
-                    placeholder="Important realizations, patterns, or breakthroughs from this session..."
-                    className="w-full p-3 bg-[#F9F6FF] rounded-xl border border-[#3F2965]/10 focus:border-[#Dd1764] focus:ring-4 focus:ring-[#Dd1764]/5 outline-none resize-none"
-                    rows={3}
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-bold text-[#3F2965] mb-2">Follow-up Plan</label>
-                  <textarea
-                    value={notesForm.followUpPlan}
-                    onChange={(e) => setNotesForm(prev => ({ ...prev, followUpPlan: e.target.value }))}
-                    placeholder="Plan for future sessions, frequency, or therapeutic approach adjustments..."
-                    className="w-full p-3 bg-[#F9F6FF] rounded-xl border border-[#3F2965]/10 focus:border-[#Dd1764] focus:ring-4 focus:ring-[#Dd1764]/5 outline-none resize-none"
-                    rows={3}
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-bold text-[#3F2965] mb-2">Additional Notes</label>
-                  <textarea
-                    value={notesForm.additionalNotes}
-                    onChange={(e) => setNotesForm(prev => ({ ...prev, additionalNotes: e.target.value }))}
-                    placeholder="Any other observations, concerns, or notes not covered above..."
-                    className="w-full p-3 bg-[#F9F6FF] rounded-xl border border-[#3F2965]/10 focus:border-[#Dd1764] focus:ring-4 focus:ring-[#Dd1764]/5 outline-none resize-none"
-                    rows={3}
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-bold text-[#3F2965] mb-2">Therapist Notes (Private)</label>
-                  <textarea
-                    value={notesForm.therapistNotes}
-                    onChange={(e) => setNotesForm(prev => ({ ...prev, therapistNotes: e.target.value }))}
-                    placeholder="Private notes for therapist reference only (not shared with client)..."
-                    className="w-full p-3 bg-[#F9F6FF] rounded-xl border border-[#3F2965]/10 focus:border-[#Dd1764] focus:ring-4 focus:ring-[#Dd1764]/5 outline-none resize-none"
-                    rows={3}
-                  />
-                </div>
-              </div>
-
-              <div className="flex gap-3 mt-8">
-                <button 
-                  onClick={() => setNotesModal({isOpen: false, booking: null})}
-                  className="flex-1 py-3 bg-gray-100 text-gray-600 rounded-xl font-bold hover:bg-gray-200 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button 
-                  onClick={saveMeetingNotes}
-                  className="flex-1 py-3 bg-[#Dd1764] text-white rounded-xl font-bold hover:bg-[#b01350] transition-all shadow-lg shadow-[#Dd1764]/20 flex items-center justify-center gap-2"
-                >
-                  <Save size={18} /> Save Notes
-                </button>
-              </div>
             </div>
-          </div>
-        )}
+        </div>
+      )}
         
-        {/* HEADER & NAV ACTIONS */}
-        <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-6 mb-10">
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold flex items-center gap-3">
-              <LayoutDashboard className="text-[#Dd1764]" />
-              Admin Dashboard
+      <div className="max-w-7xl mx-auto">
+        
+        {/* --- HEADER --- */}
+        <div className="mb-8">
+            <h1 className="text-3xl md:text-4xl font-bold text-[#3F2965] flex items-center gap-3">
+              <LayoutDashboard size={32} className="text-[#Dd1764]" /> Admin Dashboard
             </h1>
-            <p className="text-[#3F2965]/60 mt-1 text-sm md:text-base">Manage appointments, users, and platform settings.</p>
-          </div>
-          
-           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 w-full xl:w-auto">
-            {/* Clients */}
-            <button
-              onClick={() => router.push("/admin/clients")}
-              className="justify-center px-4 py-3 bg-white text-[#3F2965] border border-[#3F2965]/10 rounded-full font-bold shadow-sm hover:bg-[#F9F6FF] transition-all flex items-center gap-2 text-xs md:text-sm"
-            >
-              <User size={16} className="text-[#Dd1764]" />
-              Clients
-            </button>
-
-            {/* Discounts */}
-            <button
-              onClick={() => router.push("/admin/discounts")}
-              className="justify-center px-4 py-3 bg-white text-[#3F2965] border border-[#3F2965]/10 rounded-full font-bold shadow-sm hover:bg-[#F9F6FF] transition-all flex items-center gap-2 text-xs md:text-sm"
-            >
-              <Award size={16} className="text-[#Dd1764]" />
-              Discounts
-            </button>
-
-            {/* Config / Settings */}
-            <button
-              onClick={() => router.push("/admin/settings")}
-              className="justify-center px-4 py-3 bg-white text-[#3F2965] border border-[#3F2965]/10 rounded-full font-bold shadow-sm hover:bg-[#F9F6FF] transition-all flex items-center gap-2 text-xs md:text-sm"
-            >
-              <Settings size={16} className="text-[#Dd1764]" />
-              Config
-            </button>
-
-            {/* Slots */}
-            <button
-              onClick={() => router.push("/admin/slots")}
-              className="justify-center px-4 py-3 bg-[#3F2965] text-white rounded-full font-bold shadow-lg hover:shadow-[#3F2965]/20 hover:scale-105 transition-all flex items-center gap-2 text-xs md:text-sm"
-            >
-              <Calendar size={16} />
-              Slots
-            </button>
-          </div>
+            <p className="text-[#3F2965]/60 mt-2 text-base">Overview of all appointments and platform management.</p>
         </div>
 
-        {/* STATS */}
+        {/* --- MANAGEMENT TOOLS (Compact & Responsive) --- */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-10">
+            <button onClick={() => router.push("/admin/clients")} className="flex flex-col items-center justify-center p-3 sm:p-4 bg-white border border-[#3F2965]/10 rounded-xl shadow-sm hover:shadow-md hover:border-[#3F2965]/20 transition-all group">
+                <div className="w-10 h-10 rounded-full bg-[#F9F6FF] flex items-center justify-center text-[#Dd1764] mb-2 group-hover:bg-[#3F2965] group-hover:text-white transition-colors">
+                    <User size={20} />
+                </div>
+                <span className="font-bold text-[#3F2965] text-xs sm:text-sm">Clients</span>
+            </button>
+            <button onClick={() => router.push("/admin/discounts")} className="flex flex-col items-center justify-center p-3 sm:p-4 bg-white border border-[#3F2965]/10 rounded-xl shadow-sm hover:shadow-md hover:border-[#3F2965]/20 transition-all group">
+                <div className="w-10 h-10 rounded-full bg-[#F9F6FF] flex items-center justify-center text-[#Dd1764] mb-2 group-hover:bg-[#3F2965] group-hover:text-white transition-colors">
+                    <Award size={20} />
+                </div>
+                <span className="font-bold text-[#3F2965] text-xs sm:text-sm">Discounts</span>
+            </button>
+            <button onClick={() => router.push("/admin/settings")} className="flex flex-col items-center justify-center p-3 sm:p-4 bg-white border border-[#3F2965]/10 rounded-xl shadow-sm hover:shadow-md hover:border-[#3F2965]/20 transition-all group">
+                <div className="w-10 h-10 rounded-full bg-[#F9F6FF] flex items-center justify-center text-[#Dd1764] mb-2 group-hover:bg-[#3F2965] group-hover:text-white transition-colors">
+                    <Settings size={20} />
+                </div>
+                <span className="font-bold text-[#3F2965] text-xs sm:text-sm">Config</span>
+            </button>
+            <button onClick={() => router.push("/admin/slots")} className="flex flex-col items-center justify-center p-3 sm:p-4 bg-white border border-[#3F2965]/10 rounded-xl shadow-sm hover:shadow-md hover:border-[#3F2965]/20 transition-all group">
+                <div className="w-10 h-10 rounded-full bg-[#F9F6FF] flex items-center justify-center text-[#Dd1764] mb-2 group-hover:bg-[#3F2965] group-hover:text-white transition-colors">
+                    <Calendar size={20} />
+                </div>
+                <span className="font-bold text-[#3F2965] text-xs sm:text-sm">Slots</span>
+            </button>
+        </div>
+
+        {/* --- STATS CIRCLES (Restored) --- */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-12 px-2 md:px-8">
-          <StatCircle
-            label="Total Requests"
-            value={stats.total}
-            icon={LayoutDashboard}
-            color="border-[#3F2965]"
-            bg="bg-[#3F2965]/5"
-            textColor="text-[#3F2965]"
+          <StatCircle 
+            label="Total Requests" 
+            value={stats.total} 
+            icon={LayoutDashboard} 
+            color="border-[#3F2965]" 
+            bg="bg-[#3F2965]/5" 
+            textColor="text-[#3F2965]" 
           />
           <div className="hidden md:block h-px flex-1 bg-gradient-to-r from-[#3F2965]/5 via-[#3F2965]/20 to-[#3F2965]/5" />
-          <StatCircle
-            label="Pending Action"
-            value={stats.pending}
-            icon={Clock}
-            color="border-orange-400"
-            bg="bg-orange-50"
-            textColor="text-orange-600"
+          <StatCircle 
+            label="Pending Action" 
+            value={stats.pending} 
+            icon={Clock} 
+            color="border-orange-400" 
+            bg="bg-orange-50" 
+            textColor="text-orange-600" 
           />
           <div className="hidden md:block h-px flex-1 bg-gradient-to-r from-[#3F2965]/5 via-[#3F2965]/20 to-[#3F2965]/5" />
-          <StatCircle
-            label="Confirmed"
-            value={stats.confirmed}
-            icon={CheckCircle}
-            color="border-emerald-500"
-            bg="bg-emerald-50"
-            textColor="text-emerald-600"
+          <StatCircle 
+            label="Confirmed" 
+            value={stats.confirmed} 
+            icon={CheckCircle} 
+            color="border-emerald-500" 
+            bg="bg-emerald-50" 
+            textColor="text-emerald-600" 
           />
         </div>
 
-        {/* FILTERS */}
-        <div className="flex overflow-x-auto pb-4 mb-4 md:mb-8 border-b border-[#3F2965]/10 gap-2 no-scrollbar">
-          {["ALL", "PENDING", "CONFIRMED", "REJECTED"].map((f) => (
-            <button
-              key={f}
-              onClick={() => setFilter(f as any)}
-              className={`whitespace-nowrap px-4 py-2 rounded-full text-xs md:text-sm font-bold transition-all ${filter === f
-                ? "bg-[#3F2965] text-white shadow-md"
-                : "bg-white text-[#3F2965]/60 hover:bg-white hover:text-[#3F2965]"
-                }`}
-            >
-              {f === "ALL" ? "All Bookings" : f.charAt(0) + f.slice(1).toLowerCase()}
-            </button>
-          ))}
+        {/* --- FILTERS TOOLBAR --- */}
+        <div className="bg-white p-3 rounded-2xl border border-[#3F2965]/10 shadow-sm mb-8 flex flex-col md:flex-row gap-4 items-center">
+            <div className="flex overflow-x-auto gap-2 no-scrollbar w-full md:w-auto pb-2 md:pb-0">
+                {["ALL", "PENDING", "CONFIRMED", "REJECTED"].map((f) => (
+                    <button key={f} onClick={() => setFilter(f as any)} className={`whitespace-nowrap px-5 py-2.5 rounded-xl text-xs font-bold transition-all ${filter === f ? "bg-[#3F2965] text-white" : "bg-[#F9F6FF] text-[#3F2965]/60 hover:bg-[#3F2965]/5"}`}>{f === "ALL" ? "All Status" : f.charAt(0) + f.slice(1).toLowerCase()}</button>
+                ))}
+            </div>
+
+            <div className="flex-1 hidden md:block"></div>
+
+            <div className="flex gap-3 w-full md:w-auto">
+                <div className="relative group flex-1 md:w-auto">
+                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[#3F2965]/30"><Calendar size={16} /></div>
+                    <input 
+                        type="date" 
+                        value={dateSearch}
+                        onChange={(e) => setDateSearch(e.target.value)}
+                        className="w-full pl-10 pr-4 py-2.5 bg-[#F9F6FF] text-[#3F2965] text-sm font-bold rounded-xl border border-transparent focus:border-[#Dd1764]/30 focus:bg-white focus:outline-none transition-all cursor-pointer"
+                    />
+                </div>
+
+                <div className="relative group flex-1 md:w-auto">
+                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[#3F2965]/30"><Filter size={16} /></div>
+                    <select
+                        value={therapyFilter}
+                        onChange={(e) => setTherapyFilter(e.target.value)}
+                        className="w-full pl-10 pr-8 py-2.5 bg-[#F9F6FF] text-[#3F2965] text-sm font-bold rounded-xl border border-transparent focus:border-[#Dd1764]/30 focus:bg-white focus:outline-none transition-all appearance-none cursor-pointer"
+                    >
+                        <option value="ALL">All Therapies</option>
+                        {uniqueTherapyTypes.map((type) => (
+                            <option key={type as string} value={type as string}>{type}</option>
+                        ))}
+                    </select>
+                </div>
+            </div>
         </div>
 
-        {/* BOOKINGS GRID */}
-        {loading ? (
-          <Loader fullScreen={true} message="Loading Dashboard Data..."/>
+        {/* --- BOOKINGS GRID --- */}
+        {loading ? ( 
+            <Loader fullScreen={true} message="Loading Dashboard Data..."/> 
         ) : filteredBookings.length === 0 ? (
-          <div className="text-center py-20 bg-white rounded-3xl border border-dashed border-[#3F2965]/20">
-            <p className="text-[#3F2965]/40">No bookings found in this category.</p>
+          <div className="text-center py-24 bg-white rounded-3xl border border-dashed border-[#3F2965]/10">
+            <div className="w-16 h-16 bg-[#F9F6FF] rounded-full flex items-center justify-center mx-auto mb-4 text-[#3F2965]/40">
+                <Search size={32} />
+            </div>
+            <p className="text-[#3F2965]/40 font-bold text-lg">No bookings found matching filters.</p>
+            <button onClick={() => {setDateSearch(""); setTherapyFilter("ALL"); setFilter("ALL")}} className="mt-2 text-[#Dd1764] text-sm font-bold hover:underline">Clear Filters</button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {filteredBookings.map((b) => (
               <BookingCard 
                 key={b.id} 
                 booking={b} 
                 onConfirm={handleConfirmClick}
                 onReject={(id) => updateStatus(id, "REJECTED")}
-                onStartMeeting={startMeeting}
-                onEndMeeting={endMeeting}
                 onOpenNotes={openNotesModal}
               />
             ))}
           </div>
         )}
       </div>
-  );
-}
-
-// ---------------- SUB-COMPONENTS ---------------- //
-
-type StatCircleProps = {
-  label: string;
-  value: number;
-  icon: any;
-  color: string;
-  bg: string;
-  textColor: string;
-};
-
-function StatCircle({ label, value, icon: Icon, color, bg, textColor }: StatCircleProps) {
-  return (
-    <div className={`relative w-36 h-36 md:w-48 md:h-48 rounded-full border-[4px] md:border-[6px] ${color} ${bg} flex flex-col items-center justify-center shadow-xl md:shadow-2xl shadow-[#3F2965]/10 hover:scale-105 transition-all duration-300 group`}>
-      <div className={`absolute -top-4 md:-top-5 p-2 md:p-3 rounded-full bg-white shadow-md border ${color} group-hover:-translate-y-1 transition-transform`}>
-        <Icon className={`${textColor} w-5 h-5 md:w-6 md:h-6`} strokeWidth={2.5} />
-      </div>
-      <p className={`text-3xl md:text-5xl font-black ${textColor} mt-2`}>{value}</p>
-      <p className="text-[9px] md:text-[11px] font-bold uppercase tracking-widest text-[#3F2965]/60 mt-1 md:mt-2">{label}</p>
     </div>
   );
 }
 
+// --- STAT CIRCLE COMPONENT ---
+type StatCircleProps = { label: string; value: number; icon: any; color: string; bg: string; textColor: string; };
+function StatCircle({ label, value, icon: Icon, color, bg, textColor }: StatCircleProps) {
+  return (
+    <div className={`relative w-28 h-28 sm:w-36 sm:h-36 md:w-48 md:h-48 rounded-full border-[4px] md:border-[6px] ${color} ${bg} flex flex-col items-center justify-center shadow-xl md:shadow-2xl shadow-[#3F2965]/10 hover:scale-105 transition-all duration-300 group`}>
+      <div className={`absolute -top-3 md:-top-5 p-2 md:p-3 rounded-full bg-white shadow-md border ${color} group-hover:-translate-y-1 transition-transform`}><Icon className={`${textColor} w-4 h-4 md:w-6 md:h-6`} strokeWidth={2.5} /></div>
+      <p className={`text-2xl sm:text-3xl md:text-5xl font-black ${textColor} mt-1 md:mt-2`}>{value}</p>
+      <p className="text-[8px] sm:text-[9px] md:text-[11px] font-bold uppercase tracking-widest text-[#3F2965]/60 mt-0.5 md:mt-2">{label}</p>
+    </div>
+  );
+}
+
+// --- BOOKING CARD (Old Style) ---
 type BookingCardProps = {
   booking: Booking;
   onConfirm: (booking: Booking) => void;
   onReject: (id: string) => void;
-  onStartMeeting?: (id: string) => void;
-  onEndMeeting?: (id: string) => void;
   onOpenNotes?: (booking: Booking) => void;
 };
 
-function BookingCard({ booking, onConfirm, onReject, onStartMeeting, onEndMeeting, onOpenNotes }: BookingCardProps) {
+function BookingCard({ booking, onConfirm, onReject, onOpenNotes }: BookingCardProps) {
   const date = new Date(booking.slot.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
   const time = `${new Date(booking.slot.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${new Date(booking.slot.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
 
   return (
-    <div className="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-[#3F2965]/5 hover:shadow-md transition-all flex flex-col md:flex-row gap-4 md:gap-6">
-
+    <div className="bg-white rounded-2xl border border-[#3F2965]/5 p-5 flex flex-col sm:flex-row gap-6 hover:shadow-lg hover:border-[#3F2965]/10 transition-all duration-300">
+      
+      {/* Date/Time Block */}
       <div className="flex flex-row md:flex-col items-center justify-between md:justify-center bg-[#F9F6FF] text-[#3F2965] rounded-xl p-3 md:p-4 min-w-full md:min-w-[120px] text-center border border-[#3F2965]/5">
         <div className="flex flex-col md:items-center text-left md:text-center">
           <span className="text-[10px] font-bold uppercase opacity-60">Session</span>
@@ -660,89 +481,88 @@ function BookingCard({ booking, onConfirm, onReject, onStartMeeting, onEndMeetin
         </div>
       </div>
 
-      <div className="flex-1 flex flex-col justify-between gap-3">
-        <div className="space-y-3">
-          <div className="flex flex-wrap items-start justify-between gap-2">
-            <div>
-              <h3 className="font-bold text-base md:text-lg text-[#3F2965]">{booking.user.name || "Unknown User"}</h3>
-              <div className="flex flex-col gap-1 mt-1">
-                <p className="text-xs md:text-sm text-[#3F2965]/60 flex items-center gap-2">
+
+      {/* Details Column */}
+      <div className="flex-1 flex flex-col justify-between gap-4">
+        <div>
+            <div className="flex justify-between items-start mb-2">
+                <div>
+                    <h3 className="font-bold text-lg text-[#3F2965]">{booking.clientName || booking.user.name || "Unknown User"}</h3>
+                    <div className="flex flex-wrap gap-2 mt-1">
+                        {booking.attendees && booking.attendees > 1 && (
+                            <span className="text-[10px] font-bold text-[#3F2965] flex items-center gap-1 bg-purple-50 px-2 py-0.5 rounded-md border border-purple-100">
+                                <Users size={10} /> {booking.attendees} People
+                            </span>
+                        )}
+                        {booking.maritalStatus && (
+                             <span className="text-[10px] font-bold text-[#Dd1764] flex items-center gap-1 bg-pink-50 px-2 py-0.5 rounded-md border border-pink-100">
+                                <Heart size={10} /> {booking.maritalStatus}
+                            </span>
+                        )}
+                    </div>
+                </div>
+                <span className={`px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider ${
+                    booking.status === 'CONFIRMED' ? 'bg-green-100 text-green-700' : 
+                    booking.status === 'REJECTED' ? 'bg-red-100 text-red-700' : 
+                    'bg-yellow-100 text-yellow-700'
+                }`}>
+                    {booking.status}
+                </span>
+            </div>
+            
+            <div className="space-y-1.5 mb-4">
+                <p className="text-xs font-medium text-[#3F2965]/60 flex items-center gap-2">
                   <Mail size={12} /> <span className="break-all">{booking.user.email}</span>
                 </p>
-                {booking.user.phone && (
-                  <p className="text-xs md:text-sm text-[#3F2965]/60 flex items-center gap-2">
-                    <Phone size={12} /> {booking.user.phone}
-                  </p>
+                {(booking.phone || booking.user.phone) && (
+                    <p className="text-xs font-medium text-[#3F2965]/60 flex items-center gap-2">
+                        <Phone size={12} /> {booking.phone || booking.user.phone}
+                    </p>
                 )}
-              </div>
             </div>
 
-            <div className="flex items-center gap-2">
-                <span className={`px-2 py-1 rounded-full text-[10px] font-bold ${booking.status === 'CONFIRMED' ? 'bg-green-100 text-green-700' : booking.status === 'REJECTED' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'}`}>
-                {booking.status}
-                </span>
-                
-               
-            </div>
-          </div>
-
-          <div className="bg-[#F9F6FF] p-3 rounded-lg border border-[#3F2965]/5">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-[10px] font-bold bg-[#3F2965] text-white px-2 py-0.5 rounded">
-                {booking.type === "FIRST" ? "First Session" : "Follow-up"}
-              </span>
-              {booking.therapyType && (
-                <span className="text-[10px] font-bold bg-[#Dd1764] text-white px-2 py-0.5 rounded">
-                  {booking.therapyType}
-                </span>
-              )}
-            </div>
-            <p className="text-xs md:text-sm text-[#3F2965]/80 italic">
-              {booking.reason ? `"${booking.reason}"` : <span className="opacity-50">No specific reason provided.</span>}
-            </p>
-          </div>
-          
-          {booking.meetingLink && (
-            <div className="flex items-center gap-2 p-2 bg-green-50 rounded-lg border border-green-100 w-fit">
-                <LinkIcon size={12} className="text-green-600" />
-                <a href={booking.meetingLink} target="_blank" rel="noopener noreferrer" className="text-xs text-green-700 font-bold underline truncate max-w-[200px]">
-                    {booking.meetingLink}
-                </a>
-            </div>
-          )}
-
-          {/* MEETING CONTROLS - Only for confirmed online sessions */}
-          {booking.status === "CONFIRMED" && booking.slot.mode === "ONLINE" && (
-            <div>
-              <div className="flex gap-2 flex-wrap">
-                <button 
-                  onClick={() => onOpenNotes?.(booking)}
-                  className="flex items-center gap-1 px-3 py-1 bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold rounded-lg transition-colors"
-                >
-                  <FileText size={12} /> Notes
-                </button>
-              </div>
-              
-              {booking.meetingNotes?.meetingStartedAt && (
-                <p className="text-xs text-blue-600 mt-2">
-                  Started: {new Date(booking.meetingNotes.meetingStartedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  {booking.meetingNotes.meetingEndedAt && ` • Duration: ${booking.meetingNotes.meetingDuration}min`}
+            <div className="bg-[#F9F6FF] p-3 rounded-xl border border-[#3F2965]/5">
+                <div className="flex items-center gap-2 mb-1">
+                    <span className="text-[10px] font-bold bg-[#3F2965] text-white px-2 py-0.5 rounded-md">
+                        {booking.type === "FIRST" ? "First Session" : "Follow-up"}
+                    </span>
+                    {booking.therapyType && (
+                        <span className="text-[10px] font-bold bg-[#Dd1764] text-white px-2 py-0.5 rounded-md">
+                            {booking.therapyType}
+                        </span>
+                    )}
+                </div>
+                <p className="text-xs text-[#3F2965]/70 italic line-clamp-2">
+                    {booking.reason || "No specific notes provided."}
                 </p>
-              )}
             </div>
-          )}
         </div>
 
-        {booking.status === "PENDING" && (
-          <div className="flex gap-3 pt-3 border-t border-[#3F2965]/5">
-            <button onClick={() => onConfirm(booking)} className="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg text-xs md:text-sm font-bold transition-colors flex items-center justify-center gap-2">
-              <CheckCircle size={14} /> Confirm
-            </button>
-            <button onClick={() => onReject(booking.id)} className="flex-1 bg-white border border-red-200 text-red-600 hover:bg-red-50 py-2 rounded-lg text-xs md:text-sm font-bold transition-colors flex items-center justify-center gap-2">
-              <XCircle size={14} /> Reject
-            </button>
-          </div>
-        )}
+        {/* Actions */}
+        <div className="flex items-center justify-end gap-2 mt-auto pt-3 border-t border-[#3F2965]/5">
+            {booking.meetingLink && (
+                <a href={booking.meetingLink} target="_blank" rel="noopener noreferrer" className="p-2 text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors border border-blue-100" title="Join Meeting">
+                    <Video size={16} />
+                </a>
+            )}
+            
+            {booking.status === "CONFIRMED" && (
+                <button onClick={() => onOpenNotes?.(booking)} className="flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-[#3F2965] bg-white border border-[#3F2965]/10 hover:bg-[#F9F6FF] rounded-xl transition-all shadow-sm">
+                    <FileText size={14} className="text-[#3F2965]/60" /> Session Notes
+                </button>
+            )}
+
+            {booking.status === "PENDING" && (
+                <>
+                    <button onClick={() => onReject(booking.id)} className="px-4 py-2 text-xs font-bold text-red-600 bg-white border border-red-100 hover:bg-red-50 rounded-xl transition-all">
+                        Reject
+                    </button>
+                    <button onClick={() => onConfirm(booking)} className="px-4 py-2 text-xs font-bold text-white bg-green-600 hover:bg-green-700 rounded-xl transition-all shadow-sm flex items-center gap-1.5">
+                        <CheckCircle size={14} /> Confirm
+                    </button>
+                </>
+            )}
+        </div>
       </div>
     </div>
   );

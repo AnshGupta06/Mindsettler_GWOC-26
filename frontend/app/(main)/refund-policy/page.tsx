@@ -46,14 +46,14 @@ export default function RefundPolicyPage() {
   return (
     <div className="bg-white min-h-screen">
       
-      {/* Added top padding to push the Heading down from navbar */}
+      {}
       <div className="pt-16 sm:pt-2">
         <PageHeader
           title="Non-Refund Policy"
         />
       </div>
 
-      {/* Added negative top margin to pull cards up towards the heading */}
+      {}
       <section className="-mt-8 sm:-mt-12 pb-12 bg-gradient-to-b from-white to-lightBg relative z-10">
         <div className="container mx-auto max-w-4xl px-4">
 
@@ -89,7 +89,7 @@ export default function RefundPolicyPage() {
           </div>
 
           <div className="mt-10 text-center">
-            <Card className="border border-primary/10 shadow-xl bg-gradient-to-r from-primary/5 to-accent/5 hover:shadow-2xl transition-all duration-300">
+            <Card className="border border-primary/10 shadow-xl hover:shadow-2xl transition-all duration-300">
               <CardContent className="pt-6">
                 <div className="flex items-center justify-center gap-3 mb-4">
                   <Phone className="h-6 w-6 text-primary" />

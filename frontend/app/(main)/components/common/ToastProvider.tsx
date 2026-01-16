@@ -11,7 +11,7 @@ export default function ToastProvider() {
       containerClassName=""
       containerStyle={{}}
       toastOptions={{
-        // Define default options
+        
         className: '',
         duration: 4000,
         style: {
@@ -19,17 +19,17 @@ export default function ToastProvider() {
           color: '#fff',
         },
 
-        // Default options for specific types
+        
         success: {
           duration: 3000,
           style: {
-            background: '#F9F6FF', // Light Purple
-            color: '#3F2965', // Dark Purple
+            background: '#F9F6FF', 
+            color: '#3F2965', 
             border: '1px solid #3F2965',
             fontWeight: 'bold',
           },
           iconTheme: {
-            primary: '#Dd1764', // Pink Checkmark
+            primary: '#Dd1764', 
             secondary: '#F9F6FF',
           },
         },

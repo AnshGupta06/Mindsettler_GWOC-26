@@ -10,7 +10,8 @@ import {
   Calendar, Clock, CheckCircle, AlertCircle, ShieldCheck, 
   Sparkles, ArrowRight, Wallet, Banknote, BrainCircuit,
   Monitor, Building2, CalendarDays, Receipt, Mail, Bell, Lock,
-  Copy, Check, Smartphone, Tag, Loader2, Ban
+  Copy, Check, Smartphone, Tag, Loader2, Ban,
+  User as UserIcon, Phone, Users, Heart, Info
 } from "lucide-react";
 import { motion } from "framer-motion";
 import AlertModal from "../components/common/AlertModal";
@@ -46,29 +47,33 @@ export default function BookPage() {
   
   const [user, setUser] = useState<User | null>(null);
   const [authChecking, setAuthChecking] = useState(true);
-  const [isBlocked, setIsBlocked] = useState(false); // ✨ New State
+  const [isBlocked, setIsBlocked] = useState(false); 
   
-  // ✨ Dynamic Pricing State
   const [pricing, setPricing] = useState({
     FIRST: 1499,
     FOLLOW_UP: 999
   });
   
-  // Data State
   const [slots, setSlots] = useState<Slot[]>([]);
   const [bookingHistory, setBookingHistory] = useState<BookingHistory[]>([]);
   const [discount, setDiscount] = useState<ApplicableDiscount | null>(null);
   const [checkingDiscount, setCheckingDiscount] = useState(false);
   
-  // Selection State
   const [selectedSlot, setSelectedSlot] = useState<Slot | null>(null);
   const [type, setType] = useState<"FIRST" | "FOLLOW_UP">("FIRST");
   const [paymentMethod, setPaymentMethod] = useState<"UPI" | "CASH">("UPI");
+  
+  // --- Form Fields ---
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [attendees, setAttendees] = useState(1);
+  const [maritalStatus, setMaritalStatus] = useState("Single");
+  const [maritalStatusOther, setMaritalStatusOther] = useState("");
   const [reason, setReason] = useState("");
+  
   const [therapyType, setTherapyType] = useState<string>("general");
   const [slotModeFilter, setSlotModeFilter] = useState<"ONLINE" | "OFFLINE" | "BOTH">("BOTH");
   
-  // UI State
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -76,18 +81,14 @@ export default function BookPage() {
   const [bookingSuccess, setBookingSuccess] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  // Logic State
   const [isFirstSessionAllowed, setIsFirstSessionAllowed] = useState(true);
 
   const therapyApproaches = therapyApproachesData;
 
-  // 1. Initial Auth & Data Fetch
   useEffect(() => {
-    // ✨ Fetch Dynamic Pricing from Admin Settings
     fetch(`${API_URL}/api/settings`)
       .then(res => res.json())
       .then(data => {
-         // Only update if valid numbers exist
          if(data.priceFirst && data.priceFollowUp) {
              setPricing({ 
                FIRST: Number(data.priceFirst), 
@@ -98,22 +99,30 @@ export default function BookPage() {
       .catch(err => console.error("Failed to load pricing:", err));
 
     const unsub = onAuthStateChanged(auth, async (currentUser) => {
-      
       if (currentUser) {
         setUser(currentUser);
         
-        // ✨ Check Block Status Immediately
+        // Initial fallback prefill from Firebase
+        if (currentUser.displayName) setName(currentUser.displayName);
+        if (currentUser.phoneNumber) setPhone(currentUser.phoneNumber);
+        
         try {
             const token = await currentUser.getIdToken();
             const res = await fetch(`${API_URL}/api/auth/me`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            if (res.status === 403) {
+            
+            if (res.ok) {
+                const userData = await res.json();
+                // Prefill from DB if available (and user hasn't typed yet)
+                if (userData.name) setName(userData.name);
+                if (userData.phone) setPhone(userData.phone);
+            } else if (res.status === 403) {
                 const data = await res.json();
                 if (data.error === "ACCOUNT_BLOCKED") setIsBlocked(true);
             }
         } catch (err) {
-            console.error("Status check failed", err);
+            console.error("Status/Profile check failed", err);
         }
 
         const urlParams = new URLSearchParams(window.location.search);
@@ -125,19 +134,16 @@ export default function BookPage() {
       } else {
         setUser(null);
       }
-      
       setAuthChecking(false);
     });
     
     return () => unsub();
   }, []);
 
-  // 2. Fetch Slots
   useEffect(() => {
     if (user && !isBlocked) fetchSlots();
   }, [therapyType, user, isBlocked]);
 
-  // 3. Dynamic Session Logic
   useEffect(() => {
     if (!user) return;
 
@@ -171,10 +177,8 @@ export default function BookPage() {
     } else {
       setSlotModeFilter("BOTH");
     }
-
   }, [bookingHistory, therapyType, user, therapyApproaches]);
 
-  // --- API CALLS ---
   const fetchApplicableDiscount = async (currentUser: User) => {
     try {
         setCheckingDiscount(true);
@@ -182,7 +186,6 @@ export default function BookPage() {
         const res = await fetch(`${API_URL}/api/discounts/check`, {
             headers: { Authorization: `Bearer ${token}` }
         });
-        
         if (res.ok) {
             const data = await res.json();
             setDiscount(data.discount); 
@@ -245,10 +248,8 @@ export default function BookPage() {
     return acc;
   }, {} as Record<string, Slot[]>);
 
-  // --- CALCULATIONS ---
   const calculateTotal = () => {
     const basePrice = type === "FIRST" ? pricing.FIRST : pricing.FOLLOW_UP;
-    
     if (!discount) return basePrice;
     const discountAmount = (basePrice * discount.discountPercent) / 100;
     return Math.max(0, Math.ceil(basePrice - discountAmount));
@@ -256,7 +257,6 @@ export default function BookPage() {
 
   const finalPrice = calculateTotal();
 
-  // --- UPI HELPERS ---
   const handleCopyUpi = () => {
     navigator.clipboard.writeText(UPI_ID);
     setCopied(true);
@@ -272,6 +272,14 @@ export default function BookPage() {
       toast.error("Please select a time slot.");
       return; 
     }
+    
+    // --- Validation ---
+    if (!name.trim()) { toast.error("Name is required."); return; }
+    if (!phone.trim()) { toast.error("Phone number is required."); return; }
+    if (!attendees || attendees < 1) { toast.error("Please specify number of people joining."); return; }
+    if (maritalStatus === "Other" && !maritalStatusOther.trim()) { toast.error("Please specify your status."); return; }
+    // ------------------
+
     if (!agreed) { 
       toast.error("Please agree to the Confidentiality Policy.");
       return; 
@@ -295,12 +303,14 @@ export default function BookPage() {
         headers: { Authorization: `Bearer ${token}` },
       });
 
+      // Construct reason with metadata for admin clarity
       let finalReason = reason;
       if (discount) {
         finalReason += ` | [${discount.label}: ${discount.discountPercent}% OFF APPLIED]`;
       }
-      // Add price info to reason for admin reference
       finalReason += ` | [System Price: ₹${finalPrice}]`;
+
+      const finalStatus = maritalStatus === "Other" ? maritalStatusOther : maritalStatus;
 
       const res = await fetch(`${API_URL}/api/bookings`, {
         method: "POST",
@@ -314,6 +324,11 @@ export default function BookPage() {
           reason: finalReason,
           paymentMethod,
           therapyType,
+          // New Fields
+          name,
+          phone,
+          attendees: Number(attendees),
+          status: finalStatus
         }),
       });
 
@@ -398,7 +413,7 @@ export default function BookPage() {
                 <h2 className="text-3xl md:text-4xl font-bold mb-4">Request Sent!</h2>
                 <p className="text-[#3F2965]/70 text-lg max-w-md mb-8 leading-relaxed">
                   Your session request has been received. <br/>
-                  We will notify you via email once the admin confirms your slot.
+                  We will notify you via email at <strong>{user?.email}</strong> once the admin confirms your slot.
                 </p>
                 <button 
                   onClick={() => router.push("/profile")}
@@ -411,7 +426,7 @@ export default function BookPage() {
               
               <div className="grid lg:grid-cols-12 h-full gap-0 lg:gap-8">
                 
-                {/* --- LEFT COLUMN (Form) --- */}
+                {/* --- LEFT COLUMN (Selection) --- */}
                 <div className="lg:col-span-8 h-full overflow-y-auto custom-scrollbar p-1 pb-20 lg:p-4 lg:pr-2">
                   <div className="space-y-10">
                     
@@ -426,7 +441,7 @@ export default function BookPage() {
                         </p>
                         </div>
 
-                        {/* STEP 1: Therapy Selection */}
+                        {/* --- Step 1: Therapy Type --- */}
                         <section>
                         <div className="flex items-center gap-3 mb-4">
                             <div className="w-8 h-8 rounded-xl bg-[#3F2965] text-white flex items-center justify-center font-bold text-sm shadow-lg shadow-[#3F2965]/20">1</div>
@@ -460,9 +475,6 @@ export default function BookPage() {
                                         </option>
                                     ))}
                                     </select>
-                                    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-[#3F2965]/40">
-                                        <ArrowRight size={16} className="rotate-90" />
-                                    </div>
                                 </div>
 
                                 <p className="text-xs text-[#3F2965]/50 italic leading-relaxed">
@@ -472,7 +484,7 @@ export default function BookPage() {
                         </div>
                         </section>
 
-                        {/* STEP 2: Session Type */}
+                        {/* --- Step 2: Session Type --- */}
                         <section className={!therapyType ? "opacity-50 grayscale pointer-events-none blur-[1px] transition-all" : "transition-all"}>
                         <div className="flex items-center gap-3 mb-4">
                             <div className="w-8 h-8 rounded-xl bg-[#3F2965] text-white flex items-center justify-center font-bold text-sm shadow-lg shadow-[#3F2965]/20">2</div>
@@ -481,7 +493,7 @@ export default function BookPage() {
                         
                         <div className="grid sm:grid-cols-2 gap-4">
                             
-                            {/* FIRST SESSION */}
+                            {/* Option 1: First Session */}
                             <button
                                 disabled={!isFirstSessionAllowed}
                                 onClick={() => setType("FIRST")}
@@ -526,7 +538,7 @@ export default function BookPage() {
                                 )}
                             </button>
 
-                            {/* FOLLOW UP */}
+                            {/* Option 2: Follow-up */}
                             <button
                                 disabled={isFirstSessionAllowed} 
                                 onClick={() => setType("FOLLOW_UP")}
@@ -573,14 +585,14 @@ export default function BookPage() {
                         </div>
                         </section>
 
-                        {/* STEP 3: Slot Selection */}
+                        {/* --- Step 3: Slots --- */}
                         <section className={!therapyType ? "opacity-50 grayscale pointer-events-none blur-[1px] transition-all" : "transition-all"}>
                         <div className="flex items-center gap-3 mb-4">
                             <div className="w-8 h-8 rounded-xl bg-[#3F2965] text-white flex items-center justify-center font-bold text-sm shadow-lg shadow-[#3F2965]/20">3</div>
                             <h2 className="text-xl font-bold">Select Time</h2>
                         </div>
 
-                        {/* Filter */}
+                        {/* Filter Toggles */}
                         <div className="bg-white/60 rounded-2xl p-4 mb-6 border border-[#3F2965]/5">
                             <div className="flex flex-wrap gap-2">
                             <button
@@ -676,13 +688,13 @@ export default function BookPage() {
                   </div>
                 </div>
 
-                {/* --- RIGHT COLUMN (Summary) --- */}
+                {/* --- RIGHT COLUMN (Summary & Details) --- */}
                 <div className="lg:col-span-4 h-full overflow-y-auto custom-scrollbar lg:border-l lg:border-[#3F2965]/5 lg:bg-white/30 p-6 md:p-8 pb-20">
                     
                     <div className="bg-white rounded-[2rem] shadow-xl shadow-[#3F2965]/5 border border-[#3F2965]/5 overflow-hidden mb-6">
                       
                       <div className="bg-[#3F2965] p-5 text-white text-center relative overflow-hidden">
-                        <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+                        <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.webp')] opacity-10"></div>                        
                         <h3 className="text-base font-bold relative z-10 flex items-center justify-center gap-2">
                            <Receipt size={16} className="text-[#Dd1764]" /> Booking Summary
                         </h3>
@@ -697,7 +709,7 @@ export default function BookPage() {
                           </div>
                         ) : (
                           <div className="space-y-4">
-                            {/* Time & Date */}
+                            {/* Time/Date */}
                             <div className="flex justify-between items-center pb-4 border-b border-gray-100">
                               <div>
                                 <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">Date</p>
@@ -713,7 +725,7 @@ export default function BookPage() {
                               </div>
                             </div>
 
-                            {/* Details Grid */}
+                            {/* Details */}
                             <div className="space-y-3">
                                 <div className="flex justify-between items-center">
                                   <span className="text-xs font-medium text-gray-500">Therapy</span>
@@ -736,7 +748,7 @@ export default function BookPage() {
                                 </div>
                             </div>
 
-                            {/* --- AUTOMATIC DISCOUNT SECTION --- */}
+                            {/* Discount Logic */}
                             <div className="pt-2">
                                 {checkingDiscount ? (
                                     <div className="flex items-center gap-2 text-[#3F2965]/50 text-xs">
@@ -760,7 +772,7 @@ export default function BookPage() {
                                 ) : null}
                             </div>
                             
-                            {/* PRICING ROW */}
+                            {/* Total */}
                             <div className="pt-3 border-t border-gray-100 flex justify-between items-end">
                                 <span className="text-sm font-bold text-[#3F2965]">Total Amount</span>
                                 <div className="text-right">
@@ -774,20 +786,117 @@ export default function BookPage() {
                                   </span>
                                 </div>
                             </div>
+                          </div>
+                        )}
+
+                        {/* --- NEW FIELDS SECTION --- */}
+                        {selectedSlot && (
+                          <div className="space-y-4 pt-4 border-t border-dashed border-gray-200">
+                             
+                             {/* Name */}
+                             <div className="space-y-1.5">
+                                <label className="text-[10px] font-bold text-[#3F2965]/60 uppercase tracking-wider">
+                                  Name *
+                                </label>
+                                <div className="relative">
+                                  <UserIcon size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                                  <input 
+                                    type="text"
+                                    value={name}
+                                    onChange={(e) => setName(e.target.value)}
+                                    placeholder="Your Full Name"
+                                    className="w-full pl-9 pr-3 py-2.5 bg-[#F9F6FF] rounded-xl text-xs font-medium focus:outline-none focus:bg-white focus:ring-2 focus:ring-[#Dd1764]/10 transition-all border border-transparent focus:border-[#Dd1764]/20"
+                                  />
+                                </div>
+                             </div>
+
+                             {/* Email Notification Note (Replaces Input) */}
+                             <div className="bg-blue-50/50 p-2.5 rounded-xl border border-blue-100 flex items-start gap-2">
+                                <Info size={14} className="text-blue-500 mt-0.5 shrink-0" />
+                                <p className="text-[10px] text-blue-700/80 leading-relaxed">
+                                   Confirmation details will be sent to your registered email: <br/>
+                                   <span className="font-bold text-blue-800">{user?.email}</span>
+                                </p>
+                             </div>
+
+                             {/* Phone & Attendees */}
+                             <div className="grid grid-cols-2 gap-3">
+                                <div className="space-y-1.5">
+                                  <label className="text-[10px] font-bold text-[#3F2965]/60 uppercase tracking-wider">
+                                    Number *
+                                  </label>
+                                  <div className="relative">
+                                    <Phone size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                                    <input 
+                                      type="tel"
+                                      value={phone}
+                                      onChange={(e) => setPhone(e.target.value)}
+                                      placeholder="Mobile No."
+                                      className="w-full pl-9 pr-3 py-2.5 bg-[#F9F6FF] rounded-xl text-xs font-medium focus:outline-none focus:bg-white focus:ring-2 focus:ring-[#Dd1764]/10 transition-all border border-transparent focus:border-[#Dd1764]/20"
+                                    />
+                                  </div>
+                                </div>
+                                <div className="space-y-1.5">
+                                  <label className="text-[10px] font-bold text-[#3F2965]/60 uppercase tracking-wider">
+                                    People Joining *
+                                  </label>
+                                  <div className="relative">
+                                    <Users size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                                    <input 
+                                      type="number"
+                                      min="1"
+                                      value={attendees}
+                                      onChange={(e) => setAttendees(parseInt(e.target.value))}
+                                      className="w-full pl-9 pr-3 py-2.5 bg-[#F9F6FF] rounded-xl text-xs font-medium focus:outline-none focus:bg-white focus:ring-2 focus:ring-[#Dd1764]/10 transition-all border border-transparent focus:border-[#Dd1764]/20"
+                                    />
+                                  </div>
+                                </div>
+                             </div>
+
+                             {/* Status */}
+                             <div className="space-y-1.5">
+                                <label className="text-[10px] font-bold text-[#3F2965]/60 uppercase tracking-wider">
+                                  Status *
+                                </label>
+                                <div className="relative">
+                                  <Heart size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                                  <select 
+                                    value={maritalStatus}
+                                    onChange={(e) => setMaritalStatus(e.target.value)}
+                                    className="w-full pl-9 pr-3 py-2.5 bg-[#F9F6FF] rounded-xl text-xs font-medium focus:outline-none focus:bg-white focus:ring-2 focus:ring-[#Dd1764]/10 transition-all border border-transparent focus:border-[#Dd1764]/20 appearance-none"
+                                  >
+                                    <option value="Single">Single</option>
+                                    <option value="Married">Married</option>
+                                    <option value="Couple">Couple</option>
+                                    <option value="Divorced">Divorced</option>
+                                    <option value="Other">Other</option>
+                                  </select>
+                                </div>
+                                {maritalStatus === "Other" && (
+                                  <input 
+                                    type="text"
+                                    value={maritalStatusOther}
+                                    onChange={(e) => setMaritalStatusOther(e.target.value)}
+                                    placeholder="Please specify..."
+                                    className="mt-2 w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-[#Dd1764]"
+                                  />
+                                )}
+                             </div>
 
                           </div>
                         )}
 
-                        <div className="space-y-2">
-                          <label className="text-[10px] font-bold text-[#3F2965]/60 block uppercase tracking-wider">
-                            Personal Note
+                        {/* Reason Field */}
+                        <div className="space-y-2 pt-2">
+                          <label className="text-[10px] font-bold text-[#3F2965]/60 block uppercase tracking-wider leading-tight">
+                            What will you think to talk about? <br/> or what you are going through?
                           </label>
                           <textarea
                             className="w-full bg-[#F9F6FF] border border-transparent focus:bg-white focus:border-[#Dd1764]/20 rounded-xl p-3 text-xs focus:outline-none focus:ring-2 focus:ring-[#Dd1764]/10 resize-none transition-all placeholder:text-gray-400"
-                            rows={2}
+                            rows={3}
                             value={reason}
                             onChange={(e) => setReason(e.target.value)}
-                            placeholder="Briefly describe what you'd like to discuss..."
+                            placeholder="Briefly describe here..."
                           />
                         </div>
 
@@ -817,7 +926,7 @@ export default function BookPage() {
                               </div>
                             )}
 
-                            {/* --- PAYMENT SECTION --- */}
+                            {/* Payment Section */}
                             <div className="bg-[#F9F6FF] p-4 rounded-xl border border-[#3F2965]/5 space-y-3">
                                 
                                 <div className="flex items-center gap-2 mb-1">
@@ -834,7 +943,7 @@ export default function BookPage() {
                                 {paymentMethod === "UPI" ? (
                                     <>
                                         <div className="flex gap-4 items-center bg-white p-3 rounded-xl border border-gray-100 shadow-sm">
-                                            {/* QR Code */}
+                                            {/* QR */}
                                             <div className="shrink-0 bg-white p-1 rounded-lg border border-gray-100">
                                                 <img 
                                                     src={qrCodeUrl} 
@@ -843,7 +952,7 @@ export default function BookPage() {
                                                 />
                                             </div>
 
-                                            {/* UPI Actions */}
+                                            {/* Details */}
                                             <div className="flex-1 space-y-2">
                                                 <div className="flex items-center justify-between bg-gray-50 p-2 rounded-lg border border-gray-100">
                                                     <code className="text-[10px] font-mono font-bold text-[#3F2965] truncate max-w-[100px]">
@@ -858,7 +967,7 @@ export default function BookPage() {
                                                     </button>
                                                 </div>
 
-                                                {/* HIDDEN ON DESKTOP to fix 'Scheme not found' error */}
+                                                {/* Deep Link */}
                                                 <a 
                                                     href={upiDeepLink}
                                                     className="w-full text-center py-1.5 rounded-lg bg-[#3F2965] text-white text-[10px] font-bold hover:bg-[#2a1b45] transition-colors flex items-center justify-center gap-1.5 md:hidden"
@@ -890,7 +999,7 @@ export default function BookPage() {
                                 <CheckCircle size={10} className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white opacity-0 peer-checked:opacity-100" />
                               </div>
                               <span className="text-[10px] text-[#3F2965]/70 leading-tight">
-                                I agree to the <Link href="/confidentiality" className="underline font-bold text-[#3F2965]">Confidentiality Policy</Link>.
+                                I agree to the <Link href="/confidentiality" target="_blank" className="underline font-bold text-[#3F2965]">Confidentiality Policy</Link>.
                               </span>
                             </label>
 

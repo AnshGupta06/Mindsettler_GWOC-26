@@ -2,7 +2,7 @@ import * as settingsService from "../services/globalSettingsService.js";
 
 export const getSettings = async (req, res) => {
     try {
-        const settings = await settingsService.getSettings(); // ✨ Added await
+        const settings = await settingsService.getSettings(); 
         res.json(settings);
     } catch (err) {
         res.status(500).json({ error: "Failed to fetch settings" });
@@ -11,7 +11,7 @@ export const getSettings = async (req, res) => {
 
 export const updateSettings = async (req, res) => {
     try {
-        const updated = await settingsService.updateSettings(req.body); // ✨ Added await
+        const updated = await settingsService.updateSettings(req.body); 
         res.json(updated);
     } catch (err) {
         res.status(500).json({ error: "Failed to update settings" });

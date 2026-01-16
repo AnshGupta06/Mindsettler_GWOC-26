@@ -6,13 +6,13 @@ const DEFAULTS = {
     cancellationHours: 24
 };
 
-// Fetch the single row of settings
+
 export const getSettings = async () => {
     try {
-        // Try to find the first (and only) settings row
+        
         const settings = await prisma.globalSettings.findFirst();
 
-        // If no settings exist yet, return defaults (or create them)
+        
         if (!settings) {
             return DEFAULTS;
         }
@@ -20,18 +20,18 @@ export const getSettings = async () => {
         return settings;
     } catch (err) {
         console.error("Error fetching global settings:", err);
-        return DEFAULTS; // Fallback if DB fails
+        return DEFAULTS; 
     }
 };
 
-// Update (or Create if missing) the settings
+
 export const updateSettings = async (newSettings) => {
     try {
-        // Check if a row exists
+        
         const existing = await prisma.globalSettings.findFirst();
 
         if (existing) {
-            // Update the existing row
+            
             return await prisma.globalSettings.update({
                 where: { id: existing.id },
                 data: {
@@ -41,7 +41,7 @@ export const updateSettings = async (newSettings) => {
                 },
             });
         } else {
-            // Create the first row
+            
             return await prisma.globalSettings.create({
                 data: {
                     priceFirst: Number(newSettings.priceFirst),

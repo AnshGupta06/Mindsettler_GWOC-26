@@ -12,8 +12,8 @@ export interface WorkshopsData {
 }
 
 export async function getWorkshops(): Promise<Workshop[]> {
-  // In a real application, you might fetch from an API
-  // For now, we'll return the static data
+  
+  
   return workshopsData.workshops;
 }
 

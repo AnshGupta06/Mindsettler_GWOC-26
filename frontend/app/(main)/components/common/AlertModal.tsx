@@ -7,10 +7,10 @@ import { X, Lock, AlertTriangle, CheckCircle, AlertCircle, Ban } from "lucide-re
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
-  // "page" is kept for backward compatibility with your other files
+  
   page?: string; 
   
-  // New Props for Generic Use
+  
   type?: "AUTH" | "CONFIRM" | "SUCCESS" | "ERROR" | "BLOCKED";
   title?: string;
   message?: string;
@@ -76,7 +76,7 @@ export default function AlertModal({
 
   const currentConfig = config[type];
 
-  // Logic to determine content for AUTH mode (Legacy support)
+  
   const renderAuthMessage = () => {
     if (page === "book") {
       return "To book a personalized session and track your healing journey, please log in to your MindSettler account.";
@@ -95,7 +95,7 @@ export default function AlertModal({
     <AnimatePresence>
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-          {/* Backdrop */}
+          {}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -104,7 +104,7 @@ export default function AlertModal({
             className="absolute inset-0 bg-black/60 backdrop-blur-sm"
           />
 
-          {/* Modal Card */}
+          {}
           <motion.div
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -112,7 +112,7 @@ export default function AlertModal({
             transition={{ type: "spring", duration: 0.5 }}
             className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden p-8 text-center"
           >
-            {/* Close Button (Hidden if loading or Success/Error modes force a specific action) */}
+            {}
             {!isLoading && type !== 'SUCCESS' && (
               <button 
                 onClick={onClose}
@@ -122,12 +122,12 @@ export default function AlertModal({
               </button>
             )}
 
-            {/* Icon Circle */}
+            {}
             <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6 ${currentConfig.bg}`}>
               {currentConfig.icon}
             </div>
 
-            {/* Text Content */}
+            {}
             <h2 className="text-2xl font-bold text-[#3F2965] mb-3">
               {type === "AUTH" ? currentConfig.title : title || currentConfig.title}
             </h2>
@@ -136,24 +136,24 @@ export default function AlertModal({
               {renderMessage()}
             </p>
 
-            {/* Action Buttons */}
+            {}
             <div className="flex flex-col gap-3">
               {type === "AUTH" ? (
-                // --- AUTH MODE BUTTONS ---
+                
                 <Link href="/login" onClick={onClose}>
                   <button className={`w-full py-3.5 rounded-xl text-white font-bold text-lg shadow-lg hover:scale-[1.02] transition-transform ${currentConfig.btnColor}`}>
                     {currentConfig.btnText}
                   </button>
                 </Link>
               ) : type === "BLOCKED" ? (
-                // --- BLOCKED MODE BUTTONS ---
+                
                 <Link href="/contact" onClick={onClose}>
                    <button className={`w-full py-3.5 rounded-xl text-white font-bold text-lg shadow-lg hover:scale-[1.02] transition-transform ${currentConfig.btnColor}`}>
                     {currentConfig.btnText}
                   </button>
                 </Link>
               ) : (
-                // --- GENERIC ACTION BUTTON ---
+                
                 <button 
                   onClick={onAction || onClose}
                   disabled={isLoading}
@@ -170,7 +170,7 @@ export default function AlertModal({
                 </button>
               )}
               
-              {/* Cancel Button (Only if needed) */}
+              {}
               {currentConfig.showCancel && !isLoading && (
                 <button 
                   onClick={onClose}

@@ -13,7 +13,7 @@ import {
   CalendarCheck,
   Sparkles
 } from "lucide-react";
-// Add this function to generate SEO tags based on the slug
+
 export async function generateMetadata({ params }: AwarenessPageProps): Promise<Metadata> {
   const { slug } = await params;
   const content = awarenessContent[slug as keyof typeof awarenessContent];
@@ -25,14 +25,14 @@ export async function generateMetadata({ params }: AwarenessPageProps): Promise<
   }
 
   return {
-    title: content.title, // Becomes "Anxiety | Mindsettler" thanks to template
-    description: content.intro.slice(0, 160), // Search engines prefer < 160 chars
+    title: content.title, 
+    description: content.intro.slice(0, 160), 
     openGraph: {
       title: `${content.title} - Mental Health Awareness`,
       description: content.intro,
       images: [
         {
-          url: content.heroImage, // Uses the specific image for this topic
+          url: content.heroImage, 
           width: 1200,
           height: 630,
           alt: content.title,
@@ -47,7 +47,7 @@ interface AwarenessPageProps {
   }>;
 }
 
-// Generate static params for all awareness pages at build time
+
 export async function generateStaticParams() {
   return Object.keys(awarenessContent).map((slug) => ({
     slug: slug,
@@ -60,7 +60,7 @@ export default async function AwarenessDetailPage(props: AwarenessPageProps) {
   
   const content = awarenessContent[slug as keyof typeof awarenessContent];
 
-  // Fallback if slug doesn't match
+  
   if (!content) {
     return (
       <main className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
@@ -79,15 +79,15 @@ export default async function AwarenessDetailPage(props: AwarenessPageProps) {
   return (
     <main className="min-h-screen bg-white">
       
-      {/* --- 1. HERO SECTION --- */}
+      {}
       <section className="relative pt-24 pb-12 md:pt-32 md:pb-24 overflow-hidden bg-[#F9F6FF]">
-        {/* Simple Background Pattern */}
-        <div className="absolute inset-0 opacity-[0.03] bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]" />
+        {}
+        <div className="absolute inset-0 opacity-[0.03] bg-[url('https://www.transparenttextures.com/patterns/cubes.webp')]" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
           <div className="grid lg:grid-cols-2 gap-8 md:gap-12 lg:gap-20 items-center">
             
-            {/* Left: Content */}
+            {}
             <div className="order-2 lg:order-1 space-y-6 md:space-y-8">
                
                
@@ -121,7 +121,7 @@ export default async function AwarenessDetailPage(props: AwarenessPageProps) {
                </StaggerContainer>
             </div>
 
-            {/* Right: Image */}
+            {}
             <div className="order-1 lg:order-2">
               <ImageWipeReveal>
                 <div className="relative aspect-[16/10] rounded-3xl md:rounded-[2.5rem] overflow-hidden shadow-xl md:shadow-2xl shadow-[#3F2965]/5 border-4 border-white">
@@ -139,7 +139,7 @@ export default async function AwarenessDetailPage(props: AwarenessPageProps) {
         </div>
       </section>
 
-      {/* --- 2. WHAT IS IT? --- */}
+      {}
       <section className="py-12 md:py-20 bg-white relative">
 
         <div className="pointer-events-none absolute left-2 top-115 -translate-y-1/2 hidden lg:block">
@@ -182,15 +182,12 @@ export default async function AwarenessDetailPage(props: AwarenessPageProps) {
         </div>
       </section>
 
-      {/* --- 3. SYMPTOMS --- */}
+      {}
       <section className="py-16 md:py-24 max-w-7xl mx-auto px-4 sm:px-6 relative">
         <div className="grid lg:grid-cols-12 gap-10 md:gap-16">
-          {/* Header Column */}
+          {}
           <div className="lg:col-span-4 space-y-4 md:space-y-6 lg:sticky lg:top-24 lg:self-start">
-            {/* <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#Dd1764]/10 text-[#Dd1764] font-bold uppercase tracking-widest text-[10px] md:text-sm">
-              <AlertCircle size={16} /> 
-              Recognition
-            </div> */}
+            {}
             
             <h2 className="text-3xl md:text-5xl font-bold text-[#3F2965] leading-tight">
               Signs & <br/> Symptoms
@@ -211,7 +208,7 @@ export default async function AwarenessDetailPage(props: AwarenessPageProps) {
             </div>
           </div>
 
-          {/* List Column */}
+          {}
           <div className="lg:col-span-8">
             <StaggerContainer>
               <div className="grid md:grid-cols-2 gap-4 md:gap-6">
@@ -244,19 +241,13 @@ export default async function AwarenessDetailPage(props: AwarenessPageProps) {
         </div>
       </section>
 
-      {/* --- 4. CAUSES --- */}
+      {}
       {content.causes && content.causes.length > 0 && (
         <section className="py-16 md:py-24 bg-[#3F2965] text-white relative overflow-hidden">
-          <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
-          
+          <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.webp')]"></div>
           <div className="max-w-6xl mx-auto px-4 sm:px-6 relative z-10 text-center">
             <div className="mb-10 md:mb-16 space-y-4">
-              {/* <SlideUp>
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20 text-white font-bold text-[10px] md:text-xs uppercase tracking-widest">
-                  <Brain size={12} />
-                  Understanding
-                </div>
-              </SlideUp> */}
+              {}
               
               <SlideUp delay={0.1}>
                 <h2 className="text-3xl md:text-5xl font-bold">Common Triggers</h2>
@@ -286,16 +277,11 @@ export default async function AwarenessDetailPage(props: AwarenessPageProps) {
         </section>
       )}
 
-      {/* --- 5. STATISTICS --- */}
+      {}
       {content.statistics && (
         <section className="py-16 md:py-24 max-w-7xl mx-auto px-4 sm:px-6 relative">
           <div className="text-center mb-10 md:mb-16 space-y-4">
-            {/* <SlideUp>
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#F9F6FF] border border-[#3F2965]/10 text-[#Dd1764] font-bold text-[10px] md:text-xs uppercase tracking-widest">
-                <Activity size={12} />
-                Insights
-              </div>
-            </SlideUp> */}
+            {}
             
             <SlideUp delay={0.1}>
               <h2 className="text-3xl md:text-5xl font-bold text-[#3F2965]">Did You Know?</h2>
@@ -325,15 +311,12 @@ export default async function AwarenessDetailPage(props: AwarenessPageProps) {
         </section>
       )}
 
-      {/* --- 6. HOW WE HELP --- */}
+      {}
       <section className="py-16 md:py-24 bg-[#F9F6FF] relative overflow-hidden">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 relative z-10">
           
           <div className="text-center mb-12 md:mb-20 space-y-4 md:space-y-6">
-            {/* <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-[#3F2965]/10 text-[#3F2965] font-bold text-[10px] md:text-xs uppercase tracking-widest">
-              <Sparkles size={12} />
-              Our Approach
-            </div> */}
+            {}
             
             <h2 className="text-3xl md:text-5xl font-bold text-[#3F2965]">
               How MindSettler Helps
@@ -383,13 +366,13 @@ export default async function AwarenessDetailPage(props: AwarenessPageProps) {
         </div>
       </section>
 
-      {/* --- 7. CTA SECTION --- */}
+      {}
       <section className="py-16 md:py-24 px-4 sm:px-6 relative overflow-hidden bg-white">
         <div className="max-w-6xl mx-auto relative z-10">
           <StaggerContainer>
             <div className="grid md:grid-cols-2 gap-6 md:gap-8">
               
-              {/* Awareness Card */}
+              {}
               <StaggerItem>
                 <div className="group h-full bg-[#F9F6FF] rounded-[2.5rem] p-8 md:p-12 flex flex-col items-start border border-[#3F2965]/10 relative overflow-hidden hover:shadow-2xl hover:-translate-y-1 transition-all duration-500">
                   <div className="absolute inset-0 bg-[#3F2965] scale-x-0 group-hover:scale-x-100 transition-transform duration-700 origin-left ease-out" />
@@ -417,7 +400,7 @@ export default async function AwarenessDetailPage(props: AwarenessPageProps) {
                 </div>
               </StaggerItem>
 
-             {/* Booking Card */}
+             {}
              <StaggerItem>
                 <div className="h-full bg-[#3F2965] rounded-[2.5rem] p-8 md:p-12 flex flex-col items-start text-white shadow-xl shadow-[#3F2965]/20 border border-[#3F2965] relative overflow-hidden group transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl">
                   

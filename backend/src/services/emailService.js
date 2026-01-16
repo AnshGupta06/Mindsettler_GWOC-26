@@ -1,7 +1,7 @@
 import brevo from "@getbrevo/brevo";
 import "dotenv/config";
 
-// --- VALIDATION CHECK ---
+
 if (!process.env.BREVO_API_KEY) {
   console.error("⚠️ FATAL: BREVO_API_KEY is missing in .env file");
 }
@@ -12,10 +12,6 @@ if (!process.env.SENDER_EMAIL) {
 const apiInstance = new brevo.TransactionalEmailsApi();
 const apiKey = apiInstance.authentications["apiKey"];
 apiKey.apiKey = process.env.BREVO_API_KEY;
-
-/* -------------------------------------------------------------------------- */
-/* PROFESSIONAL EMAIL TEMPLATE BUILDER                                        */
-/* -------------------------------------------------------------------------- */
 
 const createEmailTemplate = (title, bodyContent, ctaLink = null, ctaText = null) => `
 <!DOCTYPE html>
@@ -30,6 +26,10 @@ const createEmailTemplate = (title, bodyContent, ctaLink = null, ctaText = null)
     .cta-button { display: inline-block; background-color: #Dd1764; color: #ffffff !important; padding: 14px 28px; border-radius: 50px; text-decoration: none; font-weight: bold; margin-top: 20px; font-size: 16px; box-shadow: 0 4px 10px rgba(221, 23, 100, 0.3); }
     .footer { background-color: #f4f4f7; padding: 20px; text-align: center; font-size: 12px; color: #888888; }
     .highlight { color: #3F2965; font-weight: bold; }
+    .info-table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 14px; }
+    .info-table td { padding: 10px; border-bottom: 1px solid #eee; }
+    .info-table td:first-child { font-weight: bold; color: #3F2965; width: 40%; }
+    .info-table td:last-child { color: #555; }
   </style>
 </head>
 <body>
@@ -73,7 +73,7 @@ const sendHtmlEmail = async (to, subject, html) => {
   }
 };
 
-// 1. Welcome Email
+
 export const sendWelcomeEmail = async (email, name) => {
   const html = createEmailTemplate(
     "Welcome to Your Healing Journey 🌿",
@@ -86,7 +86,7 @@ export const sendWelcomeEmail = async (email, name) => {
   await sendHtmlEmail(email, "Welcome to MindSettler", html);
 };
 
-// 2. Booking Rejected
+
 export const sendBookingRejectedEmail = async (email, name, date, reason) => {
   const html = createEmailTemplate(
     "Session Status Update",
@@ -100,7 +100,7 @@ export const sendBookingRejectedEmail = async (email, name, date, reason) => {
   await sendHtmlEmail(email, "Update regarding your session request", html);
 };
 
-// 3. User Blocked
+
 export const sendUserBlockedEmail = async (email, name) => {
   const html = createEmailTemplate(
     "Important Account Notice",
@@ -113,7 +113,7 @@ export const sendUserBlockedEmail = async (email, name) => {
   await sendHtmlEmail(email, "Account Access Restricted", html);
 };
 
-// 4. Session Reminder
+
 export const sendSessionReminderEmail = async (email, name, link, mode) => {
   const isOnline = mode === "ONLINE";
   const html = createEmailTemplate(
@@ -130,7 +130,7 @@ export const sendSessionReminderEmail = async (email, name, link, mode) => {
   await sendHtmlEmail(email, "Reminder: Session starting soon", html);
 };
 
-// 5. Booking Confirmed
+
 export const sendBookingConfirmedEmail = async (email, name, date, time, link, mode) => {
   const isOnline = mode === "ONLINE";
   
@@ -151,8 +151,8 @@ export const sendBookingConfirmedEmail = async (email, name, date, time, link, m
   await sendHtmlEmail(email, "Booking Confirmed ✅", html);
 };
 
-// 6. Admin: New Booking Alert
-export const sendNewBookingAdminEmail = async (adminEmail, { userName, userEmail, type, therapyType, reason }) => {
+// --- UPDATED ADMIN EMAIL FUNCTION ---
+export const sendNewBookingAdminEmail = async (adminEmail, { userName, userEmail, phone, attendees, status, type, therapyType, reason }) => {
   if (!adminEmail) {
     console.error("❌ Admin email failed: No admin email address provided (Check env.ADMIN_EMAIL)");
     return;
@@ -160,17 +160,50 @@ export const sendNewBookingAdminEmail = async (adminEmail, { userName, userEmail
   
   const html = createEmailTemplate(
     "New Booking Request 🔔",
-    `<p><strong>User:</strong> ${userName} (${userEmail})</p>
-     <p><strong>Type:</strong> ${type}</p>
-     ${therapyType ? `<p><strong>Therapy:</strong> ${therapyType}</p>` : ''}
-     <p><strong>Reason:</strong> ${reason || "—"}</p>`,
+    `<p>A new booking request has been received. Please review the details below:</p>
+     
+     <table class="info-table">
+        <tr>
+            <td>Client Name:</td>
+            <td>${userName}</td>
+        </tr>
+        <tr>
+            <td>Email:</td>
+            <td>${userEmail}</td>
+        </tr>
+        <tr>
+            <td>Phone:</td>
+            <td>${phone || "Not provided"}</td>
+        </tr>
+        <tr>
+            <td>Session Type:</td>
+            <td><span style="background:#F3E8FF; color:#3F2965; padding:2px 8px; border-radius:4px; font-weight:bold;">${type}</span></td>
+        </tr>
+        <tr>
+            <td>Therapy Mode:</td>
+            <td>${therapyType || "General"}</td>
+        </tr>
+        <tr>
+            <td>Attendees:</td>
+            <td>${attendees} Person(s)</td>
+        </tr>
+        <tr>
+            <td>Marital Status:</td>
+            <td>${status || "N/A"}</td>
+        </tr>
+     </table>
+
+     <div style="background:#FFF; border:1px solid #eee; padding:15px; border-radius:8px; margin-top:10px;">
+        <strong>Reason / Notes:</strong><br/>
+        <i style="color:#555;">"${reason || "No notes provided"}"</i>
+     </div>`,
     `${process.env.NEXT_PUBLIC_APP_URL}/admin`,
-    "Manage Bookings"
+    "Open Admin Dashboard"
   );
   await sendHtmlEmail(adminEmail, "New Booking Request", html);
 };
 
-// 7. ✨ User: Booking Cancelled
+
 export const sendBookingCancelledEmail = async (email, name, date, time) => {
   const html = createEmailTemplate(
     "Session Cancelled ❌",
@@ -183,7 +216,7 @@ export const sendBookingCancelledEmail = async (email, name, date, time) => {
   await sendHtmlEmail(email, "Session Cancelled", html);
 };
 
-// 8. ✨ User: Refund Requested
+
 export const sendRefundRequestedEmail = async (email, name, date, time) => {
   const html = createEmailTemplate(
     "Refund Request Initiated 💸",
@@ -197,7 +230,7 @@ export const sendRefundRequestedEmail = async (email, name, date, time) => {
   await sendHtmlEmail(email, "Refund Request Received", html);
 };
 
-// 9. ✨ Admin: Refund Alert
+
 export const sendAdminRefundAlert = async (adminEmail, { userName, userEmail, date, time, refundAmount }) => {
   if (!adminEmail) return;
   
@@ -213,7 +246,7 @@ export const sendAdminRefundAlert = async (adminEmail, { userName, userEmail, da
   await sendHtmlEmail(adminEmail, "Refund Action Required", html);
 };
 
-// 10. ✨ User: Admin Report
+
 export const sendAdminReportEmail = async (email, name, reportContent, adminName = "Admin") => {
   const html = createEmailTemplate(
     "Important Update from Your Therapist 📋",
@@ -233,7 +266,7 @@ export const sendAdminReportEmail = async (email, name, reportContent, adminName
   await sendHtmlEmail(email, "Therapist Report & Update", html);
 };
 
-// 11. ✨ User: Session Notes (Public)
+
 export const sendSessionNotesToUser = async (email, name, notes) => {
   const html = createEmailTemplate(
     "Your Session Notes 📝",
@@ -253,7 +286,7 @@ export const sendSessionNotesToUser = async (email, name, notes) => {
   await sendHtmlEmail(email, "Your Session Notes", html);
 };
 
-// 12. ✨ Admin: Therapist Notes (Private)
+
 export const sendTherapistNotesToAdmin = async (adminEmail, userName, userEmail, therapistNotes) => {
   if (!adminEmail) return;
   

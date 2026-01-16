@@ -6,7 +6,7 @@ export interface Resource {
   type: 'Book' | 'Website' | 'Video' | 'Course';
   category: 'Core Books' | 'Academic & Clinical' | 'Video & Lecture';
   link: string;
-  longSummary?: string; // Markdown supported
+  longSummary?: string; 
 }
 
 const detailedSummaries = {
@@ -241,7 +241,7 @@ Courses focusing on developmental psychology and the needs of children/adolescen
 };
 
 export const resources: Resource[] = [
-  // Core Books
+  
   {
     id: 'b1',
     title: 'The Gift of Therapy',
@@ -313,7 +313,7 @@ export const resources: Resource[] = [
     longSummary: detailedSummaries.systemsProchaska,
   },
 
-  // Academic & Clinical Resources
+  
   {
     id: 'w1',
     title: 'American Psychological Association',
@@ -345,7 +345,7 @@ export const resources: Resource[] = [
     longSummary: detailedSummaries.openLearn,
   },
 
-  // Video & Lecture Resources
+  
   {
     id: 'v1',
     title: 'Carl Rogers Therapy Sessions',

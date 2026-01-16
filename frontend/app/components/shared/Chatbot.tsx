@@ -32,7 +32,7 @@ export function Chatbot() {
 
   useEffect(() => {
     if (scrollAreaRef.current) {
-      // Direct access to scroll viewport for smooth scrolling
+      
       const scrollContainer = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
       if (scrollContainer) {
         scrollContainer.scrollTo({
@@ -96,7 +96,7 @@ export function Chatbot() {
 
   return (
     <>
-      {/* Floating Trigger Button */}
+      {}
       <motion.div
         initial={false}
         animate={{ scale: isOpen ? 0 : 1, opacity: isOpen ? 0 : 1 }}
@@ -114,7 +114,7 @@ export function Chatbot() {
       <AnimatePresence>
         {isOpen && (
           <>
-            {/* Soft Backdrop */}
+            {}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -123,7 +123,7 @@ export function Chatbot() {
               className="fixed inset-0 bg-black/10 backdrop-blur-[1px] z-[51]"
             />
 
-            {/* Chatbot Window */}
+            {}
             <motion.div
               initial={{ opacity: 0, scale: 0.5, y: 100, x: 100, originX: 1, originY: 1 }}
               animate={{
@@ -145,7 +145,7 @@ export function Chatbot() {
               }}
               className="ms-chatbot-sheet fixed bottom-6 right-6 z-[52] flex flex-col w-[380px] max-w-[calc(100vw-3rem)] h-[600px] max-h-[calc(100vh-6rem)] bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border border-none"
             >
-              {/* Header - Restored Title & Description */}
+              {}
               <div className="ms-chatbot-header p-6 pb-4 relative pr-12">
                 <Button
                   variant="ghost"
@@ -161,7 +161,7 @@ export function Chatbot() {
                 </p>
               </div>
 
-              {/* Messages Area */}
+              {}
               <div className="flex-1 overflow-hidden">
                 <ScrollArea className="h-full" ref={scrollAreaRef}>
                   <div className="space-y-6 p-4">
@@ -208,7 +208,7 @@ export function Chatbot() {
                       </div>
                     ))}
 
-                    {/* Restored Loading Section */}
+                    {}
                     {isLoading && (
                       <div className="flex flex-col gap-1 pl-12">
                         <div className="text-xs text-muted-foreground italic">
@@ -232,7 +232,7 @@ export function Chatbot() {
                 </ScrollArea>
               </div>
 
-              {/* Input Area */}
+              {}
               <form
                 onSubmit={handleSendMessage}
                 className="flex items-center gap-2 border-t p-4 bg-white"

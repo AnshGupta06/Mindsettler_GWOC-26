@@ -19,16 +19,16 @@ export default function AdminLayout({
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (user) => {
-      // 1. Check if user is logged in AND is an admin
+      
       if (user && isUserAdmin(user.email)) {
         setIsAuthorized(true);
       } else {
-        // 2. If not, kick them out
+        
         toast.error("Unauthorized access: admin access only!")
         if (user) {
-             router.replace("/"); // Logged in regular users -> Home
+             router.replace("/"); 
         } else {
-             router.replace("/login"); // Guests -> Login
+             router.replace("/login"); 
         }
       }
       setChecking(false);

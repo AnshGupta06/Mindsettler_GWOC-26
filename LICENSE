@@ -1,0 +1,121 @@
+MIT License
+
+Copyright (c) 2025 MindSettler Team
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+================================================================================
+
+THIRD-PARTY LICENSES AND ATTRIBUTIONS
+
+This project uses several open-source libraries and services. Below are the
+licenses and attributions for the major dependencies:
+
+1. Next.js - MIT License
+   Copyright (c) 2025 Vercel, Inc.
+
+2. React.js - MIT License
+   Copyright (c) Facebook, Inc. and its affiliates.
+
+3. Express.js - MIT License
+   Copyright (c) 2009-2014 TJ Holowaychuk <tj@vision-media.ca>
+
+4. Prisma - Apache License 2.0
+   Copyright (c) 2025 Prisma Data, Inc.
+
+5. Firebase - Apache License 2.0
+   Copyright (c) Google LLC
+
+6. Google Generative AI (Gemini) - Subject to Google's Terms of Service
+   Copyright (c) Google LLC
+
+7. Tailwind CSS - MIT License
+   Copyright (c) Tailwind Labs, Inc.
+
+8. Framer Motion - MIT License
+   Copyright (c) 2018 Framer B.V.
+
+9. Radix UI - MIT License
+   Copyright (c) 2022 WorkOS
+
+10. GSAP - Standard License (GreenSock)
+    Copyright (c) 2023 GreenSock
+
+11. Resend - MIT License
+    Copyright (c) 2023 Resend
+
+================================================================================
+
+ADDITIONAL TERMS AND CONDITIONS
+
+1. AI Services Usage:
+   - This software integrates with Google's Gemini AI service
+   - Users must comply with Google's AI usage policies
+   - AI-generated insights should be treated as supportive suggestions, not prescriptions
+
+2. User Data & Privacy:
+   - Users retain ownership of their journals and personal data
+   - Platform operators must comply with applicable privacy laws (GDPR/CCPA)
+   - Mental health data is sensitive and must be handled with highest security standards
+
+3. Medical Disclaimer:
+   - This platform is for wellness and self-care purposes only
+   - It is NOT a medical device and does NOT provide medical diagnoses
+
+4. Commercial Use:
+   - This software may be used for commercial purposes under the MIT license
+   - Operators are responsible for compliance with healthcare regulations (e.g., HIPAA) if applicable
+
+================================================================================
+
+DISCLAIMER
+
+This software is provided for educational and informational purposes. 
+
+**CRITICAL NOTICE:**
+MindSettler is NOT a substitute for professional mental health care, therapy, or medical advice. 
+
+- If you are in crisis or thinking about self-harm, please contact local emergency services immediately.
+- The AI companion provides general wellness support, not clinical therapy.
+- Always consult with a qualified mental health professional for medical needs.
+
+The developers and contributors are not liable for any actions taken based on the software's content or AI responses.
+
+================================================================================
+
+CONTACT INFORMATION
+
+For questions about this license or the software:
+- Project Repository: https://github.com/AnshGupta06/Mindsettler_GWOC-26
+
+================================================================================
+
+ACKNOWLEDGMENTS
+
+We thank the open-source community and the following organizations:
+
+- Google for Gemini AI
+- Vercel for Next.js ecosystem
+- The React and Node.js communities
+- All contributors who help democratize mental wellness tools
+
+================================================================================
+
+Last Updated: January 15, 2026
+Version: 1.0.0

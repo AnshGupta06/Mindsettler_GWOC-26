@@ -1,6 +1,6 @@
 import { API_URL } from "./api";
 
-// Fetch global status (Admin)
+
 export const getDiscountStatus = async (token: string) => {
     const res = await fetch(`${API_URL}/api/discounts/status`, {
         headers: { Authorization: `Bearer ${token}` }
@@ -9,7 +9,7 @@ export const getDiscountStatus = async (token: string) => {
     return res.json();
 };
 
-// Toggle global status (Admin)
+
 export const toggleDiscountStatus = async (token: string, enable: boolean) => {
     const res = await fetch(`${API_URL}/api/discounts/toggle`, {
         method: "POST",
@@ -23,7 +23,7 @@ export const toggleDiscountStatus = async (token: string, enable: boolean) => {
     return res.json();
 };
 
-// Get all rules (Admin)
+
 export const getDiscountRules = async (token: string) => {
     const res = await fetch(`${API_URL}/api/discounts/rules`, {
         headers: { Authorization: `Bearer ${token}` }
@@ -32,7 +32,7 @@ export const getDiscountRules = async (token: string) => {
     return res.json();
 };
 
-// Create rule (Admin)
+
 export const createDiscountRule = async (token: string, data: { bookingCountFrom: number; bookingCountTo: number; discountPercent: number; label?: string }) => {
     const res = await fetch(`${API_URL}/api/discounts/rules`, {
         method: "POST",
@@ -46,7 +46,7 @@ export const createDiscountRule = async (token: string, data: { bookingCountFrom
     return res.json();
 };
 
-// Delete rule (Admin)
+
 export const deleteDiscountRule = async (token: string, id: string) => {
     const res = await fetch(`${API_URL}/api/discounts/rules/${id}`, {
         method: "DELETE",
@@ -56,7 +56,7 @@ export const deleteDiscountRule = async (token: string, id: string) => {
     return res.json();
 };
 
-// Check eligibility (User)
+
 export const checkDiscountEligibility = async (token: string) => {
     const res = await fetch(`${API_URL}/api/discounts/check`, {
         headers: { Authorization: `Bearer ${token}` }
