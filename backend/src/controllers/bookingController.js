@@ -59,6 +59,8 @@ export const createBooking = async (req, res) => {
       type, 
       reason, 
       therapyType,
+      transactionId,
+      paymentType, // ✅ ADDED: Extract paymentType
       name,
       phone,
       attendees,
@@ -152,6 +154,8 @@ export const createBooking = async (req, res) => {
           type, 
           reason, 
           therapyType,
+          paymentType,
+          transactionId, 
           status: "PENDING",
           clientName: name,        
           phone: phone,            
@@ -171,7 +175,6 @@ export const createBooking = async (req, res) => {
     res.json(booking);
 
     // 5. Send Admin Notification
-    // Construct a detailed reason string so Admin sees all info immediately
     const detailedReason = `
       ${reason || ''} 
       ---
@@ -180,17 +183,19 @@ export const createBooking = async (req, res) => {
       Phone: ${phone}
       Attendees: ${attendees}
       Status: ${status}
+      Payment Type: ${paymentType || 'Not specified'} 
     `.trim();
 
     sendNewBookingAdminEmail(ADMIN_EMAIL, {
-        userName: name || user.name, // Prefer form name
-        userEmail: user.email,       // Verified DB email
-        phone,                       // Pass phone explicitly
-        attendees,                   // Pass attendees explicitly
-        status,                      // Pass marital status explicitly
+        userName: name || user.name, 
+        userEmail: user.email,       
+        phone,                       
+        attendees,                   
+        status,                      
         type,
         therapyType,
-        reason,                      // Pass raw reason (no need to pack details)
+        reason,
+        transactionId
     }).catch(err => console.error("❌ Admin email failed:", err));
 
   } catch (err) {

@@ -10,10 +10,10 @@ interface AuthModalProps {
   
   page?: string; 
   
-  
   type?: "AUTH" | "CONFIRM" | "SUCCESS" | "ERROR" | "BLOCKED";
   title?: string;
-  message?: string;
+  // UPDATED: Allows passing JSX elements (icons + text)
+  message?: string | React.ReactNode; 
   actionLabel?: string;
   onAction?: () => void;
   isLoading?: boolean;
@@ -76,7 +76,6 @@ export default function AlertModal({
 
   const currentConfig = config[type];
 
-  
   const renderAuthMessage = () => {
     if (page === "book") {
       return "To book a personalized session and track your healing journey, please log in to your MindSettler account.";
@@ -95,7 +94,7 @@ export default function AlertModal({
     <AnimatePresence>
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-          {}
+          {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -104,7 +103,7 @@ export default function AlertModal({
             className="absolute inset-0 bg-black/60 backdrop-blur-sm"
           />
 
-          {}
+          {/* Modal Content */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -112,7 +111,7 @@ export default function AlertModal({
             transition={{ type: "spring", duration: 0.5 }}
             className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden p-8 text-center"
           >
-            {}
+            {/* Close Button */}
             {!isLoading && type !== 'SUCCESS' && (
               <button 
                 onClick={onClose}
@@ -122,38 +121,36 @@ export default function AlertModal({
               </button>
             )}
 
-            {}
+            {/* Icon */}
             <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6 ${currentConfig.bg}`}>
               {currentConfig.icon}
             </div>
 
-            {}
+            {/* Title */}
             <h2 className="text-2xl font-bold text-[#3F2965] mb-3">
               {type === "AUTH" ? currentConfig.title : title || currentConfig.title}
             </h2>
             
-            <p className="text-[#3F2965]/70 mb-8 leading-relaxed whitespace-pre-line">
+            {/* Message Body - Changed from <p> to <div> to support nested elements */}
+            <div className="text-[#3F2965]/70 mb-8 leading-relaxed whitespace-pre-line">
               {renderMessage()}
-            </p>
+            </div>
 
-            {}
+            {/* Action Buttons */}
             <div className="flex flex-col gap-3">
               {type === "AUTH" ? (
-                
                 <Link href="/login" onClick={onClose}>
                   <button className={`w-full py-3.5 rounded-xl text-white font-bold text-lg shadow-lg hover:scale-[1.02] transition-transform ${currentConfig.btnColor}`}>
                     {currentConfig.btnText}
                   </button>
                 </Link>
               ) : type === "BLOCKED" ? (
-                
                 <Link href="/contact" onClick={onClose}>
                    <button className={`w-full py-3.5 rounded-xl text-white font-bold text-lg shadow-lg hover:scale-[1.02] transition-transform ${currentConfig.btnColor}`}>
                     {currentConfig.btnText}
                   </button>
                 </Link>
               ) : (
-                
                 <button 
                   onClick={onAction || onClose}
                   disabled={isLoading}
@@ -170,7 +167,6 @@ export default function AlertModal({
                 </button>
               )}
               
-              {}
               {currentConfig.showCancel && !isLoading && (
                 <button 
                   onClick={onClose}

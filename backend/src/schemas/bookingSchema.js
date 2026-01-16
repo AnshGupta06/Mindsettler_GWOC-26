@@ -12,8 +12,11 @@ export const createBookingSchema = z.object({
 
     therapyType: z.string().optional(),
     reason: z.string().max(500).optional(),
+    
+    // ✅ Ensure these are present
+    paymentType: z.string().optional(),
+    transactionId: z.string().optional(),
 
-    // --- NEW FIELDS (No Email) ---
     name: z.string().min(1, "Name is required"),
     phone: z.string().min(1, "Phone number is required"),
     attendees: z.number().int().min(1, "At least 1 attendee is required"),

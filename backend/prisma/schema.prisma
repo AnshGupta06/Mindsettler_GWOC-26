@@ -54,13 +54,13 @@ model Booking {
   type      SessionType
   therapyType String?
   reason    String?
-
   userId    String
   slotId    String @unique
   meetingLink String?
   user      User        @relation(fields: [userId], references: [id])
   slot      SessionSlot @relation(fields: [slotId], references: [id])
-
+  paymentType   String?  
+  transactionId String?
   meetingNotes MeetingNotes?
   clientName    String?
   phone         String?

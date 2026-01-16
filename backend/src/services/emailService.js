@@ -152,7 +152,7 @@ export const sendBookingConfirmedEmail = async (email, name, date, time, link, m
 };
 
 // --- UPDATED ADMIN EMAIL FUNCTION ---
-export const sendNewBookingAdminEmail = async (adminEmail, { userName, userEmail, phone, attendees, status, type, therapyType, reason }) => {
+export const sendNewBookingAdminEmail = async (adminEmail, { userName, userEmail, phone, attendees, status, type, therapyType, reason, paymentType, transactionId }) => {
   if (!adminEmail) {
     console.error("❌ Admin email failed: No admin email address provided (Check env.ADMIN_EMAIL)");
     return;
@@ -191,6 +191,16 @@ export const sendNewBookingAdminEmail = async (adminEmail, { userName, userEmail
             <td>Marital Status:</td>
             <td>${status || "N/A"}</td>
         </tr>
+        <tr>
+            <td>Payment Type:</td>
+            <td><span style="font-weight:bold; color:#059669;">${paymentType || "Not Specified"}</span></td>
+        </tr>
+        ${transactionId ? `
+        <tr style="background-color:#F0FDF4;">
+            <td><strong>Transaction ID (UTR):</strong></td>
+            <td style="font-family:monospace; font-size:16px; letter-spacing:1px; color:#166534;">${transactionId}</td>
+        </tr>
+        ` : ''}
      </table>
 
      <div style="background:#FFF; border:1px solid #eee; padding:15px; border-radius:8px; margin-top:10px;">
@@ -203,29 +213,28 @@ export const sendNewBookingAdminEmail = async (adminEmail, { userName, userEmail
   await sendHtmlEmail(adminEmail, "New Booking Request", html);
 };
 
-
 export const sendBookingCancelledEmail = async (email, name, date, time) => {
   const html = createEmailTemplate(
     "Session Cancelled ❌",
     `<p>Hi ${name},</p>
      <p>Your session scheduled for <span class="highlight">${date}</span> at <span class="highlight">${time}</span> has been successfully cancelled as per your request.</p>
-     <p>If you would like to reschedule, please visit the booking page.</p>`,
+     <p>Please note that all cancellations and rescheduling are subject to our <a href="${process.env.NEXT_PUBLIC_APP_URL}/refund-policy" style="text-decoration: underline; font-weight: bold; color: #Dd1764;">Refund Policy</a>.</p>
+     <p>style="font-size: 13px; color: #666; font-style: italic;">(Note: Refunds are processed only if you have already paid online via UPI. Pay-at-session bookings do not require a refund.)</p>
+     <p>If you cancelled more than 24 hours in advance and wish to book a new slot, please visit the booking page.</p>`,
     `${process.env.NEXT_PUBLIC_APP_URL}/book`,
     "Book New Session"
   );
   await sendHtmlEmail(email, "Session Cancelled", html);
 };
-
-
 export const sendRefundRequestedEmail = async (email, name, date, time) => {
   const html = createEmailTemplate(
     "Refund Request Initiated 💸",
     `<p>Hi ${name},</p>
      <p>You have cancelled your confirmed session scheduled for <span class="highlight">${date}</span> at <span class="highlight">${time}</span>.</p>
-     <p>A <strong>refund request</strong> has been automatically raised with our admin team. The amount will be credited back to your original payment method (or via UPI) within 24-48 business hours.</p>
-     <p>If you have any questions, simply reply to this email.</p>`,
-    `${process.env.NEXT_PUBLIC_APP_URL}/contact`,
-    "Contact Support"
+     <p>In accordance with our <a href="${process.env.NEXT_PUBLIC_APP_URL}/refund-policy" style="text-decoration: underline; font-weight: bold; color: #Dd1764;">Refund Policy</a>, a <strong>refund request</strong> has been automatically raised with our admin team.</p>
+     <p>The amount will be credited back to your original payment method (or via UPI) within 24-48 business hours. If you have any questions regarding this process, please reply to this email.</p>`,
+    `${process.env.NEXT_PUBLIC_APP_URL}/refund-policy`,
+    "View Refund Policy"
   );
   await sendHtmlEmail(email, "Refund Request Received", html);
 };

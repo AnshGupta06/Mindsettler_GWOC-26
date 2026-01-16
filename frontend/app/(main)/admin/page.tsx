@@ -11,7 +11,8 @@ import {
   Calendar, Clock, User, CheckCircle, XCircle, 
   Video, X, Link as LinkIcon, ExternalLink,
   Phone, Mail, FileText, Save, Users, Heart,
-  Filter, Search, LayoutDashboard, Award, Settings, ShieldAlert
+  Filter, Search, LayoutDashboard, Award, Settings, ShieldAlert,
+  Banknote
 } from "lucide-react";
 
 // --- TYPE DEFINITIONS ---
@@ -22,6 +23,7 @@ type Booking = {
   therapyType?: string;
   reason?: string;
   meetingLink?: string;
+  paymentType?: string; // ✅ ADDED
   
   // Database Fields
   clientName?: string;
@@ -452,7 +454,7 @@ function StatCircle({ label, value, icon: Icon, color, bg, textColor }: StatCirc
   );
 }
 
-// --- BOOKING CARD (Old Style) ---
+// --- BOOKING CARD ---
 type BookingCardProps = {
   booking: Booking;
   onConfirm: (booking: Booking) => void;
@@ -530,6 +532,21 @@ function BookingCard({ booking, onConfirm, onReject, onOpenNotes }: BookingCardP
                         <span className="text-[10px] font-bold bg-[#Dd1764] text-white px-2 py-0.5 rounded-md">
                             {booking.therapyType}
                         </span>
+                    )}
+
+                    {/* ✅ ADDED: Payment Type in Admin View */}
+                    {booking.paymentType && (
+                         <div className="flex flex-col items-start gap-1">
+                             <span className="text-[10px] font-bold bg-emerald-600 text-white px-2 py-0.5 rounded-md flex items-center gap-1">
+                                <Banknote size={10} /> {booking.paymentType}
+                            </span>
+                            {/* ✅ SHOW TRANSACTION ID */}
+                            {booking.paymentType === "UPI" && (booking as any).transactionId && (
+                                <span className="text-[10px] font-mono font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-100 select-all" title="Copy to verify">
+                                    UTR: {(booking as any).transactionId}
+                                </span>
+                            )}
+                         </div>
                     )}
                 </div>
                 <p className="text-xs text-[#3F2965]/70 italic line-clamp-2">
