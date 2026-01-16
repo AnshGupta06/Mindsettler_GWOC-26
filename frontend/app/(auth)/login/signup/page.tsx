@@ -1,7 +1,7 @@
 "use client";
 
 import SignupForm from "../components/SignupForm";
-import { Brain, Heart, Sparkles, ShieldCheck } from "lucide-react";
+import { Brain, Heart, Sparkles } from "lucide-react";
 import { CharReveal, SlideUp, ImageWipeReveal } from "../../../(main)/components/common/RevealComponent";
 
 const imagesColumn1 = [
@@ -23,7 +23,7 @@ export default function SignupPage() {
   const quadColumn2 = [...imagesColumn2, ...imagesColumn2, ...imagesColumn2, ...imagesColumn2];
 
   return (
-    <div className="h-screen w-full bg-[#F2F4F8] p-4 lg:p-6 flex items-center justify-center overflow-hidden font-sans">
+    <div className="h-screen w-full bg-[#F2F4F8] p-0 lg:p-6 flex items-center justify-center overflow-hidden font-sans">
       
       <style jsx global>{`
         @keyframes scroll-vertical-25 {
@@ -48,17 +48,16 @@ export default function SignupPage() {
         }
       `}</style>
 
-      <div className="w-full h-full max-w-[1600px] bg-white rounded-[30px] shadow-2xl overflow-hidden flex relative ring-1 ring-black/5">
+      {/* Main Container: Full screen on mobile, Boxed on desktop */}
+      <div className="w-full h-full max-w-[1600px] bg-white rounded-none lg:rounded-[30px] shadow-none lg:shadow-2xl overflow-hidden flex relative ring-0 lg:ring-1 ring-black/5">
         
-        {}
-        {}
+        {/* Left Side (Images) - Hidden on mobile */}
         <ImageWipeReveal className="hidden lg:flex w-[45%] h-full relative bg-[#3F2965] overflow-hidden flex-row gap-3 p-3">
            <div className="absolute inset-0 z-20 bg-gradient-to-t from-[#3F2965] via-transparent to-[#3F2965]/80 pointer-events-none" />
            
            <div className="w-1/2 relative h-full overflow-hidden">
              <div className="flex flex-col animate-scroll-up">
                 {quadColumn1.map((img, i) => (
-                  
                   <div key={i} className="w-full aspect-[3/4] rounded-xl bg-cover bg-center shrink-0 shadow-sm mb-3" style={{backgroundImage: `url(${img})`}} />
                 ))}
              </div>
@@ -67,7 +66,6 @@ export default function SignupPage() {
            <div className="w-1/2 relative h-full overflow-hidden">
              <div className="flex flex-col animate-scroll-down">
                 {quadColumn2.map((img, i) => (
-                  
                   <div key={i} className="w-full aspect-[3/4] rounded-xl bg-cover bg-center shrink-0 shadow-sm mb-3" style={{backgroundImage: `url(${img})`}} />
                 ))}
              </div>
@@ -85,7 +83,7 @@ export default function SignupPage() {
            </div>
         </ImageWipeReveal>
 
-        {}
+        {/* Right Side (Form) */}
         <div className="flex-1 h-full bg-white flex flex-col bg-grid-pattern relative overflow-hidden">
            <SlideUp delay={0.2} className="absolute top-0 left-0 flex justify-between items-center w-full px-4 pt-4 z-30 pointer-events-none">
               <img 
@@ -102,7 +100,8 @@ export default function SignupPage() {
                <div className="absolute top-10 right-10 text-[#3F2965]/5 rotate-12 animate-pulse pointer-events-none"><Sparkles size={120} /></div>
                <div className="absolute bottom-10 left-10 text-[#Dd1764]/5 -rotate-12 pointer-events-none"><Heart size={100} /></div>
                
-               <div className="w-full max-w-[480px] bg-white p-8 lg:p-10 rounded-[32px] border-2 border-[#3F2965] shadow-[0_0_0_5px_rgba(221,23,100,0.15)] relative z-20">
+               {/* Inner Form Card: Border and Rounded corners RESTORED for all screens */}
+               <div className="w-full max-w-[480px] bg-white p-6 lg:p-10 rounded-[32px] border-2 border-[#3F2965] shadow-[0_0_0_5px_rgba(221,23,100,0.15)] relative z-20">
                   <SignupForm />
                </div>
            </div>

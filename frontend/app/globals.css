@@ -83,7 +83,6 @@
   html {
     
     font-size: 14px; 
-    scroll-behavior: smooth;
   }
 
   @media (min-width: 640px) {
