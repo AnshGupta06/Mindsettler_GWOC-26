@@ -679,8 +679,7 @@ export default function BookPage() {
                     <div className="bg-white rounded-[2rem] shadow-xl shadow-[#3F2965]/5 border border-[#3F2965]/5 overflow-hidden mb-6">
                       
                       <div className="bg-[#3F2965] p-5 text-white text-center relative overflow-hidden">
-                        <div className="absolute top-0 left-0 w-full h-full bg-[url('https:
-                        <h3 className="text-base font-bold relative z-10 flex items-center justify-center gap-2">
+<div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>                        <h3 className="text-base font-bold relative z-10 flex items-center justify-center gap-2">
                            <Receipt size={16} className="text-[#Dd1764]" /> Booking Summary
                         </h3>
                       </div>
