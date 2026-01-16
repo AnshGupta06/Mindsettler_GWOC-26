@@ -10,6 +10,7 @@ import HowItWorks from "./components/home/HowItWorks";
 import FAQSection from "./components/home/FAQSection";
 import SectionDivider from "./components/common/SectionDivider";
 
+
 export default function HomeClient() {
   return (
     <main className="min-h-screen bg-[#F9F6FF]">
