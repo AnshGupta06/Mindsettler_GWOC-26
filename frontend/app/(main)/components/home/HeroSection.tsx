@@ -126,7 +126,7 @@ export default function HeroSection() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 md:gap-12 py-6 sm:py-8 border-t border-[#3F2965]/5">
             {[
               { label: "Lives Touched", value: "500+", icon: Users },
-              { label: "Expert Therapists", value: "Certified", icon: ShieldCheck },
+              { label: "Expert Therapist", value: "Certified", icon: ShieldCheck },
               { label: "Client Satisfaction", value: "4.9/5", icon: Star },
             ].map((stat, i) => (
               <div key={i} className="flex items-center justify-center sm:justify-start gap-4 group">

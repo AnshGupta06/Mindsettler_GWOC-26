@@ -31,10 +31,14 @@ export const getSlots = async (req, res) => {
     };
 
     if (therapyType) {
+      // When a specific therapyType is requested, show slots for that therapy or general slots (therapyType: null)
       whereCondition.OR = [
         { therapyType: null }, 
         { therapyType }, 
       ];
+    } else {
+      // For general sessions, only show slots not reserved for any specific therapy
+      whereCondition.therapyType = null;
     }
 
     const slots = await prisma.sessionSlot.findMany({
