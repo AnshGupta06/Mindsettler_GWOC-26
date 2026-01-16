@@ -8,6 +8,7 @@ import LoginForm from "./components/LoginForm";
 import { isUserAdmin } from "@/app/lib/admin";
 import { Quote, Activity } from "lucide-react";
 import { CharReveal, SlideUp, ImageWipeReveal } from "../../(main)/components/common/RevealComponent";
+import { API_URL } from "@/app/lib/api";
 
 const imagesColumn1 = [ 
   "/login_images/mental_health13.webp", 
@@ -26,8 +27,21 @@ export default function LoginPage() {
   const router = useRouter();
 
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (user) => {
+    const unsub = onAuthStateChanged(auth, async (user) => {
       if (user) {
+        // 🛡️ SAFETY NET: Ensure user is synced before redirecting.
+        // This catches cases where the Google Button component unmounted too fast.
+        try {
+            const token = await user.getIdToken();
+            await fetch(`${API_URL}/api/auth/sync-user`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+                body: JSON.stringify({ email: user.email, name: user.displayName }),
+            });
+        } catch (e) {
+            console.error("Auto-sync on login page failed:", e);
+        }
+
         if (isUserAdmin(user.email)) router.replace("/admin");
         else router.replace("/profile");
       }
@@ -64,7 +78,7 @@ export default function LoginPage() {
         }
       `}</style>
 
-      {/* Main Container: Full screen on mobile (rounded-none, shadow-none), Boxed on desktop */}
+      {/* Main Container */}
       <div className="w-full h-full max-w-[1600px] bg-white rounded-none lg:rounded-[30px] shadow-none lg:shadow-2xl overflow-hidden flex flex-col lg:flex-row relative ring-0 lg:ring-1 ring-black/5">
 
         {/* Left Side (Form) */}
@@ -85,7 +99,6 @@ export default function LoginPage() {
                <div className="absolute top-[-5%] left-[-5%] text-[#3F2965]/5 rotate-45 animate-pulse pointer-events-none"><Activity size={200} /></div>
                <div className="absolute bottom-10 right-10 text-[#Dd1764]/5 rotate-12 pointer-events-none"><Quote size={120} /></div>
 
-               {/* Inner Form Card: Border and Rounded corners RESTORED for all screens */}
                <div className="w-full max-w-[440px] bg-white p-6 lg:p-10 rounded-[32px] border-2 border-[#3F2965] shadow-[0_0_0_5px_rgba(221,23,100,0.15)] relative z-20">
                   <LoginForm />
                </div>

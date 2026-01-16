@@ -40,6 +40,8 @@ export default function SignupForm() {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
+    
+    // --- Validation ---
     if (!firstName || !lastName || !email || !password || !confirmPassword) {
       setErrors((prev) => ({ ...prev, general: "Please fill in all required fields." }));
       return;
@@ -59,32 +61,45 @@ export default function SignupForm() {
 
     try {
       const cred = await createUserWithEmailAndPassword(auth, email, password);
+      
+      const token = await cred.user.getIdToken();
+      await fetch(`${API_URL}/api/auth/sync-user`, {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/json", 
+          Authorization: `Bearer ${token}` 
+        },
+        body: JSON.stringify({ 
+          name: `${firstName} ${lastName}`, 
+          phone, 
+          email 
+        }),
+      });
+
+      // 3. Send Verification Email
       await sendEmailVerification(cred.user);
+      
       toast.success("Account created!", { id: toastId });
       setInfo(true);
 
+      // 4. Poll for Email Verification (Redirect Only)
       const interval = setInterval(async () => {
         try {
           await cred.user.reload();
           if (cred.user.emailVerified) {
             clearInterval(interval);
-            const token = await cred.user.getIdToken();
-            try {
-                await fetch(`${API_URL}/api/auth/sync-user`, {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-                  body: JSON.stringify({ name: `${firstName} ${lastName}`, phone, email }),
-                });
-            } catch (syncErr) { console.error("Sync failed:", syncErr); }
             toast.success("Verified! Logging in...");
             router.push("/");
           }
-        } catch (e) { console.error("Verification poll error", e); }
+        } catch (e) { 
+          console.error("Verification poll error", e); 
+        }
       }, 3000);
 
     } catch (err: any) {
       setLoading(false);
       toast.dismiss(toastId);
+      
       if (err.code === "auth/email-already-in-use") {
         setErrors((prev) => ({ ...prev, email: "This email is already registered." }));
       } else if (err.code === "auth/weak-password") {

@@ -4,6 +4,7 @@ import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { auth } from "../../../lib/firebase";
 import { useRouter } from "next/navigation";
 import { API_URL } from "@/app/lib/api";
+import toast from "react-hot-toast";
 
 export default function GoogleButton() {
   const router = useRouter();
@@ -12,19 +13,30 @@ export default function GoogleButton() {
     try {
       const provider = new GoogleAuthProvider();
       provider.setCustomParameters({ prompt: "select_account" });
+      
+      // 1. Authenticate with Firebase
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
+      
+      // 2. Sync with your Backend
       const token = await user.getIdToken();
-
-      await fetch(`${API_URL}/api/auth/sync-user`, {
+      const res = await fetch(`${API_URL}/api/auth/sync-user`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ name: user.displayName }),
+        body: JSON.stringify({ name: user.displayName, email: user.email }),
       });
 
+      // 🛑 CRITICAL FIX: Check if sync actually succeeded
+      if (!res.ok) {
+        throw new Error("Failed to sync user data with server");
+      }
+
+      // 3. Redirect only on success
       router.push("/");
+      
     } catch (err) {
-      console.error("Google sign-in failed:", err);
+      console.error("Google sign-in/sync failed:", err);
+      toast.error("Login failed. Please try again.");
     }
   };
 
