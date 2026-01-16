@@ -195,6 +195,7 @@ export const createBooking = async (req, res) => {
         type,
         therapyType,
         reason,
+        paymentType,
         transactionId
     }).catch(err => console.error("❌ Admin email failed:", err));
 
