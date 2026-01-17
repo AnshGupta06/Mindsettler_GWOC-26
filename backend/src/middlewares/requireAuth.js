@@ -12,7 +12,15 @@ export const requireAuth = async (req, res, next) => {
   try {
     const decoded = await admin.auth().verifyIdToken(token, true);
     
-    
+    // 🛑 SECURITY FIX: Block unverified emails
+    if (!decoded.email_verified) {
+      return res.status(403).json({ 
+        error: "EMAIL_NOT_VERIFIED", 
+        message: "Please verify your email address to access this feature." 
+      });
+    }
+
+    // Check if user is blocked in Database
     const user = await prisma.user.findUnique({
       where: { firebaseUid: decoded.uid },
       select: { isBlocked: true }

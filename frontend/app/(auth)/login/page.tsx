@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged, signOut } from "firebase/auth"; // Import signOut
 import { auth } from "../../lib/firebase";
 import LoginForm from "./components/LoginForm";
 import { isUserAdmin } from "@/app/lib/admin";
@@ -10,6 +10,7 @@ import { Quote, Activity } from "lucide-react";
 import { CharReveal, SlideUp, ImageWipeReveal } from "../../(main)/components/common/RevealComponent";
 import { API_URL } from "@/app/lib/api";
 
+// ... (Your existing image arrays)
 const imagesColumn1 = [ 
   "/login_images/mental_health13.webp", 
   "/login_images/mental_health14.webp", 
@@ -29,8 +30,15 @@ export default function LoginPage() {
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        // 🛡️ SAFETY NET: Ensure user is synced before redirecting.
-        // This catches cases where the Google Button component unmounted too fast.
+        // 🛑 SECURITY FIX: Check Verification before Redirecting
+        if (!user.emailVerified) {
+          // If they are on the login page but authenticated & unverified, 
+          // force sign out so they see the login form (and get the verification error when they try again).
+          await signOut(auth);
+          return;
+        }
+
+        // Safe to sync and redirect now
         try {
             const token = await user.getIdToken();
             await fetch(`${API_URL}/api/auth/sync-user`, {
@@ -49,6 +57,7 @@ export default function LoginPage() {
     return () => unsub();
   }, [router]);
 
+  // ... (rest of your existing JSX remains the same)
   const quadColumn1 = [...imagesColumn1, ...imagesColumn1, ...imagesColumn1, ...imagesColumn1];
   const quadColumn2 = [...imagesColumn2, ...imagesColumn2, ...imagesColumn2, ...imagesColumn2];
 

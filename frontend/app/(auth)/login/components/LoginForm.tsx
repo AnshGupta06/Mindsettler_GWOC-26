@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword, signOut } from "firebase/auth"; // ✅ Ensure signOut is imported
 import { auth } from "../../../lib/firebase";
 import GoogleButton from "./GoogleButton";
 import Link from "next/link";
@@ -20,24 +20,49 @@ export default function LoginForm() {
     if (!email || !password) return toast.error("Please fill in all fields");
     setLoading(true);
     try {
+      // 1. Attempt Login
       const cred = await signInWithEmailAndPassword(auth, email, password);
+      
+      // 2. 🛑 SECURITY CHECK: Is Email Verified?
+      if (!cred.user.emailVerified) {
+        await signOut(auth); // Force logout immediately
+        
+        // This toast will now be visible because we added <Toaster /> to the layout
+        toast.error("Email not verified. Please check your inbox.", {
+          duration: 5000,
+          icon: '🔒',
+          style: {
+            background: '#FEE2E2',
+            color: '#B91C1C',
+            fontWeight: 'bold',
+          },
+        });
+        
+        setLoading(false);
+        return; // Stop execution here
+      }
+
+      // 3. Proceed if verified
       const token = await cred.user.getIdToken();
       await fetch(`${API_URL}/api/auth/sync-user`, {
          method: "POST", 
          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
          body: JSON.stringify({ email: cred.user.email }) 
       });
+      
+      // (Optional) You can add a success toast here if you like
+      // toast.success("Login successful!");
+      
     } catch (err: any) {
-      toast.error("Login failed");
+      console.error("Login Error:", err);
+      toast.error("Login failed: " + (err.code === 'auth/invalid-credential' ? "Invalid email or password." : err.message));
       setLoading(false);
     }
   };
 
   return (
-    
     <StaggerContainer className="w-full" delay={0.2}>
       
-      {}
       <StaggerItem className="flex justify-start mb-6">
         <Link href="/" className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-[#3F2965] transition-colors">
            <ArrowLeft size={12} /> Return Home
@@ -45,7 +70,6 @@ export default function LoginForm() {
       </StaggerItem>
 
       <div className="mb-8">
-        {}
         <h2 className="text-3xl font-bold text-[#3F2965] tracking-tight">
           <CharReveal delay={0.4}>Welcome Back</CharReveal>
         </h2>
