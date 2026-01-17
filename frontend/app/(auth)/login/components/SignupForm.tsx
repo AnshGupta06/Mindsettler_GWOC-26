@@ -1,16 +1,23 @@
 "use client";
 
 import { useState } from "react";
-import { createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
+import { createUserWithEmailAndPassword, sendEmailVerification, updateProfile } from "firebase/auth";
 import { auth } from "../../../lib/firebase";
 import GoogleButton from "./GoogleButton";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Loader2, ArrowLeft, Mail, AlertCircle } from "lucide-react";
+import { Loader2, ArrowLeft, Mail, AlertCircle, Check, Circle } from "lucide-react";
 import { API_URL } from "@/app/lib/api";
 import toast from "react-hot-toast";
 
 import { CharReveal, StaggerContainer, StaggerItem, SlideUp} from "../../../(main)/components/common/RevealComponent";
+
+const PASSWORD_REQS = [
+  { id: 'len', label: "6+ chars", regex: /.{6,}/ },
+  { id: 'low', label: "Lowercase", regex: /[a-z]/ },
+  { id: 'num', label: "Number", regex: /[0-9]/ },
+  { id: 'sym', label: "Special", regex: /[^a-zA-Z0-9]/ },
+];
 
 export default function SignupForm() {
   const router = useRouter();
@@ -26,31 +33,21 @@ export default function SignupForm() {
   const [info, setInfo] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string; general?: string }>({});
 
-  const validatePassword = (pwd: string) => {
-    const checks = [
-      { regex: /.{6,}/, label: "At least 6 characters" },
-      { regex: /[a-z]/, label: "Lowercase letter" },
-      { regex: /[0-9]/, label: "Number" },
-      { regex: /[^a-zA-Z0-9]/, label: "Special character" },
-    ];
-    const missing = checks.filter((c) => !c.regex.test(pwd)).map((c) => c.label);
-    return missing;
-  };
-
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
     
-    // --- Validation ---
     if (!firstName || !lastName || !email || !password || !confirmPassword) {
       setErrors((prev) => ({ ...prev, general: "Please fill in all required fields." }));
       return;
     }
-    const missingRequirements = validatePassword(password);
+    
+    const missingRequirements = PASSWORD_REQS.filter(req => !req.regex.test(password)).map(req => req.label);
     if (missingRequirements.length > 0) {
       setErrors((prev) => ({ ...prev, password: `Missing: ${missingRequirements.join(", ")}` }));
       return;
     }
+
     if (password !== confirmPassword) {
       setErrors((prev) => ({ ...prev, password: "Passwords do not match." }));
       return;
@@ -60,21 +57,23 @@ export default function SignupForm() {
     const toastId = toast.loading("Creating account...");
 
     try {
+      // 1. Create User
       const cred = await createUserWithEmailAndPassword(auth, email, password);
       
-      const token = await cred.user.getIdToken();
-      await fetch(`${API_URL}/api/auth/sync-user`, {
-        method: "POST",
-        headers: { 
-          "Content-Type": "application/json", 
-          Authorization: `Bearer ${token}` 
-        },
-        body: JSON.stringify({ 
-          name: `${firstName} ${lastName}`, 
-          phone, 
-          email 
-        }),
+      // Update Profile
+      await updateProfile(cred.user, {
+        displayName: `${firstName} ${lastName}`
       });
+
+      // 2. Sync Data IMMEDIATELY
+      const token = await cred.user.getIdToken();
+      try {
+          await fetch(`${API_URL}/api/auth/sync-user`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+            body: JSON.stringify({ name: `${firstName} ${lastName}`, phone, email }),
+          });
+      } catch (syncErr) { console.error("Initial sync failed:", syncErr); }
 
       // 3. Send Verification Email
       await sendEmailVerification(cred.user);
@@ -82,18 +81,31 @@ export default function SignupForm() {
       toast.success("Account created!", { id: toastId });
       setInfo(true);
 
-      // 4. Poll for Email Verification (Redirect Only)
+      // 4. Poll for Verification
       const interval = setInterval(async () => {
         try {
           await cred.user.reload();
           if (cred.user.emailVerified) {
             clearInterval(interval);
+            
+            const freshToken = await cred.user.getIdToken(true);
+
+            try {
+                await fetch(`${API_URL}/api/auth/sync-user`, {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json", Authorization: `Bearer ${freshToken}` },
+                  body: JSON.stringify({ 
+                    name: `${firstName} ${lastName}`, 
+                    email,
+                    sendWelcome: true 
+                  }),
+                });
+            } catch (syncErr) { console.error("Welcome sync failed:", syncErr); }
+
             toast.success("Verified! Logging in...");
             router.push("/");
           }
-        } catch (e) { 
-          console.error("Verification poll error", e); 
-        }
+        } catch (e) { console.error("Verification poll error", e); }
       }, 3000);
 
     } catch (err: any) {
@@ -103,7 +115,7 @@ export default function SignupForm() {
       if (err.code === "auth/email-already-in-use") {
         setErrors((prev) => ({ ...prev, email: "This email is already registered." }));
       } else if (err.code === "auth/weak-password") {
-        setErrors((prev) => ({ ...prev, password: "Password does not meet requirements." }));
+        setErrors((prev) => ({ ...prev, password: "Password is too weak." }));
       } else if (err.code === "auth/invalid-email") {
         setErrors((prev) => ({ ...prev, email: "Invalid email address format." }));
       } else {
@@ -138,27 +150,27 @@ export default function SignupForm() {
   }
 
   return (
-    <StaggerContainer className="w-full" delay={0.2}>
-      <StaggerItem className="flex justify-start mb-4">
+    <StaggerContainer className="w-full" delay={0.1}>
+      <StaggerItem className="flex justify-start mb-2">
         <Link href="/login" className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-[#3F2965] transition-colors">
           <ArrowLeft size={14} /> Back to Login
         </Link>
       </StaggerItem>
 
-      <div className="mb-6 text-center">
+      <div className="mb-5 text-center">
         <h2 className="text-2xl font-black text-[#3F2965] tracking-tight">
-          <CharReveal delay={0.4}>Create Account</CharReveal>
+          <CharReveal delay={0.2}>Create Account</CharReveal>
         </h2>
-        <SlideUp delay={0.6}>
-          <p className="text-gray-400 text-xs font-bold uppercase tracking-widest mt-1">Begin your professional wellness journey</p>
+        <SlideUp delay={0.3}>
+          <p className="text-gray-400 text-[10px] font-bold uppercase tracking-widest mt-1">Begin your professional wellness journey</p>
         </SlideUp>
       </div>
 
-      <form onSubmit={handleSignup} className="space-y-3">
+      <form onSubmit={handleSignup} className="space-y-2.5">
         {errors.general && (
           <SlideUp>
-            <div className="p-3 rounded-lg bg-red-50 border border-red-100 flex items-center gap-2 text-xs font-bold text-red-600 mb-2">
-              <AlertCircle size={14} /> {errors.general}
+            <div className="p-2.5 rounded-lg bg-red-50 border border-red-100 flex items-center gap-2 text-[10px] font-bold text-red-600 mb-2">
+              <AlertCircle size={12} /> {errors.general}
             </div>
           </SlideUp>
         )}
@@ -182,7 +194,7 @@ export default function SignupForm() {
         <StaggerItem className="space-y-1 text-left">
            <label className="text-[9px] font-bold text-gray-400 uppercase tracking-wider ml-1">Email Address</label>
            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className={`w-full px-3 py-2.5 bg-gray-50 border rounded-lg outline-none focus:bg-white transition-all text-sm font-bold text-[#3F2965] ${errors.email ? 'border-red-300 focus:border-red-500 bg-red-50/50' : 'border-gray-200 focus:border-[#Dd1764]'}`} placeholder="Email Address" />
-           {errors.email && <p className="text-[10px] font-bold text-red-500 ml-1 mt-1 flex items-center gap-1"><AlertCircle size={10} /> {errors.email}</p>}
+           {errors.email && <p className="text-[9px] font-bold text-red-500 ml-1 mt-1 flex items-center gap-1"><AlertCircle size={10} /> {errors.email}</p>}
         </StaggerItem>
 
         <StaggerItem className="grid grid-cols-2 gap-3">
@@ -196,22 +208,36 @@ export default function SignupForm() {
            </div>
         </StaggerItem>
         
+        {password && (
+            <SlideUp className="flex flex-wrap gap-2 my-1.5">
+                {PASSWORD_REQS.map((req) => {
+                    const isMet = req.regex.test(password);
+                    return (
+                        <div key={req.id} className={`flex items-center gap-1.5 px-2 py-0.5 rounded border text-[9px] font-bold transition-all duration-300 ${isMet ? 'bg-green-50 border-green-200 text-green-700' : 'bg-gray-50 border-gray-100 text-gray-400'}`}>
+                            {isMet ? <Check size={10} className="stroke-[3]" /> : <Circle size={10} className="fill-gray-200 stroke-gray-300" />}
+                            {req.label}
+                        </div>
+                    )
+                })}
+            </SlideUp>
+        )}
+
         {errors.password && (
-            <StaggerItem>
+            <SlideUp>
               <p className="text-[10px] font-bold text-red-500 ml-1 mt-0 flex items-start gap-1 leading-snug">
                   <AlertCircle size={10} className="mt-0.5 shrink-0" /> {errors.password}
               </p>
-            </StaggerItem>
+            </SlideUp>
         )}
 
         <StaggerItem>
-          <button type="submit" disabled={loading} className="w-full py-3 rounded-lg bg-[#Dd1764] text-white font-bold text-xs uppercase tracking-widest hover:bg-[#b01350] transition-all shadow-md shadow-[#Dd1764]/20 mt-2 disabled:opacity-70 disabled:cursor-not-allowed">
+          <button type="submit" disabled={loading} className="w-full py-3 rounded-lg bg-[#Dd1764] text-white font-bold text-xs uppercase tracking-widest hover:bg-[#b01350] transition-all shadow-md shadow-[#Dd1764]/20 mt-1.5 disabled:opacity-70 disabled:cursor-not-allowed">
             {loading ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : "Create Account"}
           </button>
         </StaggerItem>
       </form>
 
-      <StaggerItem className="relative my-4">
+      <StaggerItem className="relative my-3">
         <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-gray-100"></div></div>
         <div className="relative flex justify-center text-[9px] uppercase tracking-widest text-gray-300 font-bold">
           <span className="bg-white px-2">Or continue with</span>

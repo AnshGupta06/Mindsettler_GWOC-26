@@ -1,11 +1,12 @@
 import express from "express";
-import {requireAuth} from "../middlewares/requireAuth.js";
-import { syncUser } from "../controllers/authController.js";
-import { getMe } from "../controllers/authController.js";
+import { requireAuth, requireLogin } from "../middlewares/requireAuth.js";
+import { syncUser, getMe } from "../controllers/authController.js";
+
 const router = express.Router();
+
 router.get("/me", requireAuth, getMe);
-router.post("/sync-user", (req, res, next) => {
-  next();
-}, requireAuth, syncUser);
+
+// ✅ Use requireLogin here so unverified users can save their name/phone
+router.post("/sync-user", requireLogin, syncUser);
 
 export default router;
