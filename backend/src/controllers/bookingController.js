@@ -11,31 +11,25 @@ import { getSettings } from "../services/globalSettingsService.js";
 import "dotenv/config";
 
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
+const BOOKING_COOLDOWN_MS = 2 * 60 * 1000; 
+const MAX_ACTIVE_BOOKINGS = 3;            
 
-// --- CONSTANTS ---
-const BOOKING_COOLDOWN_MS = 2 * 60 * 1000; // 2 minutes between bookings
-const MAX_ACTIVE_BOOKINGS = 3;             // Max active bookings per user
-
-// --- GET AVAILABLE SLOTS ---
 export const getSlots = async (req, res) => {
   try {
     const { therapyType } = req.query;
     const now = new Date();
     
-    // Base condition: Slot must be in future and not booked
     const whereCondition = {
       isBooked: false,
       startTime: { gt: now },
     };
 
-    // If therapyType provided, show general slots (null) OR specific therapy slots
     if (therapyType) {
       whereCondition.OR = [
         { therapyType: null }, 
         { therapyType }, 
       ];
     } else {
-      // If no type selected, show only general slots
       whereCondition.therapyType = null;
     }
 
@@ -51,7 +45,6 @@ export const getSlots = async (req, res) => {
   }
 };
 
-// --- CREATE BOOKING ---
 export const createBooking = async (req, res) => {
   try {
     const { 
@@ -60,7 +53,7 @@ export const createBooking = async (req, res) => {
       reason, 
       therapyType,
       transactionId,
-      paymentType, // ✅ ADDED: Extract paymentType
+      paymentType, 
       name,
       phone,
       attendees,
@@ -78,7 +71,6 @@ export const createBooking = async (req, res) => {
       return res.status(403).json({ error: "You are restricted from making new bookings." });
     }
 
-    // 1. Check Max Active Bookings
     const activeFutureBookings = await prisma.booking.count({
       where: {
         userId: user.id,
@@ -91,7 +83,6 @@ export const createBooking = async (req, res) => {
       return res.status(400).json({ error: `You cannot have more than ${MAX_ACTIVE_BOOKINGS} active bookings.` });
     }
 
-    // 2. Check Cooldown
     const lastBooking = await prisma.booking.findFirst({
       where: { userId: user.id },
       orderBy: { createdAt: 'desc' },
@@ -104,7 +95,6 @@ export const createBooking = async (req, res) => {
       }
     }
     
-    // 3. Check History (First vs Follow-up Logic)
     const historyCheckQuery = {
       userId: user.id,
       status: { not: "REJECTED" },
@@ -129,18 +119,15 @@ export const createBooking = async (req, res) => {
       return res.status(400).json({ error: msg });
     }
    
-    // 4. Transaction: Create Booking & Reserve Slot
     const booking = await prisma.$transaction(async (tx) => {
       const slot = await tx.sessionSlot.findUnique({ where: { id: slotId } });
       if (!slot) throw new Error("Slot not found");
       if (slot.isBooked) throw new Error("Slot unavailable");
 
-      // Check for ghost bookings (failed previous attempts on same slot)
       const existingBooking = await tx.booking.findUnique({ where: { slotId } });
       
       if (existingBooking) {
         if (existingBooking.status === "REJECTED") {
-          // Cleanup old rejected booking to free up slot ID relation
           await tx.booking.delete({ where: { id: existingBooking.id } });
         } else {
           throw new Error("Slot is already tied to an active booking.");
@@ -174,7 +161,6 @@ export const createBooking = async (req, res) => {
 
     res.json(booking);
 
-    // 5. Send Admin Notification
     const detailedReason = `
       ${reason || ''} 
       ---
@@ -205,7 +191,6 @@ export const createBooking = async (req, res) => {
   }
 };
 
-// --- GET MY BOOKINGS ---
 export const getMyBookings = async (req, res) => {
   try {
     const user = await prisma.user.findUnique({

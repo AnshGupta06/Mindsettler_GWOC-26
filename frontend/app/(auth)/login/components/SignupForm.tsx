@@ -57,15 +57,12 @@ export default function SignupForm() {
     const toastId = toast.loading("Creating account...");
 
     try {
-      // 1. Create User
       const cred = await createUserWithEmailAndPassword(auth, email, password);
       
-      // Update Profile
       await updateProfile(cred.user, {
         displayName: `${firstName} ${lastName}`
       });
 
-      // 2. Sync Data IMMEDIATELY
       const token = await cred.user.getIdToken();
       try {
           await fetch(`${API_URL}/api/auth/sync-user`, {
@@ -75,13 +72,11 @@ export default function SignupForm() {
           });
       } catch (syncErr) { console.error("Initial sync failed:", syncErr); }
 
-      // 3. Send Verification Email
       await sendEmailVerification(cred.user);
       
       toast.success("Account created!", { id: toastId });
       setInfo(true);
 
-      // 4. Poll for Verification
       const interval = setInterval(async () => {
         try {
           await cred.user.reload();

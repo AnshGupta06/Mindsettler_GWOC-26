@@ -315,3 +315,22 @@ export const sendTherapistNotesToAdmin = async (adminEmail, userName, userEmail,
   );
   await sendHtmlEmail(adminEmail, "Therapist Notes Submitted", html);
 };
+
+export const sendCorporateInquiryReceivedEmail = async (email, contactName, companyName, message) => {
+  const html = createEmailTemplate(
+    "Inquiry Received",
+    `<p>Hello <strong>${contactName}</strong>,</p>
+     <p>Thank you for your interest in partnering with <strong>MindSettler</strong> for <strong>${companyName}</strong>'s wellness needs.</p>
+     <p>We have successfully received your inquiry and our corporate team will review your requirements shortly.</p>
+     
+     <div style="background-color: #F9F6FF; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #Dd1764;">
+       <h3 style="margin-top: 0; font-size: 16px; color: #3F2965;">Your Message:</h3>
+       <p style="font-style: italic; color: #555; margin-bottom: 0;">"${message}"</p>
+     </div>
+
+     <p>We aim to get back to you within 24-48 business hours.</p>`,
+    null,
+    null
+  );
+  await sendHtmlEmail(email, "We received your Corporate Inquiry - MindSettler", html);
+};

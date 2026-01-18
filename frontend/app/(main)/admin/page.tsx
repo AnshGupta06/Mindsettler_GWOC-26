@@ -15,7 +15,6 @@ import {
   Banknote
 } from "lucide-react";
 
-// --- TYPE DEFINITIONS ---
 type Booking = {
   id: string;
   status: "PENDING" | "CONFIRMED" | "REJECTED";
@@ -23,15 +22,12 @@ type Booking = {
   therapyType?: string;
   reason?: string;
   meetingLink?: string;
-  paymentType?: string; // ✅ ADDED
-  
-  // Database Fields
+  paymentType?: string; 
   clientName?: string;
   phone?: string;
   attendees?: number;
   maritalStatus?: string;
 
-  // Relations
   user: {
     id: string; 
     name?: string;
@@ -66,7 +62,6 @@ export default function AdminBookingsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   
-  // --- FILTERS STATE ---
   const [filter, setFilter] = useState<"ALL" | "PENDING" | "CONFIRMED" | "REJECTED">("ALL");
   const [dateSearch, setDateSearch] = useState("");
   const [therapyFilter, setTherapyFilter] = useState("ALL");
@@ -203,7 +198,6 @@ export default function AdminBookingsPage() {
     }
   };
 
-  // --- FILTER LOGIC ---
   const filteredBookings = bookings.filter(b => {
     const matchesStatus = filter === "ALL" ? true : b.status === filter;
     let matchesDate = true;
@@ -228,7 +222,6 @@ export default function AdminBookingsPage() {
   return (
     <div className="min-h-screen bg-[#F9F6FF] pt-20 px-4 md:px-8 pb-12">
       
-      {/* --- CONFIRMATION MODAL --- */}
       {confirmModal.isOpen && (
          <div className="fixed inset-0 bg-[#3F2965]/20 backdrop-blur-sm z-50 flex items-center justify-center p-4">
            <div className="bg-white rounded-[2rem] p-8 max-w-md w-full shadow-2xl border border-[#3F2965]/10 animate-in zoom-in-95">
@@ -265,7 +258,6 @@ export default function AdminBookingsPage() {
          </div>
       )}
 
-      {/* --- NOTES MODAL --- */}
       {notesModal.isOpen && (
         <div className="fixed inset-0 bg-[#3F2965]/20 backdrop-blur-sm z-50 flex items-center justify-center p-4">
             <div className="bg-white rounded-[2rem] p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-[#3F2965]/10 animate-in zoom-in-95">
@@ -310,7 +302,6 @@ export default function AdminBookingsPage() {
         
       <div className="max-w-7xl mx-auto">
         
-        {/* --- HEADER --- */}
         <div className="mb-8">
             <h1 className="text-3xl md:text-4xl font-bold text-[#3F2965] flex items-center gap-3">
               <LayoutDashboard size={32} className="text-[#Dd1764]" /> Admin Dashboard
@@ -318,7 +309,6 @@ export default function AdminBookingsPage() {
             <p className="text-[#3F2965]/60 mt-2 text-base">Overview of all appointments and platform management.</p>
         </div>
 
-        {/* --- MANAGEMENT TOOLS (Compact & Responsive) --- */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-10">
             <button onClick={() => router.push("/admin/clients")} className="flex flex-col items-center justify-center p-3 sm:p-4 bg-white border border-[#3F2965]/10 rounded-xl shadow-sm hover:shadow-md hover:border-[#3F2965]/20 transition-all group">
                 <div className="w-10 h-10 rounded-full bg-[#F9F6FF] flex items-center justify-center text-[#Dd1764] mb-2 group-hover:bg-[#3F2965] group-hover:text-white transition-colors">
@@ -346,7 +336,6 @@ export default function AdminBookingsPage() {
             </button>
         </div>
 
-        {/* --- STATS CIRCLES (Restored) --- */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-12 px-2 md:px-8">
           <StatCircle 
             label="Total Requests" 
@@ -376,7 +365,6 @@ export default function AdminBookingsPage() {
           />
         </div>
 
-        {/* --- FILTERS TOOLBAR --- */}
         <div className="bg-white p-3 rounded-2xl border border-[#3F2965]/10 shadow-sm mb-8 flex flex-col md:flex-row gap-4 items-center">
             <div className="flex overflow-x-auto gap-2 no-scrollbar w-full md:w-auto pb-2 md:pb-0">
                 {["ALL", "PENDING", "CONFIRMED", "REJECTED"].map((f) => (
@@ -413,7 +401,6 @@ export default function AdminBookingsPage() {
             </div>
         </div>
 
-        {/* --- BOOKINGS GRID --- */}
         {loading ? ( 
             <Loader fullScreen={true} message="Loading Dashboard Data..."/> 
         ) : filteredBookings.length === 0 ? (
@@ -442,7 +429,6 @@ export default function AdminBookingsPage() {
   );
 }
 
-// --- STAT CIRCLE COMPONENT ---
 type StatCircleProps = { label: string; value: number; icon: any; color: string; bg: string; textColor: string; };
 function StatCircle({ label, value, icon: Icon, color, bg, textColor }: StatCircleProps) {
   return (
@@ -454,7 +440,6 @@ function StatCircle({ label, value, icon: Icon, color, bg, textColor }: StatCirc
   );
 }
 
-// --- BOOKING CARD ---
 type BookingCardProps = {
   booking: Booking;
   onConfirm: (booking: Booking) => void;
@@ -468,8 +453,6 @@ function BookingCard({ booking, onConfirm, onReject, onOpenNotes }: BookingCardP
 
   return (
     <div className="bg-white rounded-2xl border border-[#3F2965]/5 p-5 flex flex-col sm:flex-row gap-6 hover:shadow-lg hover:border-[#3F2965]/10 transition-all duration-300">
-      
-      {/* Date/Time Block */}
       <div className="flex flex-row md:flex-col items-center justify-between md:justify-center bg-[#F9F6FF] text-[#3F2965] rounded-xl p-3 md:p-4 min-w-full md:min-w-[120px] text-center border border-[#3F2965]/5">
         <div className="flex flex-col md:items-center text-left md:text-center">
           <span className="text-[10px] font-bold uppercase opacity-60">Session</span>
@@ -484,7 +467,6 @@ function BookingCard({ booking, onConfirm, onReject, onOpenNotes }: BookingCardP
       </div>
 
 
-      {/* Details Column */}
       <div className="flex-1 flex flex-col justify-between gap-4">
         <div>
             <div className="flex justify-between items-start mb-2">
@@ -534,13 +516,11 @@ function BookingCard({ booking, onConfirm, onReject, onOpenNotes }: BookingCardP
                         </span>
                     )}
 
-                    {/* ✅ ADDED: Payment Type in Admin View */}
                     {booking.paymentType && (
                          <div className="flex flex-col items-start gap-1">
                              <span className="text-[10px] font-bold bg-emerald-600 text-white px-2 py-0.5 rounded-md flex items-center gap-1">
                                 <Banknote size={10} /> {booking.paymentType}
                             </span>
-                            {/* ✅ SHOW TRANSACTION ID */}
                             {booking.paymentType === "UPI" && (booking as any).transactionId && (
                                 <span className="text-[10px] font-mono font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-100 select-all" title="Copy to verify">
                                     UTR: {(booking as any).transactionId}
@@ -555,7 +535,6 @@ function BookingCard({ booking, onConfirm, onReject, onOpenNotes }: BookingCardP
             </div>
         </div>
 
-        {/* Actions */}
         <div className="flex items-center justify-end gap-2 mt-auto pt-3 border-t border-[#3F2965]/5">
             {booking.meetingLink && (
                 <a href={booking.meetingLink} target="_blank" rel="noopener noreferrer" className="p-2 text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors border border-blue-100" title="Join Meeting">

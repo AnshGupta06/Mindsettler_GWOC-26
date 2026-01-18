@@ -1,7 +1,6 @@
-
 import { Request, Response } from 'express';
 
-import { sendEmail } from '../services/emailService'; 
+import { sendCorporateInquiryReceivedEmail } from '../services/emailService.js'; 
 
 export const submitInquiry = async (req: Request, res: Response) => {
   const { companyName, contactName, email, message } = req.body;
@@ -13,29 +12,11 @@ export const submitInquiry = async (req: Request, res: Response) => {
 
   try {
     
-    const emailHtml = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px;">
-        <h2 style="color: #3F2965;">Inquiry Received</h2>
-        <p>Hello <strong>${contactName}</strong>,</p>
-        <p>Thank you for your interest in partnering with <strong>MindSettler</strong> for <strong>${companyName}</strong>'s wellness needs.</p>
-        <p>We have successfully received your inquiry and our corporate team will review your requirements shortly.</p>
-        
-        <div style="background-color: #F9F6FF; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #Dd1764;">
-          <h3 style="margin-top: 0; font-size: 16px; color: #3F2965;">Your Message:</h3>
-          <p style="font-style: italic; color: #555; margin-bottom: 0;">"${message}"</p>
-        </div>
-
-        <p>We aim to get back to you within 24-48 business hours.</p>
-        <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;" />
-        <p style="color: #777; font-size: 12px;">Best Regards,<br/><strong>The MindSettler Team</strong></p>
-      </div>
-    `;
-
-    
-    await sendEmail(
+    await sendCorporateInquiryReceivedEmail(
       email,
-      "We received your Corporate Inquiry - MindSettler",
-      emailHtml
+      contactName,
+      companyName,
+      message
     );
 
     return res.status(200).json({ message: "Inquiry submitted successfully" });

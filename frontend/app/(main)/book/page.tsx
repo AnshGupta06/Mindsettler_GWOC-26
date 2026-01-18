@@ -699,12 +699,11 @@ export default function BookPage() {
 
 
                 {/* --- RIGHT COLUMN (Summary & Details) --- */}
-                <div className="lg:col-span-4 h-full overflow-y-auto custom-scrollbar lg:border-l lg:border-[#3F2965]/5 lg:bg-white/30 p-6 md:p-8 pb-20">
+<div className="lg:col-span-4 h-full overflow-y-auto custom-scrollbar lg:border-l lg:border-[#3F2965]/5 lg:bg-white/30 w-full p-0 py-6 lg:p-8 pb-20">
                     
                     <div className="bg-white rounded-[2rem] shadow-xl shadow-[#3F2965]/5 border border-[#3F2965]/5 overflow-hidden mb-6">
                       
-                      <div className="bg-[#3F2965] p-5 text-white text-center relative overflow-hidden">
-                        <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.webp')] opacity-10"></div>                        
+                      <div className="bg-[#3F2965] p-5 text-white text-center relative overflow-hidden">                        <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.webp')] opacity-10"></div>                        
                         <h3 className="text-base font-bold relative z-10 flex items-center justify-center gap-2">
                            <Receipt size={16} className="text-[#Dd1764]" /> Booking Summary
                         </h3>
