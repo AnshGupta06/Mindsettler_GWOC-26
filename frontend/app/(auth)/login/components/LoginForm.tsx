@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword, signOut, sendPasswordResetEmail } from "firebase/auth"; // ✅ Added sendPasswordResetEmail
 import { auth } from "../../../lib/firebase";
 import GoogleButton from "./GoogleButton";
 import Link from "next/link";
@@ -16,28 +16,82 @@ export default function LoginForm() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // ✅ New Function: Handle Forgot Password
+  const handleForgotPassword = async () => {
+    // Constraint 1: Only work after email is entered
+    if (!email) {
+      return toast.error("Please enter your email address first.", {
+        icon: '📧'
+      });
+    }
+
+    const toastId = toast.loading("Checking email...");
+
+    try {
+      // Constraint 2: This will throw an error if the email does not exist 
+      // (assuming Firebase email enumeration protection is not enabling "silent" failures)
+      await sendPasswordResetEmail(auth, email);
+      
+      toast.success("Password reset link sent! Check your inbox.", { id: toastId });
+    } catch (err: any) {
+      console.error("Reset Error:", err);
+      
+      // Handle "Email does not exist" specifically
+      if (err.code === 'auth/user-not-found') {
+        toast.error("No account found with this email.", { id: toastId });
+      } else if (err.code === 'auth/invalid-email') {
+        toast.error("Invalid email format.", { id: toastId });
+      } else {
+        toast.error("Failed to send reset link.", { id: toastId });
+      }
+    }
+  };
+
   const handleLogin = async () => {
     if (!email || !password) return toast.error("Please fill in all fields");
     setLoading(true);
     try {
+      // 1. Attempt Login
       const cred = await signInWithEmailAndPassword(auth, email, password);
+      
+      // 2. 🛑 SECURITY CHECK: Is Email Verified?
+      if (!cred.user.emailVerified) {
+        await signOut(auth); // Force logout immediately
+        
+        toast.error("Email not verified. Please check your inbox.", {
+          duration: 5000,
+          icon: '🔒',
+          style: {
+            background: '#FEE2E2',
+            color: '#B91C1C',
+            fontWeight: 'bold',
+          },
+        });
+        
+        setLoading(false);
+        return; // Stop execution here
+      }
+
+      // 3. Proceed if verified
       const token = await cred.user.getIdToken();
       await fetch(`${API_URL}/api/auth/sync-user`, {
          method: "POST", 
          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
          body: JSON.stringify({ email: cred.user.email }) 
       });
+      
+      // toast.success("Login successful!");
+      
     } catch (err: any) {
-      toast.error("Login failed");
+      console.error("Login Error:", err);
+      toast.error("Login failed: " + (err.code === 'auth/invalid-credential' ? "Invalid email or password." : err.message));
       setLoading(false);
     }
   };
 
   return (
-    
     <StaggerContainer className="w-full" delay={0.2}>
       
-      {}
       <StaggerItem className="flex justify-start mb-6">
         <Link href="/" className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-[#3F2965] transition-colors">
            <ArrowLeft size={12} /> Return Home
@@ -45,7 +99,6 @@ export default function LoginForm() {
       </StaggerItem>
 
       <div className="mb-8">
-        {}
         <h2 className="text-3xl font-bold text-[#3F2965] tracking-tight">
           <CharReveal delay={0.4}>Welcome Back</CharReveal>
         </h2>
@@ -69,7 +122,12 @@ export default function LoginForm() {
         <StaggerItem className="space-y-1">
           <div className="flex justify-between items-center ml-1">
             <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Password</label>
-            <button className="text-[10px] font-bold text-[#Dd1764] hover:underline uppercase tracking-wide">
+            {/* ✅ Updated Button */}
+            <button 
+              type="button"
+              onClick={handleForgotPassword}
+              className="text-[10px] font-bold text-[#Dd1764] hover:underline uppercase tracking-wide cursor-pointer"
+            >
               Forgot?
             </button>
           </div>

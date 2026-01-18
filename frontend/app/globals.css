@@ -1,8 +1,6 @@
 @import "tailwindcss";
 @config "../tailwind.config.js";
 
-
-
 @layer base {
   :root {
     --background: #F9F6FF;
@@ -15,7 +13,6 @@
     --popover-foreground: #171717;
 
     --primary: #3F2965;
-    
     --primary-foreground: #ffffff;
 
     --secondary: #f1f5f9;
@@ -25,7 +22,6 @@
     --muted-foreground: #64748b;
 
     --accent: #DD1764;
-    
     --accent-foreground: #ffffff;
 
     --destructive: #ef4444;
@@ -37,58 +33,18 @@
 
     --radius: 0.75rem;
 
-    
     --softPurple: #C7BEDA;
     --softPink: #F7C6D6;
     --lightBg: #F9F7FC;
   }
 
-  @media (prefers-color-scheme: light) {
-    :root {
-      
-      --background: hsl(204 10% 10%);
-      --foreground: hsl(180 10% 95%);
 
-      --card: hsl(204 10% 15%);
-      --card-foreground: hsl(180 10% 95%);
-
-      --popover: hsl(204 10% 10%);
-      --popover-foreground: hsl(180 10% 95%);
-
-      --primary: hsl(169 41% 61%);
-      --primary-foreground: hsl(169 100% 10%);
-
-      --secondary: hsl(204 10% 20%);
-      --secondary-foreground: hsl(222.2 47.4% 11.2%);
-
-      --muted: hsl(204 10% 20%);
-      --muted-foreground: hsl(180 10% 60%);
-
-      --accent: hsl(54 38% 55%);
-      --accent-foreground: hsl(54 100% 10%);
-
-      --destructive: hsl(0 84.2% 60.2%);
-      --destructive-foreground: hsl(0 0% 98%);
-
-      --border: hsl(204 10% 25%);
-      --input: hsl(204 10% 20%);
-      --ring: hsl(169 41% 61%);
-    }
-  }
-
-  
-  
-  
-  
   html {
-    
     font-size: 14px; 
-    scroll-behavior: smooth;
   }
 
   @media (min-width: 640px) {
     html {
-      
       font-size: 16px; 
     }
   }
@@ -98,7 +54,6 @@
   }
 
   body {
-    
     font-family: var(--font-jakarta), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     @apply bg-background text-foreground overflow-x-hidden antialiased;
   }
@@ -107,7 +62,6 @@
     @apply bg-transparent text-foreground placeholder:text-muted-foreground;
   }
 
-  
   h1 {
     @apply text-3xl md:text-5xl lg:text-6xl; 
   }
@@ -124,8 +78,6 @@
     @apply text-base md:text-lg;
   }
 }
-
-
 
 .ms-chatbot-trigger {
   background: #dd1764 !important;
@@ -201,7 +153,6 @@ button {
   100% { transform: translateX(400%); }
 }
 
-
 @layer utilities {
   .perspective-1000 {
     perspective: 1000px;
@@ -216,6 +167,7 @@ button {
     transform: rotateY(180deg);
   }
 }
+
 .bg-grain {
   position: relative;
 }

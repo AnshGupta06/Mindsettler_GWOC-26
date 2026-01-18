@@ -7,7 +7,8 @@ import { auth } from "../../lib/firebase";
 import { API_URL } from "@/app/lib/api";
 import { 
   Calendar, Clock, MapPin, User as UserIcon, 
-  Video, Info, History, Edit3, Smartphone, BrainCircuit
+  Video, Info, History, Edit3, Smartphone, BrainCircuit,
+  AlertTriangle, Banknote 
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import AlertModal from "../components/common/AlertModal";
@@ -22,6 +23,7 @@ type Booking = {
   therapyType?: string;
   reason?: string;
   meetingLink?: string;
+  paymentType?: string; // ✅ ADDED
   slot: {
     date: string;
     startTime: string;
@@ -44,18 +46,16 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"UPCOMING" | "HISTORY">("UPCOMING");
   
-  
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState("");
   const [editPhone, setEditPhone] = useState("");
   const [isSaving, setIsSaving] = useState(false);
 
-  
   const [modalState, setModalState] = useState<{
     isOpen: boolean;
     type: "AUTH" | "CONFIRM" | "SUCCESS" | "ERROR" | "BLOCKED";
     title?: string;
-    message?: string;
+    message?: string | React.ReactNode;
     actionLabel?: string;
     bookingId?: string; 
   }>({
@@ -64,9 +64,8 @@ export default function ProfilePage() {
   });
   
   const [actionLoading, setActionLoading] = useState(false);
-
-  
   const [, setTick] = useState(0);
+
   useEffect(() => {
     const timer = setInterval(() => setTick(t => t + 1), 60000); 
     return () => clearInterval(timer);
@@ -95,7 +94,6 @@ export default function ProfilePage() {
 
       const userData = await userRes.json();
       
-      
       if (userRes.status === 403 && userData.error === "ACCOUNT_BLOCKED") {
         setModalState({
           isOpen: true,
@@ -108,8 +106,6 @@ export default function ProfilePage() {
       }
 
       setDbUser(userData);
-      
-      
       setEditName(userData.name || currentUser.displayName || "");
       setEditPhone(userData.phone || "");
 
@@ -152,15 +148,89 @@ export default function ProfilePage() {
 
   const initiateCancel = (booking: Booking) => {
     const isConfirmed = booking.status === "CONFIRMED";
+    
+    // Calculate time difference in hours
+    const sessionStart = new Date(booking.slot.startTime).getTime();
+    const now = new Date().getTime();
+    const hoursUntilSession = (sessionStart - now) / (1000 * 60 * 60);
+    const isLateCancellation = hoursUntilSession < 24;
+
+    let title = "Cancel Session?";
+    let message: React.ReactNode = "Are you sure you want to cancel this session? This action cannot be undone.";
+    let actionLabel = "Yes, Cancel Session";
+
+    if (isConfirmed) {
+      if (isLateCancellation) {
+        // --- Late Cancellation Logic (< 24h) ---
+        title = "Late Cancellation (Fee Forfeited)";
+        actionLabel = "Confirm Cancellation";
+        message = (
+          <div className="text-left space-y-4">
+            <div className="flex items-start gap-3 bg-red-50 p-3 rounded-lg border border-red-100">
+               <AlertTriangle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
+               <div className="text-sm text-red-800">
+                  <p className="font-bold">Policy Warning</p>
+                  <p>You are cancelling with less than 24 hours' notice.</p>
+               </div>
+            </div>
+            
+            <p className="text-sm text-[#3F2965]/80 leading-relaxed">
+              According to our refund policy, this results in the <strong>forfeiture of the session fee</strong> as the time was specifically reserved for you.
+            </p>
+
+            {/* Cash Note: Only relevant for offline sessions */}
+            {booking.slot.mode === "OFFLINE" && (
+              <div className="flex items-start gap-3 bg-amber-50 p-3 rounded-lg border border-amber-100">
+                  <Info className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+                  <div className="text-sm text-amber-800">
+                      <p className="font-bold">Pay at Session Note</p>
+                      <p className="text-xs mt-1">
+                        If you are going to pay with cash which is only available in offline session, please note that late cancellations may affect your eligibility for future bookings.
+                      </p>
+                  </div>
+              </div>
+            )}
+          </div>
+        );
+      } else {
+        // --- Early Cancellation Logic (> 24h) ---
+        title = "Cancel Session";
+        actionLabel = "Remove Booking";
+        message = (
+          <div className="text-left space-y-4">
+            <div className="flex items-start gap-3 bg-blue-50 p-3 rounded-lg border border-blue-100">
+               <Info className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
+               <div className="text-sm text-blue-800">
+                  <p className="font-bold">Policy Note</p>
+                  <p>Payments are generally non-refundable.</p>
+               </div>
+            </div>
+
+            <p className="text-sm text-[#3F2965]/80 leading-relaxed">
+               However, since you are notifying us early (24h+), you are eligible to <strong>reschedule</strong> without penalty.
+            </p>
+
+            {booking.slot.mode === "OFFLINE" ? (
+               <p className="text-xs text-[#3F2965]/60 italic pl-1 border-l-2 border-[#3F2965]/10">
+                  Note: If you are going to pay with cash which is only available in offline session, no online refund processing is needed.
+               </p>
+            ) : (
+               <p className="text-sm text-[#3F2965]/80">
+                  Cancelling here will simply remove the booking. To reschedule instead, please contact us directly.
+               </p>
+            )}
+          </div>
+        );
+      }
+    }
+
     setModalState({
       isOpen: true,
       type: "CONFIRM",
       bookingId: booking.id,
-      title: isConfirmed ? "Cancel Confirmed Session?" : "Cancel Session?",
-      message: isConfirmed 
-        ? "⚠️ Since this session is confirmed, cancelling will initiate a manual refund request.\n\nOur team will process the refund within 24-48 hours. Do you want to proceed?" 
-        : "Are you sure you want to cancel this session? This action cannot be undone.",
-      actionLabel: isConfirmed ? "Yes, Request Refund" : "Yes, Cancel Session"
+      title: title,
+      message: message,
+      actionLabel: actionLabel
     });
   };
 
@@ -208,12 +278,9 @@ export default function ProfilePage() {
     return name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2);
   };
 
-  
-  
   const upcomingBookings = bookings
     .filter(b => new Date(b.slot.endTime) >= new Date() && b.status !== "REJECTED")
     .sort((a,b) => new Date(a.slot.startTime).getTime() - new Date(b.slot.startTime).getTime());
-  
   
   const historyBookings = bookings
     .filter(b => new Date(b.slot.endTime) < new Date() || b.status === "REJECTED")
@@ -240,24 +307,23 @@ export default function ProfilePage() {
 
       <div className={`max-w-[1280px] mx-auto flex flex-col lg:flex-row gap-8 relative z-10 ${modalState.isOpen && modalState.type === 'BLOCKED' ? 'blur-md pointer-events-none opacity-50' : ''}`}>
         
-        {}
+        {/* Sidebar */}
         <motion.div 
            initial={{ opacity: 0, x: -20 }}
            animate={{ opacity: 1, x: 0 }}
            className="w-full lg:w-[350px] flex-shrink-0"
         >
           <div className="bg-white rounded-[2rem] p-8 shadow-sm border border-[#3F2965]/5 sticky top-28">
-            
             <div className="flex flex-col items-center text-center relative">
               
-              {}
+              {/* Profile Image */}
               <div className="relative mb-6">
                 <div className="w-28 h-28 rounded-full bg-[#F9F6FF] flex items-center justify-center text-[#Dd1764] text-3xl font-bold shadow-sm border border-[#3F2965]/5">
                   {getInitials(dbUser?.name || user?.displayName || "")}
                 </div>
               </div>
 
-              {}
+              {/* Name Info */}
               {isEditing ? (
                   <div className="w-full mb-6 space-y-4">
                      <div>
@@ -279,8 +345,7 @@ export default function ProfilePage() {
               )}
               
               <div className="w-full space-y-4">
-                
-                {}
+                {/* Phone Field */}
                 <div className={`flex items-center gap-4 p-4 rounded-2xl border transition-all duration-300 ${!dbUser?.phone && !isEditing ? "bg-amber-50 border-amber-200" : "bg-white border-[#3F2965]/10"}`}>
                    <div className={`p-2 rounded-xl shadow-sm transition-colors ${!dbUser?.phone && !isEditing ? "bg-amber-100 text-amber-600" : "bg-[#F9F6FF] text-[#3F2965]/60"}`}>
                      <Smartphone size={18} />
@@ -304,7 +369,7 @@ export default function ProfilePage() {
                    </div>
                 </div>
 
-                {}
+                {/* Edit Actions */}
                 {!isEditing ? (
                     <button 
                         onClick={() => setIsEditing(true)}
@@ -329,17 +394,13 @@ export default function ProfilePage() {
                         </button>
                     </div>
                 )}
-
               </div>
-
             </div>
           </div>
         </motion.div>
 
-        {}
+        {/* Bookings List */}
         <div className="flex-1 min-w-0">
-           
-           {}
            <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-8">
               <h1 className="text-3xl font-bold text-[#3F2965] self-start sm:self-auto">My Sessions</h1>
               
@@ -358,7 +419,6 @@ export default function ProfilePage() {
               </div>
            </div>
 
-           {}
            {activeTab === "UPCOMING" && upcomingBookings.length > 0 && (
              <div className="mb-6 p-4 bg-blue-50 border border-blue-100 rounded-xl flex items-start gap-3">
                 <Info className="text-blue-600 shrink-0 mt-0.5" size={18} />
@@ -368,7 +428,6 @@ export default function ProfilePage() {
              </div>
            )}
 
-           {}
            <div className="space-y-4">
              <AnimatePresence mode="popLayout">
                {displayBookings.length === 0 ? (
@@ -413,7 +472,6 @@ export default function ProfilePage() {
                       > 
                         <div className="flex flex-col md:flex-row gap-6 md:gap-8 items-start">
                             
-                            {}
                             <div className="flex-shrink-0 w-full md:w-auto flex flex-row md:flex-col items-stretch justify-between md:justify-center bg-white rounded-2xl border border-[#3F2965]/10 overflow-hidden shadow-sm h-auto">
                                 <div className="md:w-full w-auto bg-[#3F2965] py-2 px-6 md:py-1.5 md:px-6 flex items-center justify-center">
                                     <p className="text-[10px] font-bold text-white uppercase tracking-widest">{startTime.toLocaleString('default', { month: 'short' })}</p>
@@ -424,7 +482,6 @@ export default function ProfilePage() {
                                 </div>
                             </div>
 
-                            {}
                             <div className="flex-1 space-y-4 w-full">
                                 <div className="flex flex-wrap items-center justify-between gap-3">
                                     <div>
@@ -438,7 +495,6 @@ export default function ProfilePage() {
                                         </div>
                                     </div>
 
-                                    {}
                                     <div className={`pl-3 pr-4 py-1.5 rounded-full text-xs font-bold flex items-center gap-2 border ${
                                         booking.status === "CONFIRMED" ? "bg-green-50 text-green-700 border-green-100" : 
                                         booking.status === "PENDING" ? "bg-amber-50 text-amber-700 border-amber-100" : 
@@ -453,17 +509,35 @@ export default function ProfilePage() {
                                     </div>
                                 </div>
 
-                                <div className="flex flex-wrap gap-3">
-                                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#F9F6FF] border border-[#3F2965]/5 text-xs font-bold text-[#3F2965]">
-                                        <MapPin size={14} className="text-[#3F2965]/40" /> {booking.slot.mode}
+                                <div className="flex flex-col gap-2">
+                                    <div className="flex flex-wrap gap-3">
+                                        <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#F9F6FF] border border-[#3F2965]/5 text-xs font-bold text-[#3F2965]">
+                                            <MapPin size={14} className="text-[#3F2965]/40" /> {booking.slot.mode}
+                                        </div>
+                                        <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#F9F6FF] border border-[#3F2965]/5 text-xs font-bold text-[#3F2965]">
+                                            <BrainCircuit size={14} className="text-[#3F2965]/40" /> {booking.therapyType || "General"}
+                                        </div>
+
+                                        {/* ✅ ADDED: Payment Type Display */}
+                                        {booking.paymentType && (
+                                            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#F9F6FF] border border-[#3F2965]/5 text-xs font-bold text-[#3F2965]">
+                                                <Banknote size={14} className="text-[#3F2965]/40" /> {booking.paymentType}
+                                            </div>
+                                        )}
                                     </div>
-                                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#F9F6FF] border border-[#3F2965]/5 text-xs font-bold text-[#3F2965]">
-                                        <BrainCircuit size={14} className="text-[#3F2965]/40" /> {booking.therapyType || "General"}
-                                    </div>
+
+                                    {/* NEW: Cash/Offline Payment Note in Card */}
+                                    {booking.slot.mode === "OFFLINE" && (
+                                        <div className="flex items-start gap-2 text-[10px] text-[#3F2965]/60 font-medium bg-[#F9F6FF] p-2 rounded-lg border border-[#3F2965]/5">
+                                            <Banknote size={12} className="mt-0.5 shrink-0 text-[#3F2965]/40" />
+                                            <span>
+                                                Note: Cash payment is available for this session (only available in offline mode).
+                                            </span>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
 
-                            {}
                             <div className="w-full md:w-[180px] flex flex-col gap-3">
                                 {booking.status === "CONFIRMED" && booking.slot.mode === "ONLINE" && !isSessionOver && (
                                     <>

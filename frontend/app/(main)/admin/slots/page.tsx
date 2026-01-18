@@ -29,11 +29,8 @@ export default function AdminSlotsPage() {
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   
-  // Sorting & Filtering
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [filterDate, setFilterDate] = useState(""); 
-
-  // Form State
   const [date, setDate] = useState("");
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
@@ -191,7 +188,6 @@ export default function AdminSlotsPage() {
     <div className="min-h-screen bg-[#F9F6FF] pt-20 pb-12 px-4 sm:px-8">
       <div className="max-w-7xl mx-auto">
       
-        {/* --- HEADER --- */}
         <div className="flex flex-col gap-6 mb-8 relative z-10">
           <div>
             <button 
@@ -208,7 +204,6 @@ export default function AdminSlotsPage() {
                     <p className="text-gray-500 mt-1 font-medium">Create and manage your availability schedule.</p>
                 </div>
                 
-                {/* Stats Badge */}
                 <div className="bg-white px-5 py-2.5 rounded-xl shadow-sm border border-gray-200 text-sm font-bold flex items-center gap-3">
                     <span className="text-gray-400 uppercase text-xs tracking-wider">Capacity</span>
                     <span className="text-[#3F2965] text-base">{bookedSlots} <span className="text-gray-300">/</span> {totalSlots} <span className="text-xs text-gray-400 font-normal">Booked</span></span>
@@ -219,7 +214,6 @@ export default function AdminSlotsPage() {
 
         <div className="grid lg:grid-cols-3 gap-8 items-start">
           
-          {/* --- LEFT COL: CREATE FORM --- */}
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-[#3F2965]/10 lg:sticky lg:top-24">
             <h2 className="text-lg font-bold mb-6 flex items-center gap-2 text-[#3F2965] border-b border-gray-100 pb-4">
               <Plus className="bg-[#3F2965] text-white rounded-full p-1" size={20} />
@@ -318,10 +312,8 @@ export default function AdminSlotsPage() {
             </form>
           </div>
 
-          {/* --- RIGHT COL: SLOT LIST --- */}
           <div className="lg:col-span-2 space-y-6">
             
-            {/* Filter Toolbar */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between bg-white p-3 rounded-2xl shadow-sm border border-[#3F2965]/10 gap-4">
               <h3 className="font-bold text-base text-[#3F2965] shrink-0 px-2 hidden sm:block">Schedule</h3>
               

@@ -12,7 +12,13 @@ export const requireAuth = async (req, res, next) => {
   try {
     const decoded = await admin.auth().verifyIdToken(token, true);
     
-    
+    if (!decoded.email_verified) {
+      return res.status(403).json({ 
+        error: "EMAIL_NOT_VERIFIED", 
+        message: "Please verify your email address to access this feature." 
+      });
+    }
+
     const user = await prisma.user.findUnique({
       where: { firebaseUid: decoded.uid },
       select: { isBlocked: true }
@@ -32,6 +38,24 @@ export const requireAuth = async (req, res, next) => {
       return res.status(401).json({ error: "Session revoked. Please login again." });
     }
     console.error("Auth error:", err);
+    res.status(401).json({ error: "Invalid token" });
+  }
+};
+
+export const requireLogin = async (req, res, next) => {
+  const header = req.headers.authorization || "";
+  const token = header.startsWith("Bearer ") ? header.split(" ")[1] : null;
+
+  if (!token) {
+    return res.status(401).json({ error: "No token provided" });
+  }
+
+  try {
+    const decoded = await admin.auth().verifyIdToken(token, true);
+    req.user = decoded;
+    next();
+  } catch (err) {
+    console.error("Login auth error:", err);
     res.status(401).json({ error: "Invalid token" });
   }
 };

@@ -34,7 +34,26 @@ export type ChatbotAssistsBookingOutput = z.infer<
 export async function chatbotAssistsBooking(
   input: ChatbotAssistsBookingInput
 ): Promise<ChatbotAssistsBookingOutput> {
-  return chatbotAssistsBookingFlow(input);
+  try {
+    const result = await chatbotAssistsBookingFlow(input);
+    return result;
+  } catch (error: any) {
+    console.error("AI Error:", error);
+
+    // If we hit the rate limit (429), return a polite message
+    if (error.status === 'RESOURCE_EXHAUSTED' || error.message.includes('429')) {
+      return {
+        response: "I'm receiving too many messages at once. Please wait 30 seconds and try again. ⏳",
+        action: 'none'
+      };
+    }
+    
+    // For other errors, generic fail message
+    return {
+      response: "I'm having trouble connecting right now. Please try again later.",
+      action: 'none'
+    };
+  }
 }
 
 const prompt = ai.definePrompt({

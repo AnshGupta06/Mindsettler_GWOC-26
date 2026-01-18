@@ -1,3 +1,4 @@
+---
 # MindSettler
 
 <div align="center">
@@ -69,6 +70,87 @@ Each member brings unique skills to make MindSettler fast, smart, and reliable.
 | **Suraj Shah** | [GitHub](https://github.com/Suraj31shah) |
 | **Pratham Patadiya** | [GitHub](https://github.com/Pratham722007) |
 
+## 📈 Process flow diagram 
+
+```mermaid
+graph TB
+    subgraph User_Lane ["CLIENT / USER"]
+        U1([Enter MindSettler Platform]) --> U2[Interact with AI Companion]
+        U2 --> U3{Decide Action}
+        U3 -- Learn --> U4[Read Psycho-Education Content]
+        U3 -- Heal --> U5[Select Therapy & Time Slot]
+        U5 --> U6[Confirm via UPI/Cash]
+        U10[Join Session via Meet/Studio] --> U11[Follow Therapeutic Arc]
+    end
+
+    subgraph System_Lane ["SYSTEM & AI COMPANION"]
+        U2 -.-> S1[AI Guides via Gemini/Genkit]
+        S1 -.-> U4
+        S1 -.-> U5
+        U6 --> S2[Generate Pending Request]
+        S2 --> S3[Check Loyalty/Discount Engine]
+        S3 --> S4[Notify Admin Dashboard]
+        S5[Automate Google Meet/Calendar] --> U10
+    end
+
+    subgraph Admin_Lane ["ADMIN / THERAPIST"]
+        S4 --> A1[Review Slot & Payment]
+        A1 --> A2{Approve Booking?}
+        A2 -- Yes --> A3[Confirm Session]
+        A2 -- No --> A4[Reject/Reschedule]
+        A3 --> S5
+        U11 --> A5[Lead Session: Clinical Care]
+    end
+```
+
+
+## ⚙️ System Architecture
+
+```mermaid
+---
+config:
+  layout: fixed
+---
+flowchart TB
+ subgraph Client_Layer["USER INTERFACE (FRONTEND)"]
+        B["4-Step Booking System"]
+        A["Next.js Web App"]
+        C["Psycho-Education Awareness Modules"]
+        D["User Dashboard: My Sessions"]
+        E["AI Wellness Companion"]
+  end
+ subgraph Logic_Layer["BUSINESS LOGIC"]
+        F["Google Genkit + Gemini AI"]
+        G["Client Session Manager"]
+        H["Smart Discount Manager"]
+        Z["Therapy Slot System"]
+  end
+ subgraph Backend_Layer["ADMIN & DATA (CONTROL PLANE)"]
+        J[("PostgreSQL Database")]
+        I["Express.js / Node.js Server"]
+        K["Admin Dashboard"]
+        L["Slot & Client Manager"]
+        M["Manual Payment Verification"]
+  end
+ subgraph Integration_Layer["EXTERNAL SERVICES"]
+        N["Firebase Auth"]
+        O["Google Meet Links"]
+        P["Google Calendar"]
+  end
+    A --> B & C & D & E
+    F -.-> E
+    G --> B
+    H --> B
+    Z --> B
+    I --> J & K
+    K --> L & M
+    N --> I
+    O --> I & D
+    B --> I
+    L --> B
+    M --> D
+    P --> I
+```
 
 ## 🧠 Core Components breakdown
 

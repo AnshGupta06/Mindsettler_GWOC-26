@@ -1,5 +1,8 @@
+import type { NextConfig } from "next";
 
-const nextConfig = {
+const nextConfig: NextConfig = {
+  reactStrictMode: false, 
+
   images: {
     remotePatterns: [
       {
@@ -7,7 +10,7 @@ const nextConfig = {
         hostname: "images.unsplash.com",
       },
     ],
-  },
+  },  
 };
 
 export default nextConfig;

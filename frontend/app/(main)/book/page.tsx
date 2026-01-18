@@ -11,7 +11,7 @@ import {
   Sparkles, ArrowRight, Wallet, Banknote, BrainCircuit,
   Monitor, Building2, CalendarDays, Receipt, Mail, Bell, Lock,
   Copy, Check, Smartphone, Tag, Loader2, Ban,
-  User as UserIcon, Phone, Users, Heart, Info
+  User as UserIcon, Phone, Users, Heart, Info, Hash, HelpCircle
 } from "lucide-react";
 import { motion } from "framer-motion";
 import AlertModal from "../components/common/AlertModal";
@@ -48,7 +48,7 @@ export default function BookPage() {
   const [user, setUser] = useState<User | null>(null);
   const [authChecking, setAuthChecking] = useState(true);
   const [isBlocked, setIsBlocked] = useState(false); 
-  
+  const [transactionId, setTransactionId] = useState("");
   const [pricing, setPricing] = useState({
     FIRST: 1499,
     FOLLOW_UP: 999
@@ -77,9 +77,12 @@ export default function BookPage() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
-  const [agreed, setAgreed] = useState(false);
+  const [agreedConfidentiality, setAgreedConfidentiality] = useState(false);
+  const [agreedPrivacy, setAgreedPrivacy] = useState(false);
+  const [agreedRefund, setAgreedRefund] = useState(false);
   const [bookingSuccess, setBookingSuccess] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [showUtrHelp, setShowUtrHelp] = useState(false); // <--- Added State for UTR Help
 
   const [isFirstSessionAllowed, setIsFirstSessionAllowed] = useState(true);
 
@@ -276,12 +279,18 @@ export default function BookPage() {
     // --- Validation ---
     if (!name.trim()) { toast.error("Name is required."); return; }
     if (!phone.trim()) { toast.error("Phone number is required."); return; }
+    if (selectedSlot.mode === "ONLINE" || paymentMethod === "UPI") {
+        if (!transactionId.trim() || transactionId.length < 4) {
+            toast.error("Please enter the UPI Transaction ID / UTR so we can verify your payment.");
+            return;
+        }
+    }
     if (!attendees || attendees < 1) { toast.error("Please specify number of people joining."); return; }
     if (maritalStatus === "Other" && !maritalStatusOther.trim()) { toast.error("Please specify your status."); return; }
     // ------------------
 
-    if (!agreed) { 
-      toast.error("Please agree to the Confidentiality Policy.");
+   if (!agreedConfidentiality || !agreedPrivacy || !agreedRefund) { 
+      toast.error("Please agree to all policies (Confidentiality, Privacy, and Refund) to continue.");
       return; 
     }
 
@@ -322,9 +331,9 @@ export default function BookPage() {
           slotId: selectedSlot.id,
           type,
           reason: finalReason,
-          paymentMethod,
+          paymentType: paymentMethod, 
           therapyType,
-          // New Fields
+          transactionId,
           name,
           phone,
           attendees: Number(attendees),
@@ -732,12 +741,11 @@ export default function BookPage() {
 
 
                 {/* --- RIGHT COLUMN (Summary & Details) --- */}
-                <div className="lg:col-span-4 h-full overflow-y-auto custom-scrollbar lg:border-l lg:border-[#3F2965]/5 lg:bg-white/30 p-6 md:p-8 pb-20">
+<div className="lg:col-span-4 h-full overflow-y-auto custom-scrollbar lg:border-l lg:border-[#3F2965]/5 lg:bg-white/30 w-full p-0 py-6 lg:p-8 pb-20">
                     
                     <div className="bg-white rounded-[2rem] shadow-xl shadow-[#3F2965]/5 border border-[#3F2965]/5 overflow-hidden mb-6">
                       
-                      <div className="bg-[#3F2965] p-5 text-white text-center relative overflow-hidden">
-                        <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.webp')] opacity-10"></div>                        
+                      <div className="bg-[#3F2965] p-5 text-white text-center relative overflow-hidden">                        <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.webp')] opacity-10"></div>                        
                         <h3 className="text-base font-bold relative z-10 flex items-center justify-center gap-2">
                            <Receipt size={16} className="text-[#Dd1764]" /> Booking Summary
                         </h3>
@@ -1022,6 +1030,57 @@ export default function BookPage() {
                                                 </p>
                                             </div>
                                         </div>
+                                        {/* ✅ NEW: Transaction ID Input with Help Guide */}
+                                        <div className="space-y-1.5 pt-2">
+                                            <label className="text-[10px] font-bold text-[#3F2965]/60 uppercase tracking-wider flex items-center justify-between">
+                                                <span>Transaction ID / UTR *</span>
+                                                <span className="text-[9px] text-[#Dd1764] lowercase normal-case bg-[#Dd1764]/5 px-1.5 py-0.5 rounded">required for verification</span>
+                                            </label>
+                                            <div className="relative">
+                                                <Hash size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                                                <input 
+                                                    type="text"
+                                                    value={transactionId}
+                                                    onChange={(e) => setTransactionId(e.target.value)}
+                                                    placeholder="e.g. 3245xxxxxxxx"
+                                                    className="w-full pl-9 pr-3 py-2.5 bg-white border border-gray-200 rounded-xl text-xs font-medium focus:outline-none focus:border-[#Dd1764] focus:ring-2 focus:ring-[#Dd1764]/10 transition-all uppercase placeholder:normal-case"
+                                                />
+                                            </div>
+                                            
+                                            {/* --- UTR HELP SECTION START --- */}
+                                            <p className="text-[10px] text-gray-400 leading-tight flex justify-between items-center">
+                                                <span>Enter the 12-digit UTR from payment history.</span>
+                                                <button 
+                                                    onClick={() => setShowUtrHelp(!showUtrHelp)}
+                                                    className="text-[#Dd1764] underline hover:text-[#3F2965] font-bold ml-2 shrink-0 flex items-center gap-1"
+                                                >
+                                                   <Info size={10} /> Where to find?
+                                                </button>
+                                            </p>
+                                            
+                                            {showUtrHelp && (
+                                                <motion.div 
+                                                    initial={{ opacity: 0, height: 0 }}
+                                                    animate={{ opacity: 1, height: "auto" }}
+                                                    className="bg-yellow-50/50 border border-yellow-100 rounded-lg p-3 text-[10px] text-[#3F2965]/80 space-y-2 mt-2"
+                                                >
+                                                    <div className="flex items-start gap-2">
+                                                      <span className="font-bold min-w-[60px] text-[#3F2965]">Google Pay:</span> 
+                                                      <span>Tap transaction &rarr; Copy "UPI Transaction ID"</span>
+                                                    </div>
+                                                    <div className="flex items-start gap-2">
+                                                      <span className="font-bold min-w-[60px] text-[#3F2965]">PhonePe:</span> 
+                                                      <span>History &rarr; Select Entry &rarr; Copy "UTR"</span>
+                                                    </div>
+                                                    <div className="flex items-start gap-2">
+                                                      <span className="font-bold min-w-[60px] text-[#3F2965]">Paytm:</span> 
+                                                      <span>Balance & History &rarr; Details &rarr; "UPI Ref No"</span>
+                                                    </div>
+                                                </motion.div>
+                                            )}
+                                            {/* --- UTR HELP SECTION END --- */}
+
+                                        </div>
                                     </>
                                 ) : (
                                     <p className="text-[10px] text-[#3F2965]/70 italic bg-white p-3 rounded-lg border border-gray-100 text-center">
@@ -1031,20 +1090,56 @@ export default function BookPage() {
                                 )}
                             </div>
 
-                            <label className="flex items-start gap-2 cursor-pointer group p-1 rounded-lg hover:bg-gray-50 transition-colors">
-                              <div className="relative flex items-center mt-0.5">
-                                <input
-                                  type="checkbox"
-                                  checked={agreed}
-                                  onChange={(e) => setAgreed(e.target.checked)}
-                                  className="peer h-4 w-4 cursor-pointer appearance-none rounded border-2 border-gray-300 transition-all checked:border-[#Dd1764] checked:bg-[#Dd1764]"
-                                />
-                                <CheckCircle size={10} className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white opacity-0 peer-checked:opacity-100" />
-                              </div>
-                              <span className="text-[10px] text-[#3F2965]/70 leading-tight">
-                                I agree to the <Link href="/confidentiality" target="_blank" className="underline font-bold text-[#3F2965]">Confidentiality Policy</Link>.
-                              </span>
-                            </label>
+                           {/* --- AGREEMENTS SECTION --- */}
+                            <div className="space-y-1 pt-2">
+                                {/* Confidentiality Policy */}
+                                <label className="flex items-start gap-2 cursor-pointer group p-1 rounded-lg hover:bg-gray-50 transition-colors">
+                                  <div className="relative flex items-center mt-0.5">
+                                    <input
+                                      type="checkbox"
+                                      checked={agreedConfidentiality}
+                                      onChange={(e) => setAgreedConfidentiality(e.target.checked)}
+                                      className="peer h-4 w-4 cursor-pointer appearance-none rounded border-2 border-gray-300 transition-all checked:border-[#Dd1764] checked:bg-[#Dd1764]"
+                                    />
+                                    <CheckCircle size={10} className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white opacity-0 peer-checked:opacity-100" />
+                                  </div>
+                                  <span className="text-[10px] text-[#3F2965]/70 leading-tight">
+                                    I agree to the <Link href="/confidentiality" target="_blank" className="underline font-bold text-[#3F2965]">Confidentiality Policy</Link>.
+                                  </span>
+                                </label>
+
+                                {/* Privacy Policy */}
+                                <label className="flex items-start gap-2 cursor-pointer group p-1 rounded-lg hover:bg-gray-50 transition-colors">
+                                  <div className="relative flex items-center mt-0.5">
+                                    <input
+                                      type="checkbox"
+                                      checked={agreedPrivacy}
+                                      onChange={(e) => setAgreedPrivacy(e.target.checked)}
+                                      className="peer h-4 w-4 cursor-pointer appearance-none rounded border-2 border-gray-300 transition-all checked:border-[#Dd1764] checked:bg-[#Dd1764]"
+                                    />
+                                    <CheckCircle size={10} className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white opacity-0 peer-checked:opacity-100" />
+                                  </div>
+                                  <span className="text-[10px] text-[#3F2965]/70 leading-tight">
+                                    I agree to the <Link href="/privacy-policy" target="_blank" className="underline font-bold text-[#3F2965]">Privacy Policy</Link>.
+                                  </span>
+                                </label>
+
+                                {/* Refund Policy */}
+                                <label className="flex items-start gap-2 cursor-pointer group p-1 rounded-lg hover:bg-gray-50 transition-colors">
+                                  <div className="relative flex items-center mt-0.5">
+                                    <input
+                                      type="checkbox"
+                                      checked={agreedRefund}
+                                      onChange={(e) => setAgreedRefund(e.target.checked)}
+                                      className="peer h-4 w-4 cursor-pointer appearance-none rounded border-2 border-gray-300 transition-all checked:border-[#Dd1764] checked:bg-[#Dd1764]"
+                                    />
+                                    <CheckCircle size={10} className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white opacity-0 peer-checked:opacity-100" />
+                                  </div>
+                                  <span className="text-[10px] text-[#3F2965]/70 leading-tight">
+                                    I agree to the <Link href="/refund-policy" target="_blank" className="underline font-bold text-[#3F2965]">Refund Policy</Link>.
+                                  </span>
+                                </label>
+                            </div>
 
                             {error && (
                               <div className="p-3 bg-red-50 border border-red-100 rounded-lg text-xs text-red-600 flex items-start gap-2 font-medium animate-pulse">
@@ -1055,7 +1150,8 @@ export default function BookPage() {
 
                             <button
                               onClick={handleSubmit}
-                              disabled={submitting || !agreed}
+                              // UPDATE DISABLED LOGIC HERE:
+                              disabled={submitting || !agreedConfidentiality || !agreedPrivacy || !agreedRefund}
                               className="w-full py-3.5 rounded-xl bg-[#Dd1764] text-white font-bold text-base hover:bg-[#c91559] hover:shadow-lg hover:shadow-[#Dd1764]/20 hover:-translate-y-0.5 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                             >
                               {submitting ? "Processing..." : (

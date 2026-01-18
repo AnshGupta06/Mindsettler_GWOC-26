@@ -101,7 +101,6 @@ const AdminSettingsPage = () => {
     <div className="min-h-screen bg-gray-50 pt-20 pb-12 px-4 sm:px-8">
       <div className="max-w-4xl mx-auto">
         
-        {/* --- Header & Back Button --- */}
         <div className="mb-8">
             <button 
                 onClick={() => router.push('/admin')} 
@@ -117,7 +116,6 @@ const AdminSettingsPage = () => {
 
         <form onSubmit={handleSave} className="grid md:grid-cols-2 gap-6">
           
-          {/* --- Pricing Card --- */}
           <div className="bg-white p-6 rounded-2xl border border-[#3F2965]/10 shadow-sm space-y-6">
             <div className="flex items-center gap-3 border-b border-gray-100 pb-4">
                <div className="p-2 bg-green-50 rounded-lg text-green-600">
@@ -149,7 +147,6 @@ const AdminSettingsPage = () => {
             </div>
           </div>
 
-          {/* --- Policy Card --- */}
           <div className="bg-white p-6 rounded-2xl border border-[#3F2965]/10 shadow-sm space-y-6">
             <div className="flex items-center gap-3 border-b border-gray-100 pb-4">
                <div className="p-2 bg-red-50 rounded-lg text-red-600">
@@ -183,7 +180,6 @@ const AdminSettingsPage = () => {
             </div>
           </div>
 
-          {/* --- Save Button --- */}
           <div className="md:col-span-2 pt-4">
             <button 
               type="submit" 

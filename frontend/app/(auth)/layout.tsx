@@ -1,4 +1,5 @@
 import "../globals.css";
+import { Toaster } from "react-hot-toast";  
 export default function AuthLayout({
   children,
 }: {
@@ -7,6 +8,7 @@ export default function AuthLayout({
   return (
     <html lang="en">
       <body>
+        <Toaster position="top-center" />
         {children}
       </body>
     </html>

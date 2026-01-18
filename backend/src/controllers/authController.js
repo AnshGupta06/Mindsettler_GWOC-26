@@ -4,9 +4,9 @@ import { sendWelcomeEmail } from "../services/emailService.js";
 export const syncUser = async (req, res) => {
   try {
     const decoded = req.user; 
-    const { name, phone } = req.body || {};
+    const { name, phone, sendWelcome } = req.body || {}; // ✅ Added sendWelcome flag
 
-    
+    // Check for existing user before upsert
     const existingUser = await prisma.user.findUnique({
         where: { firebaseUid: decoded.uid }
     });
@@ -26,9 +26,7 @@ export const syncUser = async (req, res) => {
       },
     });
 
-    
-    if (!existingUser) {
-        
+    if (sendWelcome && decoded.email_verified) {
         sendWelcomeEmail(user.email, user.name || "Friend").catch(console.error);
     }
 
@@ -45,7 +43,6 @@ export async function getMe(req, res) {
     const user = await prisma.user.findUnique({ where: { firebaseUid: uid } });
 
     if (!user) return res.status(404).json({ error: "User not found" });
-    
     
     if (user.isBlocked) return res.status(403).json({ error: "ACCOUNT_BLOCKED" });
 

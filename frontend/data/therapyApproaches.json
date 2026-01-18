@@ -115,7 +115,7 @@
     ],
     "image": "/images/therapy/ctp.webp",
     "availableOnline": true,
-    "availableOffline": true,
+    "availableOffline": false,
     "isCustom": true,
     "customDescription": "Don't see what you're looking for? Let us create a personalized therapy plan that combines the best approaches for your specific journey."
   }
