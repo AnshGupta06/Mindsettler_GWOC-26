@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { signInWithEmailAndPassword, signOut } from "firebase/auth"; // ✅ Ensure signOut is imported
+import { signInWithEmailAndPassword, signOut, sendPasswordResetEmail } from "firebase/auth"; // ✅ Added sendPasswordResetEmail
 import { auth } from "../../../lib/firebase";
 import GoogleButton from "./GoogleButton";
 import Link from "next/link";
@@ -16,6 +16,37 @@ export default function LoginForm() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // ✅ New Function: Handle Forgot Password
+  const handleForgotPassword = async () => {
+    // Constraint 1: Only work after email is entered
+    if (!email) {
+      return toast.error("Please enter your email address first.", {
+        icon: '📧'
+      });
+    }
+
+    const toastId = toast.loading("Checking email...");
+
+    try {
+      // Constraint 2: This will throw an error if the email does not exist 
+      // (assuming Firebase email enumeration protection is not enabling "silent" failures)
+      await sendPasswordResetEmail(auth, email);
+      
+      toast.success("Password reset link sent! Check your inbox.", { id: toastId });
+    } catch (err: any) {
+      console.error("Reset Error:", err);
+      
+      // Handle "Email does not exist" specifically
+      if (err.code === 'auth/user-not-found') {
+        toast.error("No account found with this email.", { id: toastId });
+      } else if (err.code === 'auth/invalid-email') {
+        toast.error("Invalid email format.", { id: toastId });
+      } else {
+        toast.error("Failed to send reset link.", { id: toastId });
+      }
+    }
+  };
+
   const handleLogin = async () => {
     if (!email || !password) return toast.error("Please fill in all fields");
     setLoading(true);
@@ -27,7 +58,6 @@ export default function LoginForm() {
       if (!cred.user.emailVerified) {
         await signOut(auth); // Force logout immediately
         
-        // This toast will now be visible because we added <Toaster /> to the layout
         toast.error("Email not verified. Please check your inbox.", {
           duration: 5000,
           icon: '🔒',
@@ -50,7 +80,6 @@ export default function LoginForm() {
          body: JSON.stringify({ email: cred.user.email }) 
       });
       
-      // (Optional) You can add a success toast here if you like
       // toast.success("Login successful!");
       
     } catch (err: any) {
@@ -93,7 +122,12 @@ export default function LoginForm() {
         <StaggerItem className="space-y-1">
           <div className="flex justify-between items-center ml-1">
             <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Password</label>
-            <button className="text-[10px] font-bold text-[#Dd1764] hover:underline uppercase tracking-wide">
+            {/* ✅ Updated Button */}
+            <button 
+              type="button"
+              onClick={handleForgotPassword}
+              className="text-[10px] font-bold text-[#Dd1764] hover:underline uppercase tracking-wide cursor-pointer"
+            >
               Forgot?
             </button>
           </div>
