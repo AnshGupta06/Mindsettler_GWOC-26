@@ -480,6 +480,21 @@ export default function BookPage() {
                                 <p className="text-xs text-[#3F2965]/50 italic leading-relaxed">
                                     💡 Not sure which therapy to choose? Start with a <strong>General Session</strong> - our therapist will help guide you to the right approach.
                                 </p>
+
+                                {therapyType && therapyType !== "general" && (() => {
+                                  const selectedTherapy = therapyApproaches.find(t => t.title === therapyType);
+                                  if (selectedTherapy) {
+                                    const modes = [];
+                                    if (selectedTherapy.availableOnline) modes.push("Online");
+                                    if (selectedTherapy.availableOffline) modes.push("Studio");
+                                    return (
+                                      <div className="p-3 mt-3 bg-blue-50 text-blue-700 text-xs font-medium rounded-lg border border-blue-100">
+                                        Available in: <strong>{modes.join(" & ")}</strong> mode{modes.length > 1 ? "s" : ""}
+                                      </div>
+                                    );
+                                  }
+                                  return null;
+                                })()}
                             </div>
                         </div>
                         </section>
@@ -595,30 +610,57 @@ export default function BookPage() {
                         {/* Filter Toggles */}
                         <div className="bg-white/60 rounded-2xl p-4 mb-6 border border-[#3F2965]/5">
                             <div className="flex flex-wrap gap-2">
-                            <button
-                                onClick={() => setSlotModeFilter("BOTH")}
-                                className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all ${
-                                slotModeFilter === "BOTH" ? "bg-[#3F2965] text-white shadow-md" : "bg-white text-[#3F2965] border border-[#3F2965]/10"
-                                }`}
-                            >
-                                <CalendarDays size={14} /> All Slots
-                            </button>
-                            <button
-                                onClick={() => setSlotModeFilter("ONLINE")}
-                                className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all ${
-                                slotModeFilter === "ONLINE" ? "bg-green-600 text-white shadow-md" : "bg-white text-green-700 border border-green-100"
-                                }`}
-                            >
-                                <Monitor size={14} /> Online
-                            </button>
-                            <button
-                                onClick={() => setSlotModeFilter("OFFLINE")}
-                                className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all ${
-                                slotModeFilter === "OFFLINE" ? "bg-blue-600 text-white shadow-md" : "bg-white text-blue-700 border border-blue-100"
-                                }`}
-                            >
-                                <Building2 size={14} /> Offline
-                            </button>
+                            {(() => {
+                              const selectedTherapy = therapyType && therapyType !== "general" 
+                                ? therapyApproaches.find(t => t.title === therapyType)
+                                : null;
+                              
+                              // Check if therapy has both modes available
+                              const hasBothModes = !selectedTherapy || (selectedTherapy.availableOnline && selectedTherapy.availableOffline);
+                              const hasOnlyOnline: boolean = selectedTherapy ? (selectedTherapy.availableOnline && !selectedTherapy.availableOffline) : false;
+                              const hasOnlyOffline: boolean = selectedTherapy ? (!selectedTherapy.availableOnline && selectedTherapy.availableOffline) : false;
+                              
+                              return (
+                                <>
+                                  {hasBothModes && (
+                                    <button
+                                        onClick={() => setSlotModeFilter("BOTH")}
+                                        className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all ${
+                                        slotModeFilter === "BOTH" ? "bg-[#3F2965] text-white shadow-md" : "bg-white text-[#3F2965] border border-[#3F2965]/10"
+                                        }`}
+                                    >
+                                        <CalendarDays size={14} /> All Slots
+                                    </button>
+                                  )}
+                                  <button
+                                      onClick={() => setSlotModeFilter("ONLINE")}
+                                      disabled={hasOnlyOffline}
+                                      className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all ${
+                                      slotModeFilter === "ONLINE" 
+                                        ? "bg-green-600 text-white shadow-md" 
+                                        : hasOnlyOffline 
+                                          ? "bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed" 
+                                          : "bg-white text-green-700 border border-green-100"
+                                      }`}
+                                  >
+                                      <Monitor size={14} /> Online
+                                  </button>
+                                  <button
+                                      onClick={() => setSlotModeFilter("OFFLINE")}
+                                      disabled={hasOnlyOnline}
+                                      className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all ${
+                                      slotModeFilter === "OFFLINE" 
+                                        ? "bg-blue-600 text-white shadow-md" 
+                                        : hasOnlyOnline 
+                                          ? "bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed" 
+                                          : "bg-white text-blue-700 border border-blue-100"
+                                      }`}
+                                  >
+                                      <Building2 size={14} /> Offline
+                                  </button>
+                                </>
+                              );
+                            })()}
                             </div>
                         </div>
 

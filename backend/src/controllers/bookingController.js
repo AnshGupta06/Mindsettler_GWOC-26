@@ -16,6 +16,20 @@ const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
 const BOOKING_COOLDOWN_MS = 2 * 60 * 1000; // 2 minutes between bookings
 const MAX_ACTIVE_BOOKINGS = 3;             // Max active bookings per user
 
+// --- THERAPY AVAILABILITY MAPPING ---
+// Maps therapy types to their online/offline availability
+const therapyAvailability = {
+  "Cognitive Behavioural Therapy (CBT)": { online: true, offline: true },
+  "Dialectical Behavioural Therapy (DBT)": { online: true, offline: true },
+  "Acceptance & Commitment Therapy (ACT)": { online: true, offline: true },
+  "Schema Therapy": { online: false, offline: true },
+  "Emotion-Focused Therapy (EFT)": { online: true, offline: true },
+  "Emotion-Focused Couples Therapy": { online: false, offline: true },
+  "Mindfulness-Based Cognitive Therapy (MBCT)": { online: true, offline: true },
+  "Client-Centred Therapy": { online: true, offline: false },
+  "Custom Therapy Plan": { online: true, offline: true },
+};
+
 // --- GET AVAILABLE SLOTS ---
 export const getSlots = async (req, res) => {
   try {
@@ -36,18 +50,30 @@ export const getSlots = async (req, res) => {
         { therapyType }, 
       ];
     } else {
-<<<<<<< HEAD
-      // For general sessions, only show slots not reserved for any specific therapy
-=======
       // If no type selected, show only general slots
->>>>>>> e7e4ee1c2d09fe045833dfa4b810fbebf3340122
       whereCondition.therapyType = null;
     }
 
-    const slots = await prisma.sessionSlot.findMany({
+    let slots = await prisma.sessionSlot.findMany({
       where: whereCondition,
       orderBy: { startTime: "asc" },
     });
+
+    // Filter slots based on therapy availability for specific modes
+    if (therapyType && therapyAvailability[therapyType]) {
+      const availability = therapyAvailability[therapyType];
+      slots = slots.filter(slot => {
+        // For general slots (therapyType: null), always include them
+        if (!slot.therapyType) return true;
+        
+        // For specific therapy slots, check if the mode is available for that therapy
+        if (slot.therapyType === therapyType) {
+          if (slot.mode === "ONLINE") return availability.online;
+          if (slot.mode === "OFFLINE") return availability.offline;
+        }
+        return true;
+      });
+    }
 
     res.json(slots);
   } catch (err) {
