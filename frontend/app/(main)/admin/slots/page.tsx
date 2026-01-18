@@ -227,7 +227,7 @@ export default function AdminSlotsPage() {
                   type="date"
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:border-[#Dd1764] text-sm font-medium text-[#3F2965] transition-all"
+                  className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:border-[#Dd1764] text-sm font-medium text-[#3F2965] transition-all min-h-[46px]"
                   required
                 />
               </div>
@@ -239,7 +239,7 @@ export default function AdminSlotsPage() {
                     type="time"
                     value={startTime}
                     onChange={(e) => setStartTime(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:border-[#Dd1764] text-sm font-medium text-[#3F2965] transition-all"
+                    className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:border-[#Dd1764] text-sm font-medium text-[#3F2965] transition-all min-h-[46px]"
                     required
                   />
                 </div>
@@ -249,7 +249,7 @@ export default function AdminSlotsPage() {
                     type="time"
                     value={endTime}
                     onChange={(e) => setEndTime(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:border-[#Dd1764] text-sm font-medium text-[#3F2965] transition-all"
+                    className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:border-[#Dd1764] text-sm font-medium text-[#3F2965] transition-all min-h-[46px]"
                     required
                   />
                 </div>
@@ -291,7 +291,7 @@ export default function AdminSlotsPage() {
                     </option>
                   ))}
                 </select>
-                <p className="text-[10px] text-gray-400 mt-1.5 ml-1 leading-tight">
+                <p className="text-[10px] text-gray-500 mt-1.5 ml-1 leading-tight">
                   Leaving this empty creates a general slot open for any therapy type.
                 </p>
               </div>
@@ -326,7 +326,7 @@ export default function AdminSlotsPage() {
                     type="date"
                     value={filterDate}
                     onChange={(e) => setFilterDate(e.target.value)}
-                    className="w-full sm:w-auto pl-9 pr-8 py-2 rounded-lg bg-gray-50 border border-gray-200 text-sm font-medium text-[#3F2965] focus:outline-none focus:border-[#Dd1764]/30 cursor-pointer"
+                    className="w-full sm:w-auto pl-9 pr-8 py-2 rounded-lg bg-gray-50 border border-gray-200 text-sm font-medium text-[#3F2965] focus:outline-none focus:border-[#Dd1764]/30 cursor-pointer min-h-[38px]"
                   />
                   {filterDate && (
                     <button 
@@ -423,7 +423,7 @@ export default function AdminSlotsPage() {
                           {!slot.isBooked ? (
                             <button
                               onClick={() => handleDelete(slot.id)}
-                              className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100"
+                              className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors opacity-100"
                               title="Delete Slot"
                             >
                               <Trash2 size={18} />

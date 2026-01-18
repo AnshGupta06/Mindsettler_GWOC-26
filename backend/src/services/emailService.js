@@ -219,7 +219,7 @@ export const sendBookingCancelledEmail = async (email, name, date, time) => {
     `<p>Hi ${name},</p>
      <p>Your session scheduled for <span class="highlight">${date}</span> at <span class="highlight">${time}</span> has been successfully cancelled as per your request.</p>
      <p>Please note that all cancellations and rescheduling are subject to our <a href="${process.env.NEXT_PUBLIC_APP_URL}/refund-policy" style="text-decoration: underline; font-weight: bold; color: #Dd1764;">Refund Policy</a>.</p>
-     <p>style="font-size: 13px; color: #666; font-style: italic;">(Note: Refunds are processed only if you have already paid online via UPI. Pay-at-session bookings do not require a refund.)</p>
+     <p style="font-size: 13px; color: #666; font-style: italic;">(Note: Refunds are processed only if you have already paid online via UPI. Pay-at-session bookings do not require a refund.)</p>
      <p>If you cancelled more than 24 hours in advance and wish to book a new slot, please visit the booking page.</p>`,
     `${process.env.NEXT_PUBLIC_APP_URL}/book`,
     "Book New Session"

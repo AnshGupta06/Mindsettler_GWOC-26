@@ -50,18 +50,20 @@ app.use(hpp());
 app.use(xss());
 
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
+  windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100,
-  message: { 
-    error: 'Too many requests from this IP, please try again in 15 minutes' 
-  },
   standardHeaders: true, 
-  legacyHeaders: false, 
+  legacyHeaders: false,
+  handler: (req, res) => {
+    res.status(429).json({
+      error: "TOO_MANY_REQUESTS",
+      message: "Too many requests from this IP. Please wait 15 minutes before trying again."
+    });
+  }
 });
 app.use('/api', limiter);
 
 app.use(express.json());
-
 
 app.use("/api/admin/", adminBookingRoutes);
 app.use("/api/settings", settingsRoutes);
@@ -74,6 +76,39 @@ app.use("/api/health", healthRoutes);
 
 app.get("/", (req, res) => {
   res.json({ message: "MindSettler backend running" });
+});
+
+app.use((req, res, next) => {
+  res.status(404).json({
+    error: "NOT_FOUND",
+    message: `API Endpoint '${req.originalUrl}' not found.`
+  });
+});
+
+app.use((err, req, res, next) => {
+  console.error("Server Error:", err);
+
+  if (err.message && err.message.includes('CORS')) {
+    return res.status(403).json({
+      error: "CORS_ERROR",
+      message: "Access denied by CORS policy."
+    });
+  }
+
+  if (err instanceof SyntaxError && 'body' in err) {
+    return res.status(400).json({
+      error: "BAD_REQUEST",
+      message: "Invalid JSON payload."
+    });
+  }
+
+  const statusCode = err.statusCode || 500;
+  const message = err.message || "Internal Server Error";
+
+  res.status(statusCode).json({
+    error: statusCode === 500 ? "SERVER_ERROR" : "REQUEST_FAILED",
+    message: message
+  });
 });
 
 export default app;

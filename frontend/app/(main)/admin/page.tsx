@@ -8,7 +8,7 @@ import { API_URL } from "@/app/lib/api";
 import toast from "react-hot-toast";
 import Loader from "../components/common/Loader";
 import { 
-  Calendar, Clock, User, CheckCircle, XCircle, 
+  Calendar, Clock, User, CheckCircle, 
   Video, X, Link as LinkIcon, ExternalLink,
   Phone, Mail, FileText, Save, Users, Heart,
   Filter, Search, LayoutDashboard, Award, Settings, ShieldAlert,
@@ -22,7 +22,8 @@ type Booking = {
   therapyType?: string;
   reason?: string;
   meetingLink?: string;
-  paymentType?: string; 
+  paymentType?: string;
+  
   clientName?: string;
   phone?: string;
   attendees?: number;
@@ -451,8 +452,29 @@ function BookingCard({ booking, onConfirm, onReject, onOpenNotes }: BookingCardP
   const date = new Date(booking.slot.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
   const time = `${new Date(booking.slot.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${new Date(booking.slot.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
 
+  const getMeetingState = () => {
+    if (booking.status !== "CONFIRMED" || booking.slot.mode !== "ONLINE" || !booking.meetingLink) return "hidden";
+    
+    const now = new Date();
+    const start = new Date(booking.slot.startTime);
+    const end = new Date(booking.slot.endTime);
+    
+    const showStart = new Date(start.getTime() - 30 * 60 * 1000); 
+    const showEnd = new Date(end.getTime() + 2 * 60 * 60 * 1000); 
+
+    if (now > showEnd) return "hidden";
+    
+    const activeStart = new Date(start.getTime() - 10 * 60 * 1000);
+    if (now >= activeStart && now <= end) return "active";
+    
+    return "future";
+  };
+  
+  const meetingState = getMeetingState();
+
   return (
     <div className="bg-white rounded-2xl border border-[#3F2965]/5 p-5 flex flex-col sm:flex-row gap-6 hover:shadow-lg hover:border-[#3F2965]/10 transition-all duration-300">
+      
       <div className="flex flex-row md:flex-col items-center justify-between md:justify-center bg-[#F9F6FF] text-[#3F2965] rounded-xl p-3 md:p-4 min-w-full md:min-w-[120px] text-center border border-[#3F2965]/5">
         <div className="flex flex-col md:items-center text-left md:text-center">
           <span className="text-[10px] font-bold uppercase opacity-60">Session</span>
@@ -515,7 +537,7 @@ function BookingCard({ booking, onConfirm, onReject, onOpenNotes }: BookingCardP
                             {booking.therapyType}
                         </span>
                     )}
-
+                    
                     {booking.paymentType && (
                          <div className="flex flex-col items-start gap-1">
                              <span className="text-[10px] font-bold bg-emerald-600 text-white px-2 py-0.5 rounded-md flex items-center gap-1">
@@ -536,9 +558,21 @@ function BookingCard({ booking, onConfirm, onReject, onOpenNotes }: BookingCardP
         </div>
 
         <div className="flex items-center justify-end gap-2 mt-auto pt-3 border-t border-[#3F2965]/5">
-            {booking.meetingLink && (
-                <a href={booking.meetingLink} target="_blank" rel="noopener noreferrer" className="p-2 text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors border border-blue-100" title="Join Meeting">
-                    <Video size={16} />
+            
+            {meetingState !== "hidden" && (
+                <a 
+                  href={booking.meetingLink} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+                     meetingState === "active" 
+                     ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20 animate-pulse hover:animate-none" 
+                     : "bg-blue-50 text-blue-600 border border-blue-100 hover:bg-blue-100"
+                  }`}
+                  title="Join Google Meet"
+                >
+                    <Video size={16} /> 
+                    {meetingState === "active" ? "Join Now" : "Meeting Link"}
                 </a>
             )}
             
