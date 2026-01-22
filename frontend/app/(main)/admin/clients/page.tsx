@@ -9,13 +9,12 @@ import {
   Users, Search, Mail, Phone, Calendar, 
   Edit2, Ban, CheckCircle, Save, X, ShieldAlert, Check, 
   ChevronDown, ChevronUp, Clock, MapPin, Filter, Send,
-  Heart, FileText, ArrowLeft, AlignLeft 
+  Heart, FileText, ArrowLeft, AlignLeft, AlertCircle 
 } from "lucide-react";
 import Loader from "../../components/common/Loader";
 import toast from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
 
-// --- Types ---
 
 type MeetingNotes = {
   id: string;
@@ -64,6 +63,7 @@ type Client = {
   email: string;
   name: string;
   phone: string;
+  emailVerified?: boolean; 
   totalBookings: number;
   lastSession: string | null;
   adminNotes: AdminNote[];
@@ -222,7 +222,6 @@ export default function AdminClientsPage() {
     <div className="min-h-screen bg-[#F9F6FF] pt-20 pb-12 px-4 sm:px-8">
       <div className="max-w-7xl mx-auto">
         
-        {/* --- Header & Back Button --- */}
         <div className="flex flex-col gap-6 mb-8 relative z-10">
           <div>
             <button 
@@ -237,10 +236,8 @@ export default function AdminClientsPage() {
             <p className="text-gray-500 mt-1">Manage users, view histories, and update notes.</p>
           </div>
 
-          {/* --- Filters Toolbar --- */}
           <div className="bg-white p-3 rounded-xl border border-gray-200 shadow-sm flex flex-col md:flex-row gap-4 items-center">
             
-            {/* Search */}
             <div className="relative w-full md:flex-1 group">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#Dd1764]" size={18} />
               <input 
@@ -251,7 +248,6 @@ export default function AdminClientsPage() {
               />
             </div>
 
-            {/* Filters */}
             <div className="flex gap-2 w-full md:w-auto">
                 <div className="relative flex-1 md:w-40 group">
                     <Filter size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#Dd1764]" />
@@ -282,7 +278,6 @@ export default function AdminClientsPage() {
           </div>
         </div>
 
-        {/* --- Client List --- */}
         <div className="space-y-4">
           {filteredClients.length === 0 ? (
              <div className="text-center py-24 bg-white rounded-xl border border-dashed border-gray-300">
@@ -308,7 +303,6 @@ export default function AdminClientsPage() {
             >
               <div className="p-4 lg:p-6 flex flex-col lg:flex-row gap-6 lg:items-start">
                 
-                {/* 1. Profile & Stats */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start gap-4 mb-6">
                     <div className={`w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold shrink-0 ${
@@ -317,9 +311,12 @@ export default function AdminClientsPage() {
                         {client.name?.charAt(0).toUpperCase() || "U"}
                     </div>
                     <div>
-                        <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                        <h3 className="text-lg font-bold text-gray-900 flex flex-wrap items-center gap-2">
                           {client.name || "Unknown"}
+                          
                           {client.isBlocked && <span className="bg-red-100 text-red-600 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider flex items-center gap-1"><ShieldAlert size={10} /> Blocked</span>}
+                          
+                         
                         </h3>
                         <div className="flex flex-col sm:flex-row gap-y-1 sm:gap-x-4 text-sm text-gray-500 mt-1">
                            <span className="flex items-center gap-1.5"><Mail size={14} className="text-gray-400"/> {client.email}</span>
@@ -328,7 +325,6 @@ export default function AdminClientsPage() {
                     </div>
                   </div>
                   
-                  {/* Stats Grid */}
                   <div className="grid grid-cols-2 gap-4">
                     <div className="p-3 bg-gray-50 border border-gray-100 rounded-lg">
                         <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Total Bookings</p>
@@ -343,7 +339,6 @@ export default function AdminClientsPage() {
                   </div>
                 </div>
 
-                {/* 2. Admin Notes (Responsive Fix) */}
                 <div className="lg:w-1/3 w-full bg-gray-50 p-4 rounded-xl border border-gray-100 flex flex-col min-h-[120px] lg:min-h-[160px]">
                     <div className="flex justify-between items-center mb-3">
                         <p className="text-xs font-bold text-gray-500 uppercase flex items-center gap-2"><Edit2 size={12} /> Admin Notes</p>
@@ -384,7 +379,6 @@ export default function AdminClientsPage() {
                     )}
                 </div>
 
-                {/* 3. Actions Toolbar */}
                 <div className="flex flex-col gap-2 lg:w-40 pt-4 lg:pt-0 border-t lg:border-t-0 lg:border-l border-gray-100 lg:pl-6">
                     <button 
                         onClick={() => toggleBlock(client)}
@@ -410,7 +404,6 @@ export default function AdminClientsPage() {
                 </div>
               </div>
 
-              {/* --- Booking History (Expandable) --- */}
               <AnimatePresence>
               {expandedId === client.id && (
                 <motion.div
@@ -449,7 +442,6 @@ export default function AdminClientsPage() {
                                             <span className="font-bold text-[#3F2965] bg-[#3F2965]/5 px-1.5 py-0.5 rounded">{booking.type}</span>
                                         </div>
 
-                                        {/* Attendees & Status Badges */}
                                         <div className="flex flex-wrap items-center gap-2 mt-2">
                                             {booking.attendees && booking.attendees > 1 && (
                                                 <span className="text-[10px] font-bold text-purple-700 flex items-center gap-1 bg-purple-50 px-2 py-0.5 rounded border border-purple-100">
@@ -463,7 +455,6 @@ export default function AdminClientsPage() {
                                             )}
                                         </div>
 
-                                        {/* Specific Contact Info (If different) */}
                                         {(booking.clientName || booking.phone) && (
                                             <div className="mt-2 pt-2 border-t border-gray-100 flex flex-wrap gap-4 text-[10px] text-gray-400 font-medium">
                                                 {booking.clientName && <span>User: {booking.clientName}</span>}
@@ -471,7 +462,6 @@ export default function AdminClientsPage() {
                                             </div>
                                         )}
 
-                                        {/* --- REASON FIELD DISPLAY --- */}
                                         {booking.reason && (
                                             <div className="mt-2 pt-2 border-t border-gray-100">
                                                 <span className="text-[10px] font-bold text-gray-400 uppercase flex items-center gap-1">
@@ -491,7 +481,6 @@ export default function AdminClientsPage() {
                                                 <button onClick={() => handleBookingStatus(booking.id, "REJECTED")} className="flex-1 px-3 py-1.5 bg-white border border-red-200 text-red-600 hover:bg-red-50 text-xs font-bold rounded transition-colors">Reject</button>
                                             </div>
                                         )}
-                                        {/* View Notes Button */}
                                         <button 
                                             onClick={() => handleViewNotes(booking)}
                                             className="flex items-center justify-center gap-1.5 px-3 py-1.5 bg-gray-50 hover:bg-gray-100 text-gray-600 text-xs font-bold rounded border border-gray-200 transition-colors"
@@ -513,7 +502,6 @@ export default function AdminClientsPage() {
         </div>
       </div>
 
-      {/* --- Report Modal --- */}
       {reportModal.isOpen && reportModal.client && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl max-w-md w-full p-6 shadow-xl">
@@ -543,7 +531,6 @@ export default function AdminClientsPage() {
         </div>
       )}
 
-      {/* --- View Notes Modal (Read Only) --- */}
       {viewNotesModal.isOpen && viewNotesModal.notes && (
           <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
             <div className="bg-white rounded-xl p-6 md:p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-xl">
@@ -558,7 +545,6 @@ export default function AdminClientsPage() {
                 </div>
 
                 <div className="space-y-6">
-                     {/* Summary */}
                     <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
                         <h4 className="text-xs font-bold text-gray-500 uppercase mb-2">Session Summary</h4>
                         <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">

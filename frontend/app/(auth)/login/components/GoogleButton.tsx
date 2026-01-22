@@ -15,7 +15,7 @@ export default function GoogleButton() {
   const handleGoogleLogin = async () => {
     if (isLoading) return; 
     
-    try {
+      try {
       const provider = new GoogleAuthProvider();
       provider.setCustomParameters({ prompt: "select_account" });
       

@@ -1,10 +1,12 @@
 import prisma from "../config/prisma.js";
 import { sendUserBlockedEmail, sendAdminReportEmail } from "../services/emailService.js";
 
-
 export const getAllClients = async (req, res) => {
   try {
     const users = await prisma.user.findMany({
+      where: {
+        emailVerified: true
+      },
       include: {
         bookings: {
           orderBy: { slot: { startTime: "desc" } }, 
@@ -18,7 +20,6 @@ export const getAllClients = async (req, res) => {
       orderBy: { createdAt: "desc" },
     });
 
-    
     const clients = users.map((user) => {
       const bookings = user.bookings || [];
       const totalBookings = bookings.length;
@@ -29,6 +30,7 @@ export const getAllClients = async (req, res) => {
         name: user.name || "N/A",
         email: user.email,
         phone: user.phone || "N/A",
+        emailVerified: user.emailVerified, 
         adminNotes: user.adminNotes || [],
         isBlocked: user.isBlocked || false,
         totalBookings,
@@ -44,13 +46,11 @@ export const getAllClients = async (req, res) => {
   }
 };
 
-
 export const updateClient = async (req, res) => {
   const { id } = req.params;
   const { adminNotes, isBlocked } = req.body;
 
   try {
-    
     const currentUser = await prisma.user.findUnique({
       where: { id },
       select: { name: true, email: true }
@@ -63,7 +63,6 @@ export const updateClient = async (req, res) => {
     const updateData = {};
     if (isBlocked !== undefined) updateData.isBlocked = isBlocked;
 
-    
     const updatedUser = await prisma.user.update({
       where: { id },
       data: updateData,
@@ -74,7 +73,6 @@ export const updateClient = async (req, res) => {
       },
     });
 
-    
     if (adminNotes && adminNotes.trim()) {
       await prisma.adminNote.create({
         data: {
@@ -84,7 +82,6 @@ export const updateClient = async (req, res) => {
         },
       });
 
-      
       const userWithNotes = await prisma.user.findUnique({
         where: { id },
         include: {
@@ -94,7 +91,6 @@ export const updateClient = async (req, res) => {
         },
       });
 
-      
       console.log(`📧 Sending new admin note as report to ${currentUser.email}...`);
       sendAdminReportEmail(currentUser.email, currentUser.name || "User", adminNotes.trim(), "Admin")
         .catch(err => console.error("❌ Failed to send notes update email:", err));
@@ -102,7 +98,6 @@ export const updateClient = async (req, res) => {
       return res.json({ success: true, user: userWithNotes });
     }
 
-    
     if (isBlocked === true) {
       console.log(`🔒 Blocking user ${currentUser.email}, sending email...`);
       sendUserBlockedEmail(currentUser.email, currentUser.name || "User")
@@ -115,7 +110,6 @@ export const updateClient = async (req, res) => {
     res.status(500).json({ error: "Failed to update client" });
   }
 };
-
 
 export const sendClientReport = async (req, res) => {
   const { id } = req.params;
@@ -135,10 +129,8 @@ export const sendClientReport = async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
 
-    
     await sendAdminReportEmail(user.email, user.name || "User", reportContent, adminName);
 
-    
     await prisma.adminNote.create({
       data: {
         userId: id,

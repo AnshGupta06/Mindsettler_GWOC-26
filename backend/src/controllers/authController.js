@@ -4,9 +4,8 @@ import { sendWelcomeEmail } from "../services/emailService.js";
 export const syncUser = async (req, res) => {
   try {
     const decoded = req.user; 
-    const { name, phone, sendWelcome } = req.body || {}; // ✅ Added sendWelcome flag
+    const { name, phone, sendWelcome } = req.body || {};
 
-    // Check for existing user before upsert
     const existingUser = await prisma.user.findUnique({
         where: { firebaseUid: decoded.uid }
     });
@@ -17,12 +16,14 @@ export const syncUser = async (req, res) => {
         email: decoded.email,
         name: name ?? undefined,
         phone: phone ?? undefined,
+        emailVerified: decoded.email_verified,
       },
       create: {
         firebaseUid: decoded.uid,
         email: decoded.email,
         name: name || decoded.name || "Friend",
         phone: phone ?? null,
+        emailVerified: decoded.email_verified || false,
       },
     });
 

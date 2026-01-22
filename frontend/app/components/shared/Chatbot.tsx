@@ -6,7 +6,10 @@ import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { ScrollArea } from '../../components/ui/scroll-area';
 import { cn } from '@/lib/utils';
-import { Bot, Loader, MessageSquare, Send, User, X } from 'lucide-react';
+import { 
+  Bot, Loader, MessageSquare, Send, User, X,
+  CalendarHeart, Phone, HeartHandshake, Library 
+} from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -14,6 +17,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 type Message = {
   role: 'user' | 'bot';
   content: string;
+  action?: string; // Added action property
 };
 
 export function Chatbot() {
@@ -27,12 +31,13 @@ export function Chatbot() {
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isRedirecting, setIsRedirecting] = useState(false); // New State
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
+  // 1. Auto-scroll Logic (Preserved)
   useEffect(() => {
     if (scrollAreaRef.current) {
-      
       const scrollContainer = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
       if (scrollContainer) {
         scrollContainer.scrollTo({
@@ -42,6 +47,44 @@ export function Chatbot() {
       }
     }
   }, [messages, isLoading]);
+
+  // 2. NEW: Automatic Redirection Logic
+  useEffect(() => {
+    const lastMsg = messages[messages.length - 1];
+    
+    // Check if the last message was from bot AND has a redirect command
+    if (lastMsg?.role === 'bot' && lastMsg.action?.startsWith('redirect_')) {
+      const action = lastMsg.action;
+      setIsRedirecting(true); // Hide buttons immediately
+
+      const timer = setTimeout(() => {
+        handleAction(action); 
+        setIsRedirecting(false); 
+      }, 1500); // 1.5s delay so user can read message
+
+      return () => clearTimeout(timer);
+    }
+  }, [messages]);
+
+  const handleAction = (action: string) => {
+    setIsOpen(false);
+    if (action.includes('booking')) router.push('/book');
+    else if (action.includes('contact')) router.push('/contact');
+    else if (action.includes('services')) router.push('/services');
+    else if (action.includes('resources')) router.push('/resource');
+  };
+
+  const getActionButton = (action: string) => {
+    if (action.includes('booking')) 
+      return { label: "Book a Session", icon: CalendarHeart, color: "bg-[#b8aaf3] hover:bg-[#a79bf0]" };
+    if (action.includes('contact')) 
+      return { label: "Contact Support", icon: Phone, color: "bg-[#3F2965] hover:bg-[#2F1D4B]" };
+    if (action.includes('services')) 
+      return { label: "View Services", icon: HeartHandshake, color: "bg-[#3F2965] hover:bg-[#2F1D4B]" };
+    if (action.includes('resources')) 
+      return { label: "Explore Resources", icon: Library, color: "bg-[#3F2965] hover:bg-[#2F1D4B]" };
+    return null;
+  };
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -60,27 +103,14 @@ export function Chatbot() {
           .slice(-10),
       });
 
+      // Updated to store action in the message object
       setMessages(prev => [
         ...prev,
-        { role: 'bot', content: result.response },
+        { role: 'bot', content: result.response, action: result.action },
       ]);
+      
+      // Removed old manual 'redirect_booking' check here because useEffect handles it now
 
-      if (result.action === 'redirect_booking') {
-        setTimeout(() => {
-          router.push('/book');
-          setIsOpen(false);
-        }, 700);
-      }
-
-      if (result.action === 'suggest_booking') {
-        setMessages(prev => [
-          ...prev,
-          {
-            role: 'bot',
-            content: '__BOOK_SESSION_BUTTON__',
-          },
-        ]);
-      }
     } catch (err) {
       setMessages(prev => [
         ...prev,
@@ -96,7 +126,6 @@ export function Chatbot() {
 
   return (
     <>
-      {}
       <motion.div
         initial={false}
         animate={{ scale: isOpen ? 0 : 1, opacity: isOpen ? 0 : 1 }}
@@ -114,7 +143,6 @@ export function Chatbot() {
       <AnimatePresence>
         {isOpen && (
           <>
-            {}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -123,7 +151,6 @@ export function Chatbot() {
               className="fixed inset-0 bg-black/10 backdrop-blur-[1px] z-[51]"
             />
 
-            {}
             <motion.div
               initial={{ opacity: 0, scale: 0.5, y: 100, x: 100, originX: 1, originY: 1 }}
               animate={{
@@ -131,12 +158,7 @@ export function Chatbot() {
                 scale: 1,
                 y: 0,
                 x: 0,
-                transition: {
-                  type: "spring",
-                  stiffness: 100,
-                  damping: 20,
-                  duration: 0.8
-                }
+                transition: { type: "spring", stiffness: 100, damping: 20, duration: 0.8 }
               }}
               exit={{
                 opacity: 0,
@@ -145,7 +167,6 @@ export function Chatbot() {
               }}
               className="ms-chatbot-sheet fixed bottom-6 right-6 z-[52] flex flex-col w-[380px] max-w-[calc(100vw-3rem)] h-[600px] max-h-[calc(100vh-6rem)] bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border border-none"
             >
-              {}
               <div className="ms-chatbot-header p-6 pb-4 relative pr-12">
                 <Button
                   variant="ghost"
@@ -161,7 +182,6 @@ export function Chatbot() {
                 </p>
               </div>
 
-              {}
               <div className="flex-1 overflow-hidden">
                 <ScrollArea className="h-full" ref={scrollAreaRef}>
                   <div className="space-y-6 p-4">
@@ -183,32 +203,40 @@ export function Chatbot() {
                           </AvatarFallback>
                         </Avatar>
 
-                        <div
-                          className={cn(
-                            'ms-chatbot-message max-w-[80%] rounded-lg p-3 text-sm',
-                            message.role === 'user'
-                              ? 'ms-chatbot-user'
-                              : 'ms-chatbot-bot'
-                          )}
-                        >
-                          {message.content === '__BOOK_SESSION_BUTTON__' ? (
-                            <Button
-                              className="mt-2 w-fit bg-[#b8aaf3] text-white hover:bg-[#a79bf0]"
-                              onClick={() => {
-                                router.push('/book');
-                                setIsOpen(false);
-                              }}
-                            >
-                              Book a session with MindSettler
-                            </Button>
-                          ) : (
-                            message.content
+                        <div className="flex flex-col gap-2 max-w-[80%]">
+                          <div
+                            className={cn(
+                              'ms-chatbot-message rounded-lg p-3 text-sm',
+                              message.role === 'user' ? 'ms-chatbot-user' : 'ms-chatbot-bot'
+                            )}
+                          >
+                            {message.content}
+                          </div>
+
+                          {/* NEW: Render Dynamic Action Buttons */}
+                          {/* Only show if NOT actively redirecting AND message has an action */}
+                          {!isRedirecting && message.role === 'bot' && message.action && message.action !== 'none' && (
+                            (() => {
+                                const btn = getActionButton(message.action);
+                                if (!btn) return null;
+                                return (
+                                    <Button
+                                        size="sm"
+                                        onClick={() => handleAction(message.action!)}
+                                        className={cn(
+                                          "flex items-center gap-2 text-white shadow-sm transition-all w-fit ml-1",
+                                          btn.color
+                                        )}
+                                    >
+                                        {btn.label} <btn.icon size={14} />
+                                    </Button>
+                                );
+                            })()
                           )}
                         </div>
                       </div>
                     ))}
 
-                    {}
                     {isLoading && (
                       <div className="flex flex-col gap-1 pl-12">
                         <div className="text-xs text-muted-foreground italic">
@@ -221,7 +249,6 @@ export function Chatbot() {
                               <Bot className="h-5 w-5" />
                             </AvatarFallback>
                           </Avatar>
-
                           <div className="ms-chatbot-bot rounded-lg p-3">
                             <Loader className="ms-chatbot-loader h-5 w-5 animate-spin" />
                           </div>
@@ -232,7 +259,6 @@ export function Chatbot() {
                 </ScrollArea>
               </div>
 
-              {}
               <form
                 onSubmit={handleSendMessage}
                 className="flex items-center gap-2 border-t p-4 bg-white"

@@ -54,7 +54,7 @@ export default function SignupForm() {
     }
 
     setLoading(true);
-    const toastId = toast.loading("Creating account...");
+    const toastId = toast.loading("Sending Verification Email...");
 
     try {
       const cred = await createUserWithEmailAndPassword(auth, email, password);
@@ -74,7 +74,7 @@ export default function SignupForm() {
 
       await sendEmailVerification(cred.user);
       
-      toast.success("Account created!", { id: toastId });
+      toast.success("Email Sent!", { id: toastId });
       setInfo(true);
 
       const interval = setInterval(async () => {
