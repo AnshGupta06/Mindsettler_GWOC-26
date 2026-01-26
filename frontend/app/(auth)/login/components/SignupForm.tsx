@@ -69,7 +69,7 @@ export default function SignupForm() {
         }));
         return; 
       }
-      toast.loading("Creating account...", { id: toastId });
+      toast.loading("Sending Verification Email...", { id: toastId });
       const cred = await createUserWithEmailAndPassword(auth, email, password);
       
       await updateProfile(cred.user, {
