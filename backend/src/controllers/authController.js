@@ -52,3 +52,47 @@ export async function getMe(req, res) {
     res.status(500).json({ error: "Failed to fetch profile" });
   }
 }
+export const verifyEmail = async (req, res) => {
+  try {
+    const { email } = req.query;
+
+    if (!email) {
+      return res.status(400).json({ error: "Email is required" });
+    }
+
+    const response = await fetch(
+      `https://emailreputation.abstractapi.com/v1/?api_key=${process.env.ABSTRACT_API_KEY}&email=${email}`
+    );
+    
+    const data = await response.json();
+    const isDisposable = data.is_disposable_email || data.email_quality?.is_disposable;
+    
+    if (isDisposable === true) {
+       return res.status(400).json({ 
+         error: "INVALID_EMAIL",
+         message: "Temporary/Disposable email addresses are not allowed."
+       });
+    }
+
+    const rawStatus = data.deliverability || data.email_deliverability?.status;
+    const status = rawStatus ? rawStatus.toUpperCase() : "UNKNOWN";
+
+    if (status === "UNDELIVERABLE") {
+       return res.status(400).json({ 
+         error: "INVALID_EMAIL",
+         message: "This email address appears to be invalid or does not exist."
+       });
+    }
+
+     if (data.email_risk?.address_risk_status === "high") {
+        return res.status(400).json({ error: "INVALID_EMAIL", message: "This email was flagged as high risk." });
+    } 
+   
+
+    res.json({ success: true, data });
+
+  } catch (err) {
+    console.error("❌ Email verification error:", err);
+    res.json({ success: true }); 
+  }
+};

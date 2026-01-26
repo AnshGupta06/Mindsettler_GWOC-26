@@ -54,9 +54,22 @@ export default function SignupForm() {
     }
 
     setLoading(true);
-    const toastId = toast.loading("Sending Verification Email...");
+    const toastId = toast.loading("Verifying email...");
 
     try {
+      const verifyRes = await fetch(`${API_URL}/api/auth/verify-email?email=${encodeURIComponent(email)}`);
+      const verifyData = await verifyRes.json();
+
+      if (!verifyRes.ok || verifyData.error === "INVALID_EMAIL") {
+        setLoading(false);
+        toast.dismiss(toastId);
+        setErrors((prev) => ({ 
+            ...prev, 
+            email: verifyData.message || "Invalid or undeliverable email address." 
+        }));
+        return; 
+      }
+      toast.loading("Creating account...", { id: toastId });
       const cred = await createUserWithEmailAndPassword(auth, email, password);
       
       await updateProfile(cred.user, {
