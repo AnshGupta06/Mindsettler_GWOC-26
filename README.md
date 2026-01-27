@@ -65,7 +65,7 @@ Each member brings unique skills to make MindSettler fast, smart, and reliable.
 
 | 👨‍💻 Developer | 🔗 Profile |
 |---------------|-----------|
-| **Siddharth Shah** | [GitHub](https://github.com/siddharth251206) |
+| **Siddharth Sheth** | [GitHub](https://github.com/siddharth251206) |
 | **Ansh Gupta** | [GitHub](https://github.com/AnshGupta06) |
 | **Suraj Shah** | [GitHub](https://github.com/Suraj31shah) |
 | **Pratham Patadiya** | [GitHub](https://github.com/Pratham722007) |
