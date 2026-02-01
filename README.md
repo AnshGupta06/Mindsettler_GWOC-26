@@ -1,9 +1,7 @@
----
 # MindSettler
 
 <div align="center">
 <Image src="frontend/public/assets/white-logo.webp" alt="Mindsettler Logo" width={100} height={100}  />
-
 
 [![Live Demo](https://img.shields.io/badge/🌐_Live_Demo-mindsettler--bypb.vercel.app-orange?style=for-the-badge)](https://mindsettler-bypb.vercel.app/)
 [![License](https://img.shields.io/badge/📄_License-MIT-blue?style=for-the-badge)](./LICENSE)
@@ -12,32 +10,54 @@
 
 ---
 
+## 🚀 Performance & Visibility
+
+MindSettler demonstrates real-world visibility and performance beyond a typical academic or prototype project.
+
+- **100/100 Google Lighthouse SEO score**, reflecting strong semantic structure and metadata optimization  
+- **200+ organic impressions within the first week of deployment**
+- **Approximately 80%+ Click-Through Rate (CTR)**, indicating high relevance in search results
+- Ranked **#1 on Google Search** for the keyword *“MindSettler”*
+- **Indexed and referenced by Google AI (Search Generative Experience)**, where Google AI uses MindSettler to answer platform-related queries in AI Mode
+
+---
+
 ## 🌟 Overview
 
-**MindSettler** is an online psycho-education and mental well-being platform that helps individuals understand their mental health and navigate life challenges through structured 
-online/offline sessions. Built with a modern **Next.js** frontend and a robust **Express.js** backend.
+**MindSettler** is an online psycho-education and mental well-being platform designed to help individuals understand their mental health and navigate life challenges through structured **online and offline therapy sessions**.  
+
+The platform is built using a modern **Next.js** frontend and a robust **Express.js** backend, with a strong focus on scalability, security, and user trust.
 
 ---
 
 ## ✨ Key Features
 
-### 🤖 **AI-Powered Chatbot**
-- **Personalized Insights**: Leveraging **Gemini AI** to analyze user inputs and offer tailored wellness advice.
-- **Resource Recommendation**: Context-aware suggestions for articles, exercises, and professional help.
+### 🤖 AI-Powered Chatbot & Automation
+- **Guidance, Not Replacement**: The AI chatbot is explicitly designed **not to replace professional therapy**. It does not attempt to resolve clinical issues or eliminate the need for therapist-led sessions.
+- **Context-Aware Interaction**: Powered by **Google Gemini AI**, the chatbot analyzes user inputs across multiple turns to understand intent and context, and to present relevant options available within the platform.
+- **Intent Recognition & Escalation**: Identifies user intent such as information-seeking, uncertainty, emotional discomfort, or the need for professional help, and **actively guides users toward booking therapy sessions** when human intervention is appropriate.
+- **Decision Support, Not Treatment**: The chatbot helps users articulate concerns and understand next steps, but **does not provide diagnosis, treatment, or therapeutic intervention**.
+- **Supplementary Resources Only**: Recommends articles and self-help material strictly as **supporting information**, not as substitutes for therapy.
+- **Safety-First AI Logic**: Dedicated AI flows monitor for crisis or self-harm indicators and immediately surface helpline resources and professional support pathways.
+> The chatbot acts as a **first-touch companion and decision aid**, guiding users toward awareness and appropriate care — not as an alternative to therapy.
 
-### 🛡️ **Secure & Private**
-- **Authentication**: Enterprise-grade security using **Firebase Auth** for reliable identity management.
-- **Role-Based Access**: Distinct portals for Users, Therapists, and Admins.
+### 🛡️ Secure & Private by Design
+- **Enterprise-Grade Authentication**: Implemented using **Firebase Authentication**, supporting secure Email/Password flows and Google Sign-In with JWT-based session verification.
+- **Role-Based Access Control (RBAC)**: Clearly defined and enforced access layers for **Users**, **Therapists**, and **Administrators**, ensuring strict data isolation and controlled privilege boundaries.
+- **Fraud & Fake Account Prevention**: Integrated **Abstract API** to detect and block disposable or temporary email domains (e.g., temp-mail services) in real time during user registration.
+- **Request & Data Protection**: Platform hardening through **Helmet security headers**, **rate limiting**, and **strict CORS policies** to mitigate XSS attacks, abuse, and unauthorized access.
+- **Privacy-Centric Design**: Sensitive data such as session details and clinical notes are accessible only to authorized roles, reinforcing user trust and confidentiality.
 
-### 👥 **Community & Connection**
-- **Interactive Resources**: Engaging content powered by **Framer Motion** and **GSAP** animations for a calming user experience.
-- **Real-time Awareness**: Dynamic educational sections to spread mental health literacy.
-- **Contact & Support**: Integrated **EmailJs** and **Brevo** for seamless communication with support teams or professionals.
+### 👥 Community, Awareness & Communication
+- **Interactive Psycho-Education**: Educational content enhanced with **Framer Motion** and **GSAP** animations to maintain engagement while preserving a calm, non-intrusive user experience.
+- **Real-Time Awareness Hub**: Dynamically updated sections focused on mental health literacy, symptoms, coping mechanisms, and evidence-based insights.
+- **Seamless Communication**: Integrated **EmailJS** and **Brevo** for reliable transactional communication, including onboarding messages, booking confirmations, and support notifications.
 
-### ⚡ **Modern Performance**
-- **Responsive Design**: Mobile-first architecture using **Tailwind CSS**.
-- **Optimized Routing**: Next.js App Router for server-side rendering and fast page loads.
-- **Type Safety**: Full **TypeScript** integration across the stack for reliability.
+### ⚡ Performance, Reliability & Developer Experience
+- **Modern Frontend Architecture**: Built on **Next.js 16 (App Router)** with server-side rendering for fast initial loads and strong SEO performance.
+- **Fully Responsive Design**: Mobile-first implementation using **Tailwind CSS**, optimized for mobile, tablet, and desktop layouts.
+- **Type-Safe Codebase**: End-to-end **TypeScript** usage across frontend and backend improves maintainability, reduces runtime errors, and enables safer refactoring.
+- **Optimized Routing & Transitions**: Efficient page transitions and routing logic ensure a smooth, application-like user experience.
 
 ---
 
@@ -48,20 +68,21 @@ online/offline sessions. Built with a modern **Next.js** frontend and a robust *
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS 4, Radix UI Primitives
 - **Animations**: Framer Motion 12, GSAP 3
-- **State/Forms**: React Hook Form, Zod Validation
+- **State & Forms**: React Hook Form with Zod validation
 - **Icons**: Lucide React
 
 ### **Backend**
-- **Runtime**: Node.js & Express 5
+- **Runtime**: Node.js with Express 5
 - **Database**: PostgreSQL (via Prisma ORM)
-- **AI Chatbot**: Gemini AI
-- **Services**: Firebase Admin (Auth), Brevo & EmailJs (Email) , Supabase ( Database)
-- **Security**: Helmet, Rate-Limit, CORS
+- **AI Integration**: Gemini AI
+- **Services**: Firebase Admin (Authentication), Brevo & EmailJS (Email), Supabase (Database)
+- **Security**: Helmet, Rate Limiting, CORS
+
+---
 
 ## 👥 Team FrostByte
 
-Built by a team of developers who love **Coding and Web Development** .
-Each member brings unique skills to make MindSettler fast, smart, and reliable.
+MindSettler is built by **Team FrostByte**, a group of developers passionate about building reliable, scalable, and user-focused web platforms.
 
 | 👨‍💻 Developer | 🔗 Profile |
 |---------------|-----------|
@@ -70,7 +91,9 @@ Each member brings unique skills to make MindSettler fast, smart, and reliable.
 | **Suraj Shah** | [GitHub](https://github.com/Suraj31shah) |
 | **Pratham Patadiya** | [GitHub](https://github.com/Pratham722007) |
 
-## 📈 Process flow diagram 
+---
+
+## 📈 Process Flow Diagram
 
 ```mermaid
 graph TB
